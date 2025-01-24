@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @font-face {
 	src: url(./fonts/Lexend-VariableFont_wght.ttf) format("truetype");
@@ -7,10 +9,6 @@
 		font-weight: <weight>;
 		font-style: normal;
 	font-display: swap
-}
-
-@theme {
-  --font-sans: "Lexend", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 /* width */
@@ -200,6 +198,8 @@ button:target {
 }
 
 .intro > button {
+	background: #222222c0;
+	border: 1px solid #fff;
 	left: 60px;
 	color: #fff;
 	padding: 10px 20px;
@@ -225,7 +225,6 @@ button:target {
 
 .intro > button:hover {
 	background-color: #fff;
-	box-shadow: var(--shadow-elevation-high);
 	color: #000;
 }
 
