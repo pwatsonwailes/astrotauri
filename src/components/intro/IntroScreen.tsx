@@ -1,31 +1,27 @@
 import React, { useState } from 'react';
 import { CharacterSelect } from '../character/CharacterSelect';
 import { CharacterArchetype } from '../../types/character';
-import { Settings } from 'lucide-react';
 import { SettingsPanel } from '../menu/SettingsPanel';
 import { useTranslation } from '../../hooks/useTranslation';
 
-import { GameState } from '../../types/game';
-import { StoryState } from '../../types/story';
+import { useGameStore } from '../../stores/useGameStore';
+import { useStoryStore } from '../../stores/useStoryStore';
 
 import images from '../../data/images';
 
 interface IntroScreenProps {
   onStartGame: (loadGame: boolean, character?: CharacterArchetype) => void;
-  gameState: GameState;
-  storyState: StoryState;
   closeMenu: () => void;
 }
 
 export const IntroScreen: React.FC<IntroScreenProps> = ({ 
   onStartGame, 
-  gameState, 
-  storyState,
   closeMenu 
 }) => {
   const [showCharacterSelect, setShowCharacterSelect] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const gameInProgress = gameState || storyState;
+
+  const gameInProgress = useGameStore.getState() || useStoryStore.getState();
   const { t } = useTranslation();
 
   const handleGameStart = (loadGame: boolean) => {

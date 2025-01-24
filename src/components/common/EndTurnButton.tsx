@@ -1,6 +1,5 @@
 import React from 'react';
 import { RotateCw } from 'lucide-react';
-import { useGameStore } from '../../stores/useGameStore';
 import { useEventStore } from '../../stores/useEventStore';
 
 interface EndTurnButtonProps {
@@ -9,13 +8,11 @@ interface EndTurnButtonProps {
 
 export const EndTurnButton: React.FC<EndTurnButtonProps> = ({ onEndTurn }) => {
   const { events } = useEventStore();
+  console.log(events)
 
   // Check if any housing completion event exists in the event log
   const hasCompletedHousing = events.some(
-    event => 
-      event.type === 'success' && 
-      event.message.includes('Goal completed') &&
-      event.message.includes('Find Accommodation')
+    event => event.type === 'success' && event.message.includes('Find Accommodation')
   );
 
   if (!hasCompletedHousing) {

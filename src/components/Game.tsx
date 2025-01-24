@@ -71,6 +71,10 @@ export function Game() {
   useEffect(() => {
     setTrack('titles');
     setVolume(50);
+
+    useGameStore.getState()
+    useStoryStore.getState()
+    useEventStore.getState()
   }, []);
 
   useEffect(() => {
@@ -133,8 +137,6 @@ export function Game() {
     return (
       <IntroScreen
         onStartGame={handleIntroButton}
-        gameState={useGameStore.getState()}
-        storyState={useStoryStore.getState()}
         closeMenu={closeMenu}
       />
     );

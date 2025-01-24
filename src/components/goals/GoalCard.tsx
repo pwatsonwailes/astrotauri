@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Goal } from '../../types/goals';
-import { EnergyBar } from './EnergyBar';
+import { RadialProgressBar } from '../common/RadialProgressBar';
 import { Clock, Timer } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 
@@ -8,7 +8,7 @@ interface GoalCardProps {
   goal: Goal;
   selected: boolean;
   onClick: () => void;
-  onActivate: () => void;
+  onActivate: (id: string) => void;
   onInvest: (amount: number) => void;
   maxEnergy: number;
 }
@@ -23,7 +23,7 @@ export const GoalCard: React.FC<GoalCardProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const renderTimer = (text) => {
+  const renderTimer = (text: string) => {
     return (
       <div className={`flex items-center gap-2 text-sm mb-4 ${goal.status === 'available' ? `text-gray-500` : `text-green-600`}`}>
         <Timer className="w-4 h-4 text-inherit" />
@@ -70,8 +70,8 @@ export const GoalCard: React.FC<GoalCardProps> = ({
       <div className="p-4">
         {timerText !== '' && renderTimer(timerText)}
 
-        {showControls && energyRequirement && energyRequirement.amount > 0 && energyRequirement.amount !== Infinity && (
-          <EnergyBar
+        {showControls && energyRequirement && remaining > 0 && energyRequirement.amount !== Infinity && (
+          <RadialProgressBar
             invested={invested}
             required={amount}
             maxInvestment={maxInvestment}
@@ -80,7 +80,7 @@ export const GoalCard: React.FC<GoalCardProps> = ({
         )}
 
         {isInvestmentComplete && isProcessing && (
-          <div className="p-4 bg-gray-700 rounded-lg">
+          <div className="py-4 ">
             <div className="flex items-center gap-2 text-gray-600">
               <Clock className="w-5 h-5 text-blue-400" />
               Processing... {goal.progress.completionTimer} turns remaining

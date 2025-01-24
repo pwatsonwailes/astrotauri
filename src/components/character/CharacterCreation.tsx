@@ -79,10 +79,10 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({ setCurrent
                     type="button"
                     onClick={() => setPronouns(option)}
                     className={`
-                      px-4 py-2 text-sm font-normal
+                      px-4 py-2 text-sm font-normal convex
                       ${pronouns === option
-                        ? 'bg-amber-500 text-white'
-                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        ? 'rowdy text-white'
+                        : 'slate text-gray-300 hover:lake'
                       }
                     `}
                   >
