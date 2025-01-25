@@ -63,7 +63,7 @@ export const LOCATIONS: { [key: string]: Location } = {
             description: 'Introduce yourself to the ship\'s crew members.',
             type: 'parentGoal',
             requirements: [{ type: 'energy', amount: 2 }],
-            rewards: { credits: 100 },
+            rewards: { reputation: 10 },
             source: 'location',
             repeatable: false,
             timeLimit: Infinity,

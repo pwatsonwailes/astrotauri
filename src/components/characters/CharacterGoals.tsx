@@ -22,14 +22,14 @@ export const CharacterGoals: React.FC<CharacterGoalsProps> = ({
   if (availableGoals.length === 0) {
     return (
       <div className="text-center text-gray-400 py-4">
-        No available goals
+        No available actions
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-white">Available Goals</h3>
+      <h3 className="text-lg font-semibold text-white">Available Actions</h3>
       <div className="space-y-4">
         {availableGoals.map(goal => (
           <GoalCard

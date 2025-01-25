@@ -7,7 +7,7 @@ import { SubLocation } from '../../types/locations';
 import { LocationCard } from '../locations/LocationCard';
 import { LocationDetails } from '../locations/LocationDetails';
 import { NPCList } from '../locations/NPCList';
-import { GoalList } from '../locations/GoalList';
+import { GoalsList } from '../goals/GoalsList';
 import { TravelStatus } from '../locations/TravelStatus';
 import { TravelOptions } from '../locations/TravelOptions';
 import { LOCATIONS } from '../../data/locations';
@@ -104,7 +104,7 @@ export const LocationsView: React.FC = () => {
             className={`
               flex items-center gap-2 px-4 py-2
               ${activeTab === 'details'
-                ? 'text-amber-400'
+                ? 'text-amber-600'
                 : 'text-gray-600 hover:text-sky-400'
               }
             `}
@@ -118,7 +118,7 @@ export const LocationsView: React.FC = () => {
             className={`
               flex items-center gap-2 px-4 py-2
               ${activeTab === 'npcs'
-                ? 'text-amber-400'
+                ? 'text-amber-600'
                 : 'text-gray-600 hover:text-sky-400'
               }
             `}
@@ -132,13 +132,13 @@ export const LocationsView: React.FC = () => {
             className={`
               flex items-center gap-2 px-4 py-2
               ${activeTab === 'goals'
-                ? 'text-amber-400'
+                ? 'text-amber-600'
                 : 'text-gray-600 hover:text-sky-400'
               }
             `}
           >
             <Target className="w-4 h-4" />
-            Goals
+            Actions
           </button>
 
           {currentLocationData.availableDestinations && (
@@ -174,7 +174,7 @@ export const LocationsView: React.FC = () => {
         )}
         
         {activeTab === 'goals' && (
-          <GoalList
+          <GoalsList
             goals={updatedGoals}
             onSelectGoal={setSelectedGoalId}
             selectedGoalId={selectedGoalId}

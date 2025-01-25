@@ -58,7 +58,7 @@ export const fr = {
     rewards: 'Récompenses',
     accept: 'ACCEPTER',
     invest: 'Investir',
-    no_goals: 'Aucun objectif disponible'
+    no_goals: 'Aucun activités disponible'
   },
   tutorial: {
     skip: 'Passer le tutoriel',

@@ -49,7 +49,7 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({ setCurrent
                 id="firstName"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className="w-full bg-transparent placeholder:text-slate-400 text-gray-700 text-base border border-slate-600 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-amber-400 hover:border-sky-400 focus:shadow"
+                className="w-full bg-transparent placeholder:text-slate-400 text-gray-700 text-base border border-slate-600 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-amber-600 hover:border-sky-400 focus:shadow"
                 required
               />
             </div>
@@ -63,7 +63,7 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({ setCurrent
                 id="lastName"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className="w-full bg-transparent placeholder:text-slate-400 text-base border border-slate-600 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-amber-400 hover:border-sky-400 focus:shadow"
+                className="w-full bg-transparent placeholder:text-slate-400 text-base border border-slate-600 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-amber-600 hover:border-sky-400 focus:shadow"
                 required
               />
             </div>

@@ -91,7 +91,7 @@ button:target {
 }
 
 .prose code {
-	@apply bg-gray-800 px-1 py-0.5 rounded text-amber-400;
+	@apply bg-gray-800 px-1 py-0.5 rounded text-amber-600;
 }
 
 .navbar {
@@ -117,7 +117,7 @@ button:target {
 .creamyBgLighter { background: #fbfbf8 }
 
 .shadowButton {
-	box-shadow:	5px 5px 14px #9fa3a8,
+	box-shadow:	5px 5px 14px #b9b9b3,
 							 -5px -5px 14px #fdffff;
 }
 
@@ -129,22 +129,16 @@ button:target {
 
 .promontory.slate {
 	background: #343a40;
-	box-shadow:	5px 5px 14px #9fa3a8,
-							 -5px -5px 14px #fdffff;
 }
 
 .convex:hover,
 .concave {
 	background: linear-gradient(145deg, #ddddd7, #ffffff);
-	box-shadow:	5px 5px 14px #b9b9b3,
-							 -5px -5px 14px #ffffff;
 }
 
 .convex.rowdy:hover,
 .concave.rowdy {
 	background: linear-gradient(145deg, #ea580c, #f97316);
-	box-shadow:	5px 5px 14px #b9b9b3,
-							 -5px -5px 14px #ffffff;
 }
 
 .convex {
@@ -153,33 +147,22 @@ button:target {
 							 -5px -5px 14px #ffffff;
 }
 
-.convex.rowdy,
-.convex.hover\:rowdy:hover {
-	background: linear-gradient(145deg, #f97316, #ea580c);
-	box-shadow:	5px 5px 14px #b9b9b3,
-							 -5px -5px 14px #ffffff;
+.convex.noShadow {
+	background: linear-gradient(145deg, #ffffff, #ddddd7);
+	box-shadow:	none;
 }
+
+.convex.rowdy,
+.convex.hover\:rowdy:hover { background: linear-gradient(145deg, #f97316, #ea580c); }
 
 .convex.lake,
-.convex.hover\:lake:hover {
-	background: linear-gradient(145deg, #38bdf8, #0ea5e9);
-	box-shadow:	5px 5px 14px #b9b9b3,
-							 -5px -5px 14px #ffffff;
-}
+.convex.hover\:lake:hover { background: linear-gradient(145deg, #38bdf8, #0ea5e9); }
 
 .convex.slate,
-.convex.hover\:slate:hover {
-	background: linear-gradient(145deg, #495057, #343a40);
-	box-shadow:	5px 5px 14px #b9b9b3,
-							 -5px -5px 14px #ffffff;
-}
+.convex.hover\:slate:hover { background: linear-gradient(145deg, #495057, #343a40); }
 
 .convex.rose,
-.convex.hover\:rose:hover {
-	background: linear-gradient(145deg, #fb7185, #f43f5e);
-	box-shadow:	5px 5px 14px #b9b9b3,
-							 -5px -5px 14px #ffffff;
-}
+.convex.hover\:rose:hover { background: linear-gradient(145deg, #fb7185, #f43f5e); }
 
 .depressed {
 	background: #fbfbf8;
@@ -234,6 +217,15 @@ button:target {
 .intro > button:hover {
 	background-color: #fff;
 	color: #000;
+}
+
+.locationName h3 {
+	color: #333;
+}
+
+.locationName:hover h3,
+.locationName.selected h3 {
+	color: #fff;
 }
 
 .textpanel {

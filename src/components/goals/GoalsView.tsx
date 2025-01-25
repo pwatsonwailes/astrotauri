@@ -34,10 +34,10 @@ export const GoalsView: React.FC = () => {
         <GoalsList
           goals={goals}
           onSelectGoal={setSelectedGoalId}
-          onInvestInGoal={investInGoal}
           selectedGoalId={selectedGoalId}
-          energy={energyPoints}
           onActivateGoal={activateGoal}
+          onInvestInGoal={investInGoal}
+          energy={energyPoints}
         />
       </div>
       

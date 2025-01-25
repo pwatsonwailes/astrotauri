@@ -11,8 +11,6 @@ interface GoalsListProps {
   energy: number;
 }
 
-type GoalsTab = 'available' | 'active';
-
 export const GoalsList: React.FC<GoalsListProps> = ({
   goals,
   onSelectGoal,

@@ -37,7 +37,7 @@ export const GoalDetails: React.FC<GoalDetailsProps> = ({
         {onBack && (
           <button
             onClick={onBack}
-            className="p-1 text-gray-600 hover:text-amber-400 transition-colors"
+            className="p-1 text-gray-600 hover:text-amber-600 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -45,7 +45,7 @@ export const GoalDetails: React.FC<GoalDetailsProps> = ({
         {!onBack && (
           <button
             onClick={onClose}
-            className="p-1 text-gray-600 hover:text-amber-400 transition-colors"
+            className="p-1 text-gray-600 hover:text-amber-600 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -71,7 +71,7 @@ export const GoalDetails: React.FC<GoalDetailsProps> = ({
             {filteredRequirements.map((req, index) => {
               return (
                 <div key={index} className="flex items-center text-gray-600">
-                  <ChevronRight className="w-4 h-4 text-amber-400 mr-2" />
+                  <ChevronRight className="w-4 h-4 text-amber-600 mr-2" />
                   {req.amount} {req.type}
                 </div>
               )
@@ -87,7 +87,7 @@ export const GoalDetails: React.FC<GoalDetailsProps> = ({
             {Object.entries(goal.rewards).map(([key, value]) => (
               value && (
                 <div key={key} className="flex items-center text-gray-600">
-                  <ChevronRight className="w-4 h-4 text-amber-400 mr-2" />
+                  <ChevronRight className="w-4 h-4 text-amber-600 mr-2" />
                   {value} {key}
                 </div>
               )

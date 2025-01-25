@@ -17,9 +17,9 @@ export const FactionGoals: React.FC<FactionGoalsProps> = ({ faction }) => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Available Goals</h3>
+        <h3 className="text-lg font-medium">Available Actions</h3>
         <div className="text-base text-gray-400">
-          {factionGoals.length} goals available
+          {factionGoals.length} actions available
         </div>
       </div>
 
@@ -38,7 +38,7 @@ export const FactionGoals: React.FC<FactionGoalsProps> = ({ faction }) => {
         
         {factionGoals.length === 0 && (
           <div className="text-gray-400 text-center py-8">
-            No goals available from this faction
+            No actions available from this faction
           </div>
         )}
       </div>

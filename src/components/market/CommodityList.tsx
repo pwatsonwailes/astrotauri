@@ -59,10 +59,10 @@ export const CommodityList: React.FC<CommodityListProps> = ({
   const SortButton = ({ field, label }: { field: SortField; label: string }) => (
     <button
       onClick={() => handleSort(field)}
-      className="flex items-center p-4 gap-1 text-white hover:text-amber-400 transition-colors"
+      className="flex items-center p-4 gap-1 text-white hover:text-amber-600 transition-colors"
     >
       {label}
-      <ArrowUpDown className={`w-4 h-4 ${sortField === field ? 'text-amber-400' : 'text-white'}`} />
+      <ArrowUpDown className={`w-4 h-4 ${sortField === field ? 'text-amber-600' : 'text-white'}`} />
     </button>
   );
 

@@ -93,7 +93,7 @@ export const TaskNode: React.FC<TaskNodeProps> = ({
             className={`
               w-full p-4 rounded-lg font-medium text-white hover:text-black transition-colors
               ${selectedSkill
-                ? 'bg-slate-800 hover:bg-amber-400'
+                ? 'bg-slate-800 hover:bg-amber-600'
                 : 'bg-gray-700 cursor-not-allowed'
               }
             `}

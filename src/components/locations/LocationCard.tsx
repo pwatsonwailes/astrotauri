@@ -56,25 +56,22 @@ export const LocationCard: React.FC<LocationCardProps> = ({
       <motion.div
         onClick={onSelect}
         className={`
-          rounded-lg p-4 cursor-pointer
-          ${isSelected ? 'convex rowdy' : 'convex'}
+          locationName rounded-lg p-4 cursor-pointer
+          ${isSelected ? 'selected convex rowdy' : 'convex hover:lake'}
         `}
       >
-        <section className="flex items-start gap-4">
-          <div className="p-2 rounded-lg">
-            <MapPin className={`w-6 h-6 ${isSelected ? 'text-white' : 'text-gray-600'}`} />
-          </div>
-          
-          <div className="flex-1">
-            <h3 className={`text-lg font-semibold mt-2 mb-0 ${isSelected ? 'text-white' : 'text-gray-600'}`}>{location.name}</h3>
+        <section>
+          <h3 className="flex gap-4 text-lg font-semibold my-0">
+            <MapPin className="w-6 h-6" />
+            {location.name}
+          </h3>
 
-            {location.type === 'ship' && location?.turnsRemaining && (
-              <>
-                <p className="text-gray-500">Currently en route to <strong>{location.destination}</strong>.</p>
-                <p className="text-gray-500">{location.turnsRemaining} turns remaining.</p>
-              </>
-            )}
-          </div>
+          {location.type === 'ship' && location?.turnsRemaining && (
+            <>
+              <p className="text-gray-500">Currently en route to <strong>{location.destination}</strong>.</p>
+              <p className="text-gray-500">{location.turnsRemaining} turns remaining.</p>
+            </>
+          )}
         </section>
       </motion.div>
     )

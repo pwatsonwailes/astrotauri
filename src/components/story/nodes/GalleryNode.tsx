@@ -139,7 +139,7 @@ export const GalleryNode: React.FC<GalleryNodeProps> = ({ node, onComplete }) =>
 
       <button
         onClick={onComplete}
-        className="absolute bottom-6 right-6 px-4 py-2 rounded-lg bg-opacity-50 bg-black hover:bg-opacity-100 hover:bg-amber-500 text-white transition-colors z-50"
+        className="absolute bottom-6 right-6 px-4 py-2 rounded-lg bg-opacity-50 convex noShadow slate hover:bg-opacity-100 hover:rowdy text-white transition-colors z-50"
       >
         {t.common.skip}
       </button>

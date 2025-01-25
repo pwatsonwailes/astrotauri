@@ -27,7 +27,7 @@ export const ResourceBar: React.FC<ResourceBarProps> = ({
       <ResourceItem
         Icon={CreditCard}
         value={credits}
-        color="text-amber-400"
+        color="text-amber-600"
         tooltip={t.resources.credits}
       />
       

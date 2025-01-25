@@ -30,9 +30,9 @@ export const SubgoalsList: React.FC<SubgoalsListProps> = ({
             onClick={() => onSelectSubgoal(goal.id)}
             className={`
               w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors
-              ${isSelected ? 'bg-amber-400/20' : ''}
+              ${isSelected ? 'bg-amber-600/20' : ''}
               ${isCompleted ? 'bg-green-900/20' : 'bg-gray-700/50'}
-              hover:bg-amber-400/20
+              hover:bg-amber-600/20
             `}
           >
             {isCompleted ? (

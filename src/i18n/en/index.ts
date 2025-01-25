@@ -58,7 +58,7 @@ export const en = {
     rewards: 'Rewards',
     accept: 'ACCEPT',
     invest: 'Invest',
-    no_goals: 'No goals available'
+    no_goals: 'No actions available'
   },
   tutorial: {
     skip: 'Skip Tutorial',
