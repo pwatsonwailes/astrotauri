@@ -78,11 +78,15 @@ export function Game() {
   }, []);
 
   useEffect(() => {
-    if (currentMusic?.track) {
+    if (!gameStarted) {
+      setTrack('titles');
+      setVolume(50);
+    }
+    else if (currentMusic?.track) {
       setTrack(currentMusic.track);
       setVolume(currentMusic.volume);
     }
-  }, [ currentMusic ]);
+  }, [ currentMusic, gameStarted ]);
 
   useEffect(() => {
     if (gameStarted && isPlaying) {

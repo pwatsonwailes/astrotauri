@@ -1,6 +1,6 @@
 import React from 'react';
 import { Goal } from '../../types/goals';
-import { RadialProgressBar } from '../common/RadialProgressBar';
+import { EnergyBar } from './EnergyBar';
 import { Clock, Timer } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 
@@ -71,7 +71,7 @@ export const GoalCard: React.FC<GoalCardProps> = ({
         {timerText !== '' && renderTimer(timerText)}
 
         {showControls && energyRequirement && remaining > 0 && energyRequirement.amount !== Infinity && (
-          <RadialProgressBar
+          <EnergyBar
             invested={invested}
             required={amount}
             maxInvestment={maxInvestment}

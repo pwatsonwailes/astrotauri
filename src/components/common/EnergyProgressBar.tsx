@@ -1,4 +1,4 @@
-export const RadialProgressBar = ({
+export const EnergyProgressBar = ({
   size = 40,
   invested = 0,
   required = 100,
