@@ -37,7 +37,7 @@ export const MarketFilters: React.FC<MarketFiltersProps> = ({
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search commodities..."
-          className="w-11/12 pl-10 pr-4 py-2 bg-gray-800 rounded-lg text-white"
+          className="w-full depressed pl-10 pr-4 py-2 rounded-lg text-white"
         />
       </div>
 
@@ -50,7 +50,7 @@ export const MarketFilters: React.FC<MarketFiltersProps> = ({
               px-3 py-1 rounded-full text-base
               ${selectedCategory === category.id
                 ? 'bg-amber-500 text-white'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                : 'text-gray-800 hover:bg-sky-400 hover:text-white'
               }
             `}
           >

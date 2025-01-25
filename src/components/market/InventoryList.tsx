@@ -20,7 +20,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
 }) => {
   if (items.length === 0) {
     return (
-      <div className="bg-gray-800 rounded-lg p-6 text-center text-gray-400">
+      <div className="promontory rounded-lg p-6 text-center text-gray-400">
         <Package className="w-8 h-8 mx-auto mb-2" />
         <p>No commodities in inventory</p>
       </div>
@@ -57,7 +57,7 @@ export const InventoryList: React.FC<InventoryListProps> = ({
                 }
               `}
             >
-              <div className="font-medium text-white">{commodity.name}</div>
+              <div className="font-medium text-gray-800">{commodity.name}</div>
               
               <div className="text-white">{item.amount}</div>
               

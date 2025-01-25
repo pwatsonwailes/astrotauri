@@ -141,6 +141,21 @@ button:target {
 	background: linear-gradient(145deg, #ea580c, #f97316);
 }
 
+.convex.lake:hover,
+.concave.lake {
+	background: linear-gradient(145deg, #0ea5e9, #38bdf8);
+}
+
+.convex.slate:hover,
+.concave.slate {
+	background: linear-gradient(145deg, #343a40, #495057);
+}
+
+.convex.rose:hover,
+.concave.rose {
+	background: linear-gradient(145deg, #f43f5e, #fb7185);
+}
+
 .convex {
 	background: linear-gradient(145deg, #ffffff, #ddddd7);
 	box-shadow:	5px 5px 14px #b9b9b3,

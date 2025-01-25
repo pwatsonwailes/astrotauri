@@ -59,7 +59,7 @@ export const CommodityList: React.FC<CommodityListProps> = ({
   const SortButton = ({ field, label }: { field: SortField; label: string }) => (
     <button
       onClick={() => handleSort(field)}
-      className="flex items-center p-4 gap-1 text-white hover:text-amber-600 transition-colors"
+      className="flex items-center p-4 gap-1 text-gray-800 hover:text-amber-600 transition-colors"
     >
       {label}
       <ArrowUpDown className={`w-4 h-4 ${sortField === field ? 'text-amber-600' : 'text-white'}`} />
@@ -67,14 +67,13 @@ export const CommodityList: React.FC<CommodityListProps> = ({
   );
 
   return (
-    <div className="bg-gray-800 rounded-lg overflow-hidden">
-      <div className="grid grid-cols-3 gap-4 p-4 font-medium text-gray-300">
+    <div className="promontory rounded-lg overflow-hidden">
+      <div className="grid grid-cols-3 gap-4 p-4 font-medium text-gray-800 border-b border-gray-400">
         <SortButton field="name" label="Commodity" />
         <SortButton field="price" label="Price" />
         <SortButton field="change" label="Trend" />
       </div>
 
-      <div className="divide-y divide-gray-700">
         {sortedCommodities.map(commodity => {
           const price = prices.find(p => p.commodityId === commodity.id);
           if (!price) return null;
@@ -82,28 +81,28 @@ export const CommodityList: React.FC<CommodityListProps> = ({
           const trend = calculateTrend(price.history);
 
           return (
-            <button
+            <div
               key={commodity.id}
               onClick={() => onSelect(commodity)}
               className={`
                 w-full grid grid-cols-3 gap-4 p-4 text-left transition-colors
                 ${selectedCommodityId === commodity.id
-                  ? 'bg-amber-600'
-                  : 'hover:bg-gray-700'
+                  ? 'bg-amber-100'
+                  : 'hover:bg-gray-100'
                 }
               `}
             >
               <div className='p-4'>
-                <div className="font-medium text-white">{commodity.name}</div>
-                <div className="text-base text-gray-400">{commodity.unit}</div>
+                <div className="font-medium text-gray-600">{commodity.name}</div>
+                <div className="text-base text-gray-600">{commodity.unit}</div>
               </div>
 
-              <div className="text-white p-4">
+              <div className="text-gray-600 p-4">
                 {price.currentPrice.toLocaleString()} cr
               </div>
 
               <div className={`flex items-center gap-1 p-4
-                ${trend > 0 ? 'text-green-400' : 'text-red-400'}
+                ${trend > 0 ? 'text-sky-400' : 'text-red-400'}
               `}>
                 {trend > 0 ? (
                   <TrendingUp className="w-4 h-4" />
@@ -112,10 +111,9 @@ export const CommodityList: React.FC<CommodityListProps> = ({
                 )}
                 {Math.abs(trend * 100).toFixed(1)}%
               </div>
-            </button>
+            </div>
           );
         })}
-      </div>
     </div>
   );
 };

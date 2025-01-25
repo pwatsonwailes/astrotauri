@@ -20,19 +20,19 @@ export const MarketTrends: React.FC<MarketTrendsProps> = ({
     'High';
 
   const volatilityColor =
-    commodity.volatility <= 0.1 ? 'text-green-400' :
+    commodity.volatility <= 0.1 ? 'text-sky-400' :
     commodity.volatility <= 0.2 ? 'text-amber-600' :
     'text-red-400';
 
   return (
-    <div className="bg-gray-800 rounded-lg p-6 space-y-4">
-      <h3 className="text-lg font-medium text-white">Market Analysis</h3>
+    <div className="promontory rounded-lg p-6 space-y-4">
+      <h3 className="text-lg font-medium text-black">Market Analysis</h3>
 
       <div className="space-y-3">
         <div className="flex justify-between items-center">
           <div className="text-gray-400">Trend</div>
           <div className={`flex items-center gap-1
-            ${price.trend > 0 ? 'text-green-400' : 'text-red-400'}
+            ${price.trend > 0 ? 'text-sky-400' : 'text-red-400'}
           `}>
             {price.trend > 0 ? (
               <TrendingUp className="w-4 h-4" />

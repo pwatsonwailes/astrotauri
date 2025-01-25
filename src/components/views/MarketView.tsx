@@ -64,13 +64,13 @@ export const MarketView: React.FC = () => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 distancedTop">
       <div className="lg:col-span-2 space-y-6">
-        <div className="flex gap-4 border-b border-gray-700">
+        <div className="flex gap-4">
           <button
             onClick={() => setActiveTab('market')}
             className={`px-4 py-2 -mb-px ${
               activeTab === 'market'
-                ? 'text-amber-600 border-b-2 border-amber-600'
-                : 'text-gray-400 hover:text-gray-300'
+                ? 'text-amber-600'
+                : 'text-gray-600 hover:text-gray-800'
             }`}
           >
             Market
@@ -80,7 +80,7 @@ export const MarketView: React.FC = () => {
             className={`px-4 py-2 -mb-px ${
               activeTab === 'inventory'
                 ? 'text-amber-600 border-b-2 border-amber-600'
-                : 'text-gray-400 hover:text-gray-300'
+                : 'text-gray-600 hover:text-gray-800'
             }`}
           >
             Inventory
