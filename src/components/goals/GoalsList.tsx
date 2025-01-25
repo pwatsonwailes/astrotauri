@@ -35,7 +35,7 @@ export const GoalsList: React.FC<GoalsListProps> = ({
 
   return (
     <div className="py-4 space-y-6">
-      <h3 className="w-full px-2 py-2 mt-0 mb-4 flex items-center gap-2 text-gray-600 text-lg">
+      <h3 className="w-full p-2 mt-0 mb-4 flex items-center gap-2 text-gray-600 text-lg font-bold">
         Active
         <span className="ml-2 px-2 py-0.5 text-sm bg-gray-800 text-white rounded-full">
           {activeCount}
@@ -58,14 +58,14 @@ export const GoalsList: React.FC<GoalsListProps> = ({
         ))}
         
         {activeCount === 0 && (
-          <div className="col-span-full text-center py-8 text-gray-600">
+          <div className="col-span-full px-2 text-gray-600">
             No active activities
           </div>
         )}
       </div>
 
       <h3
-        className="w-full px-2 py-2 mt-0 mb-4 flex items-center gap-2 text-gray-600 text-lg">
+        className="w-full p-2 mt-0 mb-4 flex items-center gap-2 text-gray-600 text-lg font-bold">
         Available
         <span className="ml-2 px-2 py-0.5 text-sm bg-gray-800 text-white rounded-full">
           {availableCount}
@@ -89,7 +89,7 @@ export const GoalsList: React.FC<GoalsListProps> = ({
         ))}
         
         {availableCount === 0 && (
-          <div className="col-span-full text-center py-8 text-gray-600">
+          <div className="col-span-full px-2 text-gray-600">
             No available activities
           </div>
         )}
