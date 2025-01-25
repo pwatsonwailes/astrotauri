@@ -80,7 +80,7 @@ export default {
   officeScene,
   pallas,
   steelsBar,
-  street,
+  streetScene,
   interior3,
   interior5,
   prospector,
