@@ -12,9 +12,9 @@
   "app": {
     "windows": [
       {
-        "title": "Astromine",
-        "width": 1440,
-        "height": 720
+        "title": "astromine",
+        "width": 800,
+        "height": 600
       }
     ],
     "security": {

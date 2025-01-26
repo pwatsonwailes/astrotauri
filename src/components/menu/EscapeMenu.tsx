@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Home, Settings, LogOut } from 'lucide-react';
 import { SettingsPanel } from './SettingsPanel';
+import { exit } from '@tauri-apps/plugin-process';
 
 interface EscapeMenuProps {
   isOpen: boolean;
@@ -19,7 +20,7 @@ export const EscapeMenu: React.FC<EscapeMenuProps> = ({ isOpen, setGameStarted, 
   };
 
   const handleQuit = () => {
-    window.close();
+    exit(1);
   };
 
   return (
