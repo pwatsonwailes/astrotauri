@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStoryStore } from '../../stores/useStoryStore';
+import { useNarrativeStore } from '../../stores/useNarrativeStore';
 import { StoryNode } from '../../types/story';
 import { storyChapters } from '../../data/story/chapters';
 
@@ -13,7 +14,7 @@ import { CharacterPanel } from './nodes/CharacterPanel';
 
 import images from '../../data/images';
 
-import { ViewType } from '../../components/navigation/ViewSelector.tsx';
+import { ViewType } from '../navigation/ViewSelector';
 
 interface StoryViewProps {
   applyTaskEffects: (effects: Array<{type: string, value: number}>) => void;
@@ -37,11 +38,15 @@ export const StoryView: React.FC<StoryViewProps> = ({
     currentImage,
     persistentAnimation: savedPersistentAnimation,
     activeCharacters,
+    temporaryNodes,
     makeChoice,
     advanceNode,
     completeChapter,
     updatePersistentAnimation
   } = useStoryStore();
+
+  // Narrative state
+  const { completeNarrative } = useNarrativeStore();
 
   useEffect(() => {
     const node = getCurrentNode();
@@ -100,9 +105,30 @@ export const StoryView: React.FC<StoryViewProps> = ({
   }, [currentChapterIndex, currentNodeIndex]);
 
   const getCurrentNode = (): StoryNode | null => {
+    // If we're playing a narrative, use temporary nodes
+    if (currentChapterIndex === -1 && temporaryNodes) {
+      return temporaryNodes[currentNodeIndex] || null;
+    }
+
+    // Otherwise use regular story chapters
     const chapter = storyChapters[currentChapterIndex];
     if (!chapter) return null;
     return chapter.nodes[currentNodeIndex] || null;
+  };
+
+  const handleComplete = () => {
+    // If we're in a narrative and at the last node
+    if (currentChapterIndex === -1 && temporaryNodes) {
+      if (currentNodeIndex >= temporaryNodes.length - 1) {
+        // Complete the narrative and return to previous view
+        completeNarrative(temporaryNodes[0].narrativeId!);
+        handleViewChange('locations');
+        return;
+      }
+    }
+
+    // Otherwise complete chapter as normal
+    completeChapter();
   };
 
   if (!currentNode) {
@@ -180,7 +206,7 @@ export const StoryView: React.FC<StoryViewProps> = ({
           onChoice={makeChoice}
           onNext={advanceNode}
           handleViewChange={handleViewChange}
-          onComplete={completeChapter}
+          onComplete={handleComplete}
           onTaskComplete={({ effects }) => {
             if (effects) {
               applyTaskEffects(effects);
