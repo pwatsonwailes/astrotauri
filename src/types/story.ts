@@ -132,4 +132,5 @@ export interface StoryState {
     src: string;
   }>;
   activeLoops: LoopState[];
+  temporaryNodes?: StoryNode[]; // For narrative content
 }

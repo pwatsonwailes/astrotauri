@@ -8,7 +8,6 @@ interface EndTurnButtonProps {
 
 export const EndTurnButton: React.FC<EndTurnButtonProps> = ({ onEndTurn }) => {
   const { events } = useEventStore();
-  console.log(events)
 
   // Check if any housing completion event exists in the event log
   const hasCompletedHousing = events.some(

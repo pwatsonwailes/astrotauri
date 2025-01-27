@@ -1,10 +1,17 @@
 import { StoryNode } from './story';
 
-export interface CharacterNarrative {
+export interface BaseNarrative {
   id: string;
-  characterId: string;
   requirements: NarrativeRequirement[];
   nodes: StoryNode[];
+}
+
+export interface CharacterNarrative extends BaseNarrative {
+  characterId: string;
+}
+
+export interface LocationNarrative extends BaseNarrative {
+  locationId: string;
 }
 
 export type NarrativeRequirement = 

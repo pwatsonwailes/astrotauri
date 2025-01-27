@@ -5,7 +5,7 @@ import { useGameStore } from '../../stores/useGameStore';
 import { useTranslation } from '../../hooks/useTranslation';
 
 interface CharacterCreationProps {
-  setCurrentView: () => void;
+  setCurrentView: (view: 'goals') => void;
 }
 
 export const CharacterCreation: React.FC<CharacterCreationProps> = ({ setCurrentView }) => {
@@ -13,19 +13,22 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({ setCurrent
   const [lastName, setLastName] = useState('');
   const [pronouns, setPronouns] = useState<'He / Him' | 'She / Her' | 'They / Them'>('They / Them');
 
-  const storyState = useStoryStore();
   const updateGameState = useGameStore(state => state.updatePlayerDetails);
   const { t } = useTranslation();
 
-  const handleCharacterCreation = useCallback(async () => {
-    updateGameState({
+  const handleCharacterCreation = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent form submission from refreshing the page
+    
+    // Update player details first
+    await updateGameState({
       firstName,
       lastName,
       pronouns
     });
     
+    // Then change the view
     setCurrentView('goals');
-  }, [firstName, lastName, pronouns, storyState, updateGameState, setCurrentView]);
+  }, [firstName, lastName, pronouns, updateGameState, setCurrentView]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">

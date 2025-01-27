@@ -4,6 +4,7 @@ export const LOCATIONS: { [key: string]: Location } = {
   'prospector': {
     id: 'prospector',
     type: 'ship',
+    image: 'prospector',
     name: 'The Wandering Prospector',
     description: 'A mid-sized mining vessel currently transporting you to Ceres. The ship is well-maintained but shows signs of heavy use.',
     subLocations: [

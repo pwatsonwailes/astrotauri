@@ -53,7 +53,13 @@ export const useGameStore = create<GameStore>()(
         updateView: (view) => set({ currentView: view }),
 
         updatePlayerDetails: (details) => {
-          set({ player: details });
+          const state = get();
+
+          set(state => ({
+            ...state,
+            player: details,
+            currentView: 'goals' // Ensure view is updated here as well
+          }));
           saveAllState();
         },
 

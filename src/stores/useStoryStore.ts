@@ -19,7 +19,8 @@ const INITIAL_STATE: StoryState = {
   isPlaying: true,
   activeCharacters: [],
   activeLoops: [],
-  persistentAnimation: null
+  persistentAnimation: null,
+  temporaryNodes: null
 };
 
 interface StoryStore extends StoryState {
@@ -34,6 +35,7 @@ interface StoryStore extends StoryState {
   updateVariable: (update: StoryVariableUpdate) => void;
   updateVariables: (updates: StoryVariableUpdate[]) => void;
   updatePersistentAnimation: (animation: StoryState['persistentAnimation']) => void;
+  loadNarrativeNodes: (nodes: StoryNode[]) => void;
 }
 
 export const useStoryStore = create<StoryStore>()(
@@ -245,6 +247,16 @@ export const useStoryStore = create<StoryStore>()(
         updatePersistentAnimation: (animation) => {
           set({ persistentAnimation: animation });
           saveAllState();
+        },
+
+        loadNarrativeNodes: (nodes: StoryNode[]) => {
+          set(state => ({
+            ...state,
+            currentChapterIndex: -1, // Special index for narrative content
+            currentNodeIndex: 0,
+            isPlaying: true,
+            temporaryNodes: nodes
+          }));
         }
       }),
       {

@@ -23,8 +23,8 @@ export const CharacterSelect: React.FC<CharacterSelectProps> = ({ handleCharacte
   };
 
   return (
-    <div className="min-h-screen creamyBgLighter p-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen creamyBgLighter p-8 flex items-center justify-center">
+      <div className="max-w-6xl mx-auto w-full">
         <h2 className="text-2xl font-bold text-gray-700 mb-6">
           {t.character.select_title}
         </h2>

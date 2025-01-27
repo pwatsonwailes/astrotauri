@@ -15,11 +15,10 @@ import lucas from '../assets/imgs/cast/main/lucas.png'
 import sadie from '../assets/imgs/cast/main/sadie.png'
 import shehzada from '../assets/imgs/cast/main/shehzada.png'
 
-import ceresZ1 from '../assets/imgs/galleries/ceres/z1.png'
-import ceresZ2 from '../assets/imgs/galleries/ceres/z2.png'
-import ceresZ3 from '../assets/imgs/galleries/ceres/z3.png'
-import ceresZ4 from '../assets/imgs/galleries/ceres/z4.png'
-import ceresZ5 from '../assets/imgs/galleries/ceres/z5.png'
+import shipZ1 from '../assets/imgs/galleries/ship/z1.png'
+import shipZ2 from '../assets/imgs/galleries/ship/z2.png'
+import shipZ3 from '../assets/imgs/galleries/ship/z3.png'
+import shipZ4 from '../assets/imgs/galleries/ship/z4.png'
 
 import ceres from '../assets/imgs/scenes/ceres/ceres.png'
 import ceresDocks from '../assets/imgs/scenes/ceres/docks.png'
@@ -68,6 +67,10 @@ export default {
   lucas,
   sadie,
   shehzada,
+  shipZ1,
+  shipZ2,
+  shipZ3,
+  shipZ4,
   ceres,
   ceresDocks,
   littleHygeia,
