@@ -3,8 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { StoryNode } from '../../../types/story';
 import { useSettingsStore } from '../../../stores/useSettingsStore';
 import { useTranslation } from '../../../hooks/useTranslation';
-import { MoteOverlay } from '../../animations/MoteOverlay';
-import { ImageStack } from '../../animations/ImageStack';
 import images from '../../../data/images';
 
 interface GalleryNodeProps {
@@ -14,11 +12,7 @@ interface GalleryNodeProps {
 
 export const GalleryNode: React.FC<GalleryNodeProps> = ({ node, onComplete }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [persistentAnimation, setPersistentAnimation] = useState<{
-    type: 'mote' | 'stack';
-    config: any;
-  } | null>(null);
-  
+
   const nodeImages = node.media?.images || [];
   const textSize = useSettingsStore(state => state.textSize);
   const { t } = useTranslation();
@@ -30,48 +24,6 @@ export const GalleryNode: React.FC<GalleryNodeProps> = ({ node, onComplete }) =>
     }
 
     const image = nodeImages[currentImageIndex];
-
-    // Handle animation persistence and modifications
-    if (image.animate) {
-      const { type, config, persist, action, target } = image.animate;
-
-      if (action) {
-        // Handle stack modifications
-        if (type === 'stack' && persistentAnimation?.type === 'stack') {
-          const currentConfig = { ...persistentAnimation.config };
-          
-          switch (action) {
-            case 'add':
-              currentConfig.foregrounds = [...currentConfig.foregrounds, ...config.foregrounds];
-              break;
-            case 'remove':
-              if (target) {
-                currentConfig.foregrounds = currentConfig.foregrounds.filter(
-                  img => img.src !== target
-                );
-              }
-              break;
-            case 'update':
-              if (target) {
-                currentConfig.foregrounds = currentConfig.foregrounds.map(img =>
-                  img.src === target ? { ...img, ...config.foregrounds[0] } : img
-                );
-              }
-              break;
-            case 'clear':
-              setPersistentAnimation(null);
-              return;
-          }
-          setPersistentAnimation({ type, config: currentConfig });
-        }
-      } else if (persist) {
-        // Set new persistent animation
-        setPersistentAnimation({ type, config });
-      } else {
-        // Clear persistent animation if new non-persistent animation
-        setPersistentAnimation(null);
-      }
-    }
 
     const timer = setTimeout(() => {
       if (currentImageIndex < nodeImages.length - 1) {
@@ -98,31 +50,7 @@ export const GalleryNode: React.FC<GalleryNodeProps> = ({ node, onComplete }) =>
             }}
             className="absolute inset-0"
           >
-            {(nodeImages[currentImageIndex].animate || persistentAnimation) ? (
-              <div className="absolute inset-0">
-                {((nodeImages[currentImageIndex].animate?.type || persistentAnimation?.type) === 'mote') && (
-                  <MoteOverlay 
-                    config={
-                      nodeImages[currentImageIndex].animate?.config || 
-                      persistentAnimation?.config
-                    } 
-                  />
-                )}
-                {((nodeImages[currentImageIndex].animate?.type || persistentAnimation?.type) === 'stack') && (
-                  <ImageStack 
-                    config={
-                      nodeImages[currentImageIndex].animate?.config || 
-                      persistentAnimation?.config
-                    }
-                  />
-                )}
-              </div>
-            ) : (
-              <img 
-                src={images[nodeImages[currentImageIndex].src]} 
-                className='galleryImg' 
-              />
-            )}
+            <img src={images[nodeImages[currentImageIndex].src]} className='galleryImg' />
 
             {nodeImages[currentImageIndex].caption && (
               <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black to-transparent">

@@ -19,7 +19,6 @@ const INITIAL_STATE: StoryState = {
   isPlaying: true,
   activeCharacters: [],
   activeLoops: [],
-  persistentAnimation: null,
   temporaryNodes: null
 };
 
@@ -34,7 +33,6 @@ interface StoryStore extends StoryState {
   resetStoryState: () => void;
   updateVariable: (update: StoryVariableUpdate) => void;
   updateVariables: (updates: StoryVariableUpdate[]) => void;
-  updatePersistentAnimation: (animation: StoryState['persistentAnimation']) => void;
   loadNarrativeNodes: (nodes: StoryNode[]) => void;
 }
 
@@ -113,6 +111,30 @@ export const useStoryStore = create<StoryStore>()(
             currentNodeIndex: nextValid.index
           };
 
+          // Handle NPC location updates
+          if (node.npcUpdates) {
+            const gameState = useGameStore.getState();
+            const updatedLocations = { ...gameState.npcLocations };
+            
+            node.npcUpdates.forEach(update => {
+              updatedLocations[update.npcId] = {
+                ...updatedLocations[update.npcId],
+                currentLocationId: update.locationId
+              };
+
+              // Add event to event log if message provided
+              if (update.message) {
+                useEventStore.getState().addEvent({
+                  type: 'info',
+                  message: update.message,
+                  timestamp: Date.now()
+                });
+              }
+            });
+
+            useGameStore.setState({ npcLocations: updatedLocations });
+          }
+
           // Emit silent story progress event if node has an ID
           if (node.id) {
             useEventStore.getState().addEvent({
@@ -134,10 +156,6 @@ export const useStoryStore = create<StoryStore>()(
 
               if (node.media.image.title) {
                 updateImg.title = node.media.image.title
-              }
-
-              if (node.media.image.animate) {
-                updateImg.animate = node.media.image.animate
               }
 
               updates.currentImage = updateImg
@@ -241,11 +259,6 @@ export const useStoryStore = create<StoryStore>()(
           });
 
           set({ variables: updatedVariables });
-          saveAllState();
-        },
-
-        updatePersistentAnimation: (animation) => {
-          set({ persistentAnimation: animation });
           saveAllState();
         },
 

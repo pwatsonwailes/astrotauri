@@ -1,5 +1,4 @@
 import { Task } from './tasks';
-import { MoteConfig, StackedImageConfig } from './animations';
 
 export type StoryNodeType = 'gallery' | 'paragraph' | 'choice' | 'button' | 'task';
 export type StoryVariableType = 'string' | 'number' | 'boolean';
@@ -31,23 +30,9 @@ export interface StoryMedia {
     caption?: string;
     displayDuration?: number;
     transitionDuration?: number;
-    animate?: {
-      type: 'mote' | 'stack';
-      config: MoteConfig | StackedImageConfig;
-      persist?: boolean;
-      action?: 'add' | 'remove' | 'update' | 'clear';
-      target?: string;
-    };
   }[];
   image?: {
     src: string;
-    animate?: {
-      type: 'mote' | 'stack';
-      config: MoteConfig | StackedImageConfig;
-      persist?: boolean;
-      action?: 'add' | 'remove' | 'update' | 'clear';
-      target?: string;
-    };
   };
   music?: {
     track: string;
@@ -84,6 +69,11 @@ export interface StoryNode {
   isLoopStart?: boolean;
   isLoopEnd?: boolean;
   maxLoops?: number;
+  npcUpdates?: {
+    npcId: string;
+    locationId: string;
+    message?: string;
+  }[];
 }
 
 export interface StoryChapter {
@@ -96,11 +86,6 @@ export interface StoryChapter {
 export interface StoryImage {
   src: string;
   alt?: string;
-  animate?: {
-    type: 'mote' | 'stack';
-    config: MoteConfig | StackedImageConfig;
-    persist?: boolean;
-  };
 }
 
 export interface StoryMusic {
@@ -123,14 +108,10 @@ export interface StoryState {
   isPlaying: boolean;
   currentImage?: StoryImage;
   currentMusic?: StoryMusic;
-  persistentAnimation?: {
-    type: 'mote' | 'stack';
-    config: MoteConfig | StackedImageConfig;
-  };
   activeCharacters: Array<{
     name: string;
     src: string;
   }>;
   activeLoops: LoopState[];
-  temporaryNodes?: StoryNode[]; // For narrative content
+  temporaryNodes?: StoryNode[];
 }

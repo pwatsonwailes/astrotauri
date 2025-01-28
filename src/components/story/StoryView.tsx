@@ -4,9 +4,6 @@ import { useStoryStore } from '../../stores/useStoryStore';
 import { StoryNode } from '../../types/story';
 import { storyChapters } from '../../data/story/chapters';
 
-import { MoteOverlay } from '../animations/MoteOverlay';
-import { ImageStack } from '../animations/ImageStack';
-
 import { StoryTextPanel } from './StoryTextPanel';
 import { GalleryNode } from './nodes/GalleryNode';
 import { CharacterPanel } from './nodes/CharacterPanel';
@@ -25,78 +22,21 @@ export const StoryView: React.FC<StoryViewProps> = ({
   handleViewChange
 }) => {
   const [currentNode, setCurrentNode] = useState<StoryNode | null>(null);
-  const [persistentAnimation, setPersistentAnimation] = useState<{
-    type: 'mote' | 'stack';
-    config: any;
-  } | null>(null);
 
   // Story state
   const {
     currentChapterIndex,
     currentNodeIndex,
     currentImage,
-    persistentAnimation: savedPersistentAnimation,
     activeCharacters,
     makeChoice,
     advanceNode,
-    completeChapter,
-    updatePersistentAnimation
+    completeChapter
   } = useStoryStore();
 
   useEffect(() => {
     const node = getCurrentNode();
     setCurrentNode(node);
-
-    // Set initial persistent animation from saved state
-    if (savedPersistentAnimation && !persistentAnimation) {
-      setPersistentAnimation(savedPersistentAnimation);
-    }
-
-    // Handle animation persistence and modifications
-    if (node?.media?.image?.animate) {
-      const { type, config, persist, action, target } = node.media.image.animate;
-
-      if (action) {
-        // Handle stack modifications
-        if (type === 'stack' && persistentAnimation?.type === 'stack') {
-          const currentConfig = { ...persistentAnimation.config };
-          
-          switch (action) {
-            case 'add':
-              currentConfig.foregrounds = [...currentConfig.foregrounds, ...config.foregrounds];
-              break;
-            case 'remove':
-              if (target) {
-                currentConfig.foregrounds = currentConfig.foregrounds.filter(
-                  img => img.src !== target
-                );
-              }
-              break;
-            case 'update':
-              if (target) {
-                currentConfig.foregrounds = currentConfig.foregrounds.map(img =>
-                  img.src === target ? { ...img, ...config.foregrounds[0] } : img
-                );
-              }
-              break;
-            case 'clear':
-              setPersistentAnimation(null);
-              updatePersistentAnimation(null);
-              return;
-          }
-          setPersistentAnimation({ type, config: currentConfig });
-          updatePersistentAnimation({ type, config: currentConfig });
-        }
-      } else if (persist) {
-        // Set new persistent animation
-        setPersistentAnimation({ type, config });
-        updatePersistentAnimation({ type, config });
-      } else {
-        // Clear persistent animation if new non-persistent animation
-        setPersistentAnimation(null);
-        updatePersistentAnimation(null);
-      }
-    }
   }, [currentChapterIndex, currentNodeIndex]);
 
   const getCurrentNode = (): StoryNode | null => {
@@ -131,26 +71,7 @@ export const StoryView: React.FC<StoryViewProps> = ({
       {/* Left Panel - Background and Characters */}
       <div className="w-2/3 relative">
         <AnimatePresence mode="wait">
-          {(currentNode?.media?.image?.animate || persistentAnimation) ? (
-            <div key="animated" className="absolute inset-0 rounded-lg promontory overflow-hidden">
-              {((currentNode?.media?.image?.animate?.type || persistentAnimation?.type) === 'mote') && (
-                <MoteOverlay 
-                  config={
-                    currentNode?.media?.image?.animate?.config || 
-                    persistentAnimation?.config
-                  } 
-                />
-              )}
-              {((currentNode?.media?.image?.animate?.type || persistentAnimation?.type) === 'stack') && (
-                <ImageStack 
-                  config={
-                    currentNode?.media?.image?.animate?.config || 
-                    persistentAnimation?.config
-                  }
-                />
-              )}
-            </div>
-          ) : currentImage && !hasMainPosition ? (
+          {currentImage && !hasMainPosition && (
             <motion.div
               key={`bg-${currentImage.src}`}
               initial={{ opacity: 0 }}
@@ -167,7 +88,7 @@ export const StoryView: React.FC<StoryViewProps> = ({
               {currentImage.title && currentImage.title.color && <span className="imageTitle font-bold" style={{ color: currentImage.title.color }}>{currentImage.title.text}</span>}
               {currentImage.title && !currentImage.title.color && <span className="imageTitle font-bold">{currentImage.title.text}</span>}
             </motion.div>
-          ) : null}
+          )}
         </AnimatePresence>
       
         {hasMainPosition && <CharacterPanel characters={activeCharacters} />}

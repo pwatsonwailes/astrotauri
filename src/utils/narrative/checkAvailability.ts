@@ -15,7 +15,7 @@ export const checkNarrativeRequirements = (
            storyState.choices[req.nodeId]);
       
       case 'goal':
-        return gameState.goals.some(
+        return gameState.actions.some(
           goal => goal.id === req.goalId && (goal.status === 'completed' || goal.status === 'archived')
         );
       

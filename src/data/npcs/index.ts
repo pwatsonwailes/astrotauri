@@ -1,33 +1,6 @@
 import { NPC } from '../../types/npcs';
 
-// Track NPC current locations and schedules
-export const NPCLocations: Record<string, {
-  currentLocationId: string;
-  schedule?: {
-    time: number;
-    locationId: string;
-  }[];
-}> = {
-  'dr-santos': {
-    currentLocationId: 'medical-bay',
-    schedule: [
-      { time: 0, locationId: 'medical-bay' },
-      { time: 8, locationId: 'crew-quarters' },
-      { time: 16, locationId: 'medical-bay' }
-    ]
-  },
-  'captain-chen': {
-    currentLocationId: 'crew-quarters',
-    schedule: [
-      { time: 0, locationId: 'crew-quarters' },
-      { time: 4, locationId: 'bridge' },
-      { time: 12, locationId: 'crew-quarters' }
-    ]
-  }
-  // Add other NPCs here
-};
-
-// NPC data separate from locations
+// Track NPC data
 export const NPCs: Record<string, NPC> = {
   'dr-santos': {
     id: 'dr-santos',
@@ -41,7 +14,8 @@ export const NPCs: Record<string, NPC> = {
       chapterId: 0,
       nodeId: 'wake_up'
     },
-    availableNarratives: ['medical-checkup', 'discuss-condition']
+    availableNarratives: ['medical-checkup', 'discuss-condition'],
+    type: 'fixed'
   },
   'captain-chen': {
     id: 'captain-chen',
@@ -50,7 +24,17 @@ export const NPCs: Record<string, NPC> = {
     description: 'A veteran spacer with decades of experience in the Belt.',
     image: 'lin',
     relationship: 0,
-    availableNarratives: ['discuss-journey', 'ship-status']
+    availableNarratives: ['discuss-journey', 'ship-status'],
+    type: 'fixed'
+  },
+  'sadie': {
+    id: 'sadie',
+    name: 'Sadie Thompson',
+    title: 'Ex-Vesta Security',
+    description: 'A sharp-eyed investigator with a history of solving the Belt\'s most perplexing cases.',
+    image: 'sadie',
+    relationship: 0,
+    availableNarratives: ['sadie-investigation'],
+    type: 'companion'
   }
-  // Add other NPCs here
 };

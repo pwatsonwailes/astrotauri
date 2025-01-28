@@ -1,22 +1,47 @@
-import { NPCLocations } from '../../data/npcs';
+import { NPCs } from '../../data/npcs';
+import { useGameStore } from '../../stores/useGameStore';
+import { NPCLocation } from '../../types/npcs';
 
-export const getNPCsAtLocation = (locationId: string): string[] => {
-  return Object.entries(NPCLocations)
-    .filter(([_, data]) => data.currentLocationId === locationId)
-    .map(([npcId]) => npcId);
+// Initialize NPC locations
+export const initializeNPCLocations = (): Record<string, NPCLocation> => {
+  const npcLocations: Record<string, NPCLocation> = {};
+  
+  Object.entries(NPCs).forEach(([id, npc]) => {
+    npcLocations[id] = {
+      currentLocationId: npc.type === 'fixed' ? 'medical-bay' : 'ceres',
+      isWithPlayer: false,
+      fixedLocation: npc.type === 'fixed' ? 'medical-bay' : undefined
+    };
+  });
+
+  return npcLocations;
 };
 
-export const updateNPCLocations = (currentTime: number): void => {
-  Object.entries(NPCLocations).forEach(([npcId, data]) => {
-    if (!data.schedule) return;
+// Get all NPCs at a specific location
+export const getNPCsAtLocation = (locationId: string): string[] => {
+  const { currentLocation, npcLocations } = useGameStore.getState();
+  const npcsAtLocation: string[] = [];
 
-    // Find the last schedule entry that's before or at the current time
-    const currentSchedule = [...data.schedule]
-      .reverse()
-      .find(entry => entry.time <= currentTime);
+  Object.entries(npcLocations).forEach(([npcId, data]) => {
+    // Check if NPC is a companion with player
+    if (data.isWithPlayer) {
+      if (locationId === currentLocation.id) {
+        npcsAtLocation.push(npcId);
+        return;
+      }
+    }
 
-    if (currentSchedule) {
-      NPCLocations[npcId].currentLocationId = currentSchedule.locationId;
+    // Check fixed location
+    if (data.fixedLocation === locationId) {
+      npcsAtLocation.push(npcId);
+      return;
+    }
+
+    // Check current location
+    if (data.currentLocationId === locationId) {
+      npcsAtLocation.push(npcId);
     }
   });
+
+  return npcsAtLocation;
 };

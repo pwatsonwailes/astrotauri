@@ -1,4 +1,3 @@
-import { Goal } from './goals';
 import { UnlockCondition } from './characters';
 
 export interface LocationNPC {
@@ -10,11 +9,13 @@ export interface LocationNPC {
   unlockCondition?: UnlockCondition;
   isUnlocked?: boolean;
   image?: string;
-}
-
-// Update LocationGoal to extend the base Goal type
-export interface LocationGoal extends Goal {
-  unlocksNPC?: LocationNPC;
+  narrativeRequirements?: {
+    type: 'story' | 'narrative' | 'turns';
+    chapterId?: number;
+    nodeId?: string;
+    narrativeId?: string;
+    turnsAfter?: number;
+  }[];
 }
 
 export interface SubLocation {
@@ -22,7 +23,6 @@ export interface SubLocation {
   name: string;
   description: string;
   npcs: LocationNPC[];
-  goals: LocationGoal[];
   isLocked?: boolean;
   unlockRequirement?: {
     type: string;
@@ -42,7 +42,6 @@ export interface Location {
   type: 'station' | 'ship' | 'area';
   subLocations: SubLocation[];
   npcs: LocationNPC[];
-  goals: LocationGoal[];
   travelRequirements?: {
     [destinationId: string]: TravelRequirement;
   };

@@ -1,35 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useGameStore } from '../../stores/useGameStore';
 import { useStoryStore } from '../../stores/useStoryStore';
-import { LocationAction } from '../locations/LocationAction';
 import { LOCATIONS } from '../../data/locations';
-import { NPCs } from '../../data/npcs';
+import { NPCList } from '../locations/NPCList';
+import { LocationCard } from '../locations/LocationCard';
 import { getNPCsAtLocation } from '../../utils/npcs/locationManager';
 
 export const LocationsView: React.FC = () => {
-  const { currentLocation, turn } = useGameStore();
+  const { currentLocation } = useGameStore();
   const { startNarrative } = useStoryStore();
+  const [selectedSubLocation, setSelectedSubLocation] = useState<string | null>(null);
 
   const locationData = LOCATIONS[currentLocation.id];
   if (!locationData) return null;
 
-  // Get NPCs currently at this location
-  const presentNPCIds = getNPCsAtLocation(currentLocation.id);
-  const presentNPCs = presentNPCIds.map(id => NPCs[id]).filter(npc => npc);
+  // Get NPCs for the current sublocation or main location
+  const getRelevantNPCs = () => {
+    if (selectedSubLocation) {
+      const subLocation = locationData.subLocations.find(sub => sub.id === selectedSubLocation);
+      if (!subLocation) return [];
+      const presentNPCIds = getNPCsAtLocation(selectedSubLocation);
+      return presentNPCIds
+        .map(id => subLocation.npcs.find(npc => npc.id === id))
+        .filter(npc => npc);
+    }
+    return [];
+  };
 
-  // Get available actions for this location
-  const locationActions = locationData.actions || [];
-  
-  // Add NPC interaction actions
-  const npcActions = presentNPCs.map(npc => ({
-    id: `talk-to-${npc.id}`,
-    type: 'talk' as const,
-    title: `Talk to ${npc.name}`,
-    description: npc.title,
-    narrativeId: npc.availableNarratives[0] // For now just use first available narrative
-  }));
-
-  const allActions = [...locationActions, ...npcActions];
+  const presentNPCs = getRelevantNPCs();
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 distancedTop pt-6">
@@ -39,18 +37,42 @@ export const LocationsView: React.FC = () => {
         <p className="text-gray-600 mb-6">{locationData.description}</p>
       </div>
 
-      {/* Available Actions */}
-      <div className="lg:col-span-2 space-y-4">
-        <h3 className="text-xl font-semibold text-black mb-4">Available Actions</h3>
-        <div className="grid gap-4">
-          {allActions.map(action => (
-            <LocationAction
-              key={action.id}
-              action={action}
-              onSelect={() => startNarrative(action.narrativeId)}
+      {/* Sub-locations */}
+      <div className="lg:col-span-1 space-y-4">
+        <h3 className="text-xl font-semibold text-black mb-4">Areas</h3>
+        <div className="space-y-4">
+          {locationData.subLocations.map(subLocation => (
+            <LocationCard
+              key={subLocation.id}
+              location={subLocation}
+              isSelected={selectedSubLocation === subLocation.id}
+              onSelect={() => setSelectedSubLocation(subLocation.id)}
+              isSubLocation
             />
           ))}
         </div>
+      </div>
+
+      {/* Available NPCs */}
+      <div className="lg:col-span-2 space-y-4">
+        {selectedSubLocation ? (
+          <>
+            <h3 className="text-xl font-semibold text-black mb-4">People Here</h3>
+            <NPCList
+              npcs={presentNPCs}
+              onSelectNPC={(npcId) => {
+                const npc = presentNPCs.find(n => n.id === npcId);
+                if (npc?.availableNarratives?.[0]) {
+                  startNarrative(npc.availableNarratives[0]);
+                }
+              }}
+            />
+          </>
+        ) : (
+          <div className="text-center text-gray-600 py-8">
+            Select an area to see who is there
+          </div>
+        )}
       </div>
     </div>
   );

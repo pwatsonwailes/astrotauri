@@ -66,7 +66,6 @@ export const ViewSelector: React.FC<ViewSelectorProps> = ({
   return (
     <div className="flex gap-2">
       {views.map(view => {
-        const hasUpdate = updates.some(u => u.view === view.id);
         const Icon = view.icon;
 
         return (
@@ -84,16 +83,6 @@ export const ViewSelector: React.FC<ViewSelectorProps> = ({
             <Tooltip content={view.label} isLeft={false}>
               <div className="relative">
                 <Icon className="w-5 h-5" />
-                <AnimatePresence>
-                  {hasUpdate && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.5 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.5 }}
-                      className="absolute -top-1 -right-1 w-2 h-2 bg-amber-500 rounded-full"
-                    />
-                  )}
-                </AnimatePresence>
               </div>
             </Tooltip>
           </button>

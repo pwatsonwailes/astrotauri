@@ -1,4 +1,5 @@
 import { Location } from '../../types/locations';
+import { NPCs } from '../npcs';
 
 export const LOCATIONS: { [key: string]: Location } = {
   'prospector': {
@@ -15,31 +16,14 @@ export const LOCATIONS: { [key: string]: Location } = {
         description: 'A small but well-equipped medical facility where you first woke up.',
         npcs: [
           {
-            id: 'dr-santos',
-            name: 'Dr. Maya Santos',
-            title: 'Ship\'s Doctor',
-            description: 'A calm and professional physician with steady hands and a reassuring presence.',
-            relationship: 0
-          }
-        ],
-        goals: [
-          {
-            id: 'medical-checkup',
-            title: 'Complete Medical Checkup',
-            description: 'Let Dr. Santos run some final tests before arrival.',
-            type: 'parentGoal',
-            requirements: [{ type: 'energy', amount: 1 }],
-            rewards: { reputation: 10 },
-            source: 'location',
-            repeatable: false,
-            timeLimit: Infinity,
-            status: 'available',
-            progress: {
-              energyInvested: 0,
-              creditsInvested: 0,
-              turnsRemaining: 2,
-              completionTimer: 0
-            }
+            ...NPCs['dr-santos'],
+            narrativeRequirements: [
+              {
+                type: 'story',
+                chapterId: 0,
+                nodeId: 'wake_up'
+              }
+            ]
           }
         ]
       },
@@ -50,40 +34,31 @@ export const LOCATIONS: { [key: string]: Location } = {
         description: 'The living area for the ship\'s crew, featuring shared spaces and individual cabins.',
         npcs: [
           {
-            id: 'captain-chen',
-            name: 'Captain Lin Chen',
-            title: 'Ship Captain',
-            description: 'A veteran spacer with decades of experience in the Belt.',
-            relationship: 0
-          }
-        ],
-        goals: [
+            ...NPCs['captain-chen'],
+            narrativeRequirements: [
+              {
+                type: 'story',
+                chapterId: 0,
+                nodeId: 'wake_up'
+              }
+            ]
+          },
           {
-            id: 'meet-crew',
-            title: 'Meet the Crew',
-            description: 'Introduce yourself to the ship\'s crew members.',
-            type: 'parentGoal',
-            requirements: [{ type: 'energy', amount: 2 }],
-            rewards: { reputation: 10 },
-            source: 'location',
-            repeatable: false,
-            timeLimit: Infinity,
-            status: 'available',
-            progress: {
-              energyInvested: 0,
-              creditsInvested: 0,
-              turnsRemaining: 3,
-              completionTimer: 0
-            }
+            ...NPCs['sadie'],
+            narrativeRequirements: [
+              {
+                type: 'story',
+                chapterId: 0,
+                nodeId: 'meet_sadie'
+              }
+            ]
           }
         ]
       }
     ],
-    npcs: [],
-    goals: [],
     availableDestinations: ['ceres']
   },
-   'ceres': {
+  'ceres': {
     id: 'ceres',
     name: 'Ceres Station',
     type: 'station',
@@ -416,7 +391,7 @@ export const LOCATIONS: { [key: string]: Location } = {
         turns: 10
       }
     }
-  },    
+  },
   'fast-picket': {
     id: 'fast-picket',
     name: 'Fast Picket Run',
@@ -439,7 +414,7 @@ export const LOCATIONS: { [key: string]: Location } = {
     name: 'Vesta Station',
     type: 'station',
     description: 'A major mining and industrial hub.',
-    subLocations: [/* ... */],
+    subLocations: [],
     npcs: [],
     goals: [],
     availableDestinations: ['ceres'],

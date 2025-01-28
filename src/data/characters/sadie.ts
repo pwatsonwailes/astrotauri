@@ -13,7 +13,7 @@ export const sadie: Character = {
   },
   relationship: 0,
   isUnlocked: false,
-  goals: [
+  actions: [
     {
       id: 'sadie_investigation',
       title: 'Aid Investigation',
@@ -32,6 +32,6 @@ export const sadie: Character = {
         turnsRemaining: 4
       }
     }
-    // Add more character-specific goals...
+    // Add more character-specific actions...
   ]
 };

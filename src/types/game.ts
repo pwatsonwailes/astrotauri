@@ -3,6 +3,7 @@ import { Goal } from './goals';
 import { PlayerInventory } from './inventory';
 import { SkillProgress } from '../engine/skills/progression';
 import { ViewType } from '../components/navigation/ViewSelector.tsx';
+import { NPCLocation } from './npcs';
 
 export interface GameState {
   currentView: ViewType;
@@ -13,6 +14,7 @@ export interface GameState {
   energyPoints: number;
   turn: number;
   reputation: number;
+  actions: Goal[];
   goals: Goal[];
   inventory: PlayerInventory;
   skills: Skills;
@@ -21,6 +23,11 @@ export interface GameState {
     id: string;
     turnsRemaining?: number; // For transport journeys
     destination?: string; // For transport journeys
+  };
+  npcLocations: Record<string, NPCLocation>; // Add NPC locations to game state
+  party: {
+    activeCompanions: string[];
+    maxCompanions: number;
   };
 }
 

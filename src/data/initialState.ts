@@ -4,6 +4,7 @@ import { generateStartingGoals } from './goals';
 import { CharacterArchetype } from '../types/character';
 import { SkillProgress } from '../engine/skills/progression';
 import { LOCATIONS } from './locations';
+import { initializeNPCLocations } from '../utils/npcs/locationManager';
 
 const createInitialSkillProgress = (level: number): SkillProgress => ({
   level,
@@ -11,25 +12,9 @@ const createInitialSkillProgress = (level: number): SkillProgress => ({
   experienceRequired: level < 7 ? 100 * Math.pow(2, level - 1) : Infinity
 });
 
-// Helper to collect all location goals
-const collectLocationGoals = () => {
-  return Object.values(LOCATIONS).flatMap(location => [
-    ...location.goals,
-    ...location.subLocations.flatMap(sub => sub.goals)
-  ]).map(goal => ({
-    ...goal,
-    source: 'location' as const,
-    type: 'parentGoal' as const
-  }));
-};
-
 export const getInitialState = (character?: CharacterArchetype): GameState => {
-
   // Get regular starting goals
   const startingGoals = generateStartingGoals();
-
-  // Get all location goals
-  const locationGoals = collectLocationGoals();
 
   // Initialize skills based on character or default values
   const baseSkills = character ? character.skills : {
@@ -62,7 +47,7 @@ export const getInitialState = (character?: CharacterArchetype): GameState => {
     // Game Progress
     turn: 1,
 
-    goals: [...startingGoals, ...locationGoals],
+    goals: startingGoals,
 
     // Inventory System
     inventory: {
@@ -78,6 +63,13 @@ export const getInitialState = (character?: CharacterArchetype): GameState => {
     },
 
     // Skills System with proper progression structure
-    skills
+    skills,
+
+    // NPC Locations and Party
+    npcLocations: initializeNPCLocations(),
+    party: {
+      activeCompanions: ['sadie'],
+      maxCompanions: 12
+    }
   };
 };

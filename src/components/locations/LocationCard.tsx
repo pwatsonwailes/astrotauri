@@ -7,7 +7,7 @@ interface LocationCardProps {
   location: Location | SubLocation;
   isSelected: boolean;
   onSelect: () => void;
-  transitTime?: int;
+  transitTime?: number;
   transitDestination?: string;
   isSubLocation?: boolean;
 }
@@ -20,60 +20,27 @@ export const LocationCard: React.FC<LocationCardProps> = ({
   transitDestination,
   isSubLocation = false
 }) => {
-  const hasSubLocations = !isSubLocation && location.subLocations
-
-  const toTitleCase = (str) => {
-    return str.replace(
-      /\w\S*/g,
-      text => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase()
-    );
-  }
-
-  if (hasSubLocations) {
-    return (
-      <motion.div onClick={onSelect}>
-        <section className="gap-4">
-          <div className="flex items-start gap-4 p-4 promontory slate rounded-lg mb-4">
-            <div className="p-2 rounded-lg">
-              <MapPin className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-xl font-semibold mt-2 mb-0 text-white">{location.name}</h2>
-            </div>
-          </div>
-          {location.type === 'ship' && transitTime && (
-            <>
-              <p className="text-gray-800 mb-4">Currently en route to {toTitleCase(transitDestination)}.</p>
-              <p className="text-gray-800 mb-4">{transitTime} turns remaining.</p>
-            </>
-          )}
-        </section>
-      </motion.div>
-    )
-  }
-  else {
-    return (
-      <motion.div
-        onClick={onSelect}
-        className={`
-          locationName rounded-lg p-4 cursor-pointer
-          ${isSelected ? 'selected convex rowdy' : 'convex hover:lake'}
-        `}
-      >
-        <section>
-          <h3 className="flex gap-4 text-lg font-semibold my-0">
-            <MapPin className="w-6 h-6" />
-            {location.name}
-          </h3>
-
-          {location.type === 'ship' && location?.turnsRemaining && (
-            <>
-              <p className="text-gray-500">Currently en route to <strong>{location.destination}</strong>.</p>
-              <p className="text-gray-500">{location.turnsRemaining} turns remaining.</p>
-            </>
-          )}
-        </section>
-      </motion.div>
-    )
-  }
+  return (
+    <motion.div
+      onClick={onSelect}
+      className={`
+        locationName rounded-lg p-4 cursor-pointer
+        ${isSelected ? 'selected convex rowdy' : 'convex hover:lake'}
+      `}
+    >
+      <section>
+        <h3 className="flex gap-4 text-lg font-semibold my-0">
+          <MapPin className="w-6 h-6" />
+          {location.name}
+        </h3>
+        <p className="text-gray-500 mt-2 mb-0">{location.description}</p>
+        {location.type === 'ship' && location?.turnsRemaining && (
+          <>
+            <p className="text-gray-500">Currently en route to <strong>{location.destination}</strong>.</p>
+            <p className="text-gray-500">{location.turnsRemaining} turns remaining.</p>
+          </>
+        )}
+      </section>
+    </motion.div>
+  );
 };
