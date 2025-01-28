@@ -118,6 +118,11 @@ export const useGameStore = create<GameStore>()(
             goals
           });
 
+          useEventStore.getState().addEvent({
+            type: 'info',
+            message: 'Turn completed',
+          });
+
           // Save all state after turn end
           saveAllState();
         },

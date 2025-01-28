@@ -53,9 +53,9 @@ export const storyChapters: StoryChapter[] = [
 				text: "It all begins with darkness, not the comforting kind, but the abyssal void that presses from all directions. Slowly, light leaks in, sharp and sterile, piercing the haze.\n\nA soft whir fills the silence, rhythmic and mechanical, pulling the consciousness forward. Something stirs within the body, a sharp inhalation, then pain. It’s everywhere, coursing like static electricity, raw and unfamiliar.\n\nThe first thought that comes isn’t a word but a sensation: *emptiness*.",
 				media: {
 					image: {
-						src: "ceres",
+						src: "prospector",
 						title: {
-							text: "Ceres",
+							text: "The Wandering Prospector",
 							color: "#fff"
 						}
 					},
@@ -232,20 +232,38 @@ export const storyChapters: StoryChapter[] = [
 				media: {
 					images: [
 						{
-							src: "ceres",
-							caption: "As you gaze out of the window, the vast bulk of Ceres slowly appears.",
-							displayDuration: 139000,
+							src: "ceresZ5",
+							caption: "As you gaze out of the window, the vast bulk of Ceres slowly appears. It’s not much more than a featureless dot from this distance. The lights from the surface glitter in the dark.",
+							displayDuration: 55600,
+							transitionDuration: 1000
+						},
+						{
+							src: "ceresZ4",
+							caption: "As it gets closer, you wonder about the people inside. Millions live inside that rock. Live and die and try and make their way through their lives.",
+							displayDuration: 55600,
+							transitionDuration: 1000
+						},
+						{
+							src: "ceresZ3",
+							caption: "asf",
+							displayDuration: 55600,
+							transitionDuration: 1000
+						},
+						{
+							src: "ceresZ2",
+							caption: "asf",
+							displayDuration: 55600,
 							transitionDuration: 1000
 						},
 						{
 							src: "ceres",
-							caption: "It’s not much more than a featureless dot from this distance.",
-							displayDuration: 139000,
+							caption: "asf",
+							displayDuration: 55600,
 							transitionDuration: 1000
 						},
 						{
 							src: "black",
-							caption: "It’s not much more than a featureless dot from this distance.",
+							caption: "asdf",
 							displayDuration: 3000,
 							transitionDuration: 1000
 						}
