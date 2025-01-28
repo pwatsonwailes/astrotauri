@@ -32,6 +32,11 @@
 		background: #f97316;
 }
 
+html {
+  font-size: 20px;
+  letter-spacing: .02em;
+}
+
 body {
 	font-family: Lexend, sans-serif;
 	margin: 0;
@@ -106,20 +111,19 @@ button:target {
 	z-index: 99;
 }
 
-.distancedTop { margin-top: 95px }
+.distancedTop { margin-top: 110px }
 
-.adjustedHeight { min-height: calc(100vh - 95px) }
+.adjustedHeight { min-height: calc(100vh - 110px) }
 
 .creamyBg {
 	background: #f6f4ee
 }
 
-.creamyBgLighter { background: #fbfbf8 }
-
-.shadowButton {
-	box-shadow:	5px 5px 14px #b9b9b3,
-							 -5px -5px 14px #fdffff;
+.creamyBgPattern {
+	background-color: #f6f4ee;
 }
+
+.creamyBgLighter { background: #fbfbf8 }
 
 .promontory {
 	background: #fbfbf8;
@@ -252,7 +256,7 @@ button:target {
 	flex-direction: column;
 }
 
-.story .w-2\/3 > div {
+.story .w-2\/3 > div:first-child {
 	align-items: center;
 	display: flex;
 	justify-content: center;
@@ -260,12 +264,14 @@ button:target {
 	overflow: hidden;
 }
 
-.story .w-2\/3 > div img {
+.story .w-2\/3 > div:first-child img {
 	max-width: fit-content;
 }
 
 .story .w-1\/3:before {
-	background: #fbfbf8;
+	background: linear-gradient(#f6f4ee, #f6f4ee) padding-box,
+	              linear-gradient(to bottom, #bbb, #999) border-box;
+	border: 1px solid transparent;
 	border-radius: .5rem;
 	box-shadow:	5px 5px 14px #b9b9b3,
 							 -5px -5px 14px #ffffff;
@@ -282,6 +288,37 @@ button:target {
 
 .story .w-1\/3:before { left: 5px; /* Adjust distance from the left */ }
 .story .w-2\/3:before { right: 5px; /* Adjust distance from the left */ }
+
+.avatar {
+	box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+	height: 150px;
+	width: 225px;
+}
+
+.avatar > div {
+	height: 100%;
+	overflow: hidden;
+	position: relative;
+}
+
+.avatar span {
+	color: #000;
+	position: absolute;
+	top: 50%;
+	right: -0.5rem;
+	transform: rotate(270deg);
+	margin-top: -.5rem;
+	text-transform: uppercase;
+	letter-spacing: .1rem;
+	font-weight: 800;
+}
+
+.story .avatar img {
+    width: 80%;
+    border-right: 1px solid #ccc;
+    top: 0.5rem;
+    position: relative;
+}
 
 .galleryImg {
 	width: 100%;

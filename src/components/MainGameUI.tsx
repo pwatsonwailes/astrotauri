@@ -54,10 +54,12 @@ export function MainGameUI() {
     }
   };
 
+  const adjustedHeight = currentView !== 'characterCreation' && currentView !== 'story'
+
   return (
-    <div className="adjustedHeight creamyBg">
+    <div className={`creamyBg ${adjustedHeight ? 'adjustedHeight' : ''}`}>
       <div className="mx-4">
-        {currentView !== 'characterCreation' && currentView !== 'story' && (
+        {adjustedHeight && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

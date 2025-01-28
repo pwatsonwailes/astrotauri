@@ -1,7 +1,6 @@
 import React from 'react';
 import { Goal } from '../../types/goals';
 import { X, ChevronRight } from 'lucide-react';
-import { SubgoalsList } from './SubgoalsList';
 
 interface GoalDetailsProps {
   goal: Goal;
@@ -20,7 +19,6 @@ export const GoalDetails: React.FC<GoalDetailsProps> = ({
   selectedSubgoalId,
   onBack
 }) => {
-  const isMainGoal = 'subgoals' in goal;
   const filteredRequirements = goal.requirements.filter(req => req.amount !== null);
 
   return (
@@ -51,18 +49,6 @@ export const GoalDetails: React.FC<GoalDetailsProps> = ({
           </button>
         )}
       </div>
-
-      {isMainGoal && (
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-600">Required Steps</h3>
-          <SubgoalsList 
-            subgoals={goal.subgoals}
-            goals={goals}
-            onSelectSubgoal={onSelectSubgoal!}
-            selectedGoalId={selectedSubgoalId}
-          />
-        </div>
-      )}
 
       {filteredRequirements.length > 0 && (
         <div className="space-y-4">

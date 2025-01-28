@@ -32,7 +32,7 @@ export const LocationsView: React.FC = () => {
   const allActions = [...locationActions, ...npcActions];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 distancedTop">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 distancedTop pt-6">
       {/* Location Description */}
       <div className="lg:col-span-3">
         <h2 className="text-2xl font-bold text-black mb-4">{locationData.name}</h2>

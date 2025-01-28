@@ -234,13 +234,13 @@ export const storyChapters: StoryChapter[] = [
 						{
 							src: "ceres",
 							caption: "As you gaze out of the window, the vast bulk of Ceres slowly appears.",
-							displayDuration: 140000,
+							displayDuration: 139000,
 							transitionDuration: 1000
 						},
 						{
 							src: "ceres",
 							caption: "It’s not much more than a featureless dot from this distance.",
-							displayDuration: 140000,
+							displayDuration: 139000,
 							transitionDuration: 1000
 						},
 						{
@@ -269,7 +269,7 @@ export const storyChapters: StoryChapter[] = [
 					},
 					character: {
 						cast: "primary",
-						position: "characterBar",
+						position: "avatar",
 						name: "Sadie",
 						src: "sadie",
 						action: "add"
