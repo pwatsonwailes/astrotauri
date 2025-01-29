@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { StoryState, StoryVariable, StoryVariableUpdate } from '../types/story';
+import { StoryState, StoryVariable, StoryVariableUpdate, StoryNode } from '../types/story';
 import { findNextValidNode } from '../utils/story/nodes';
 import { storyChapters } from '../data/story/chapters';
 import { StorageService } from '../services/storage';
 import { initialStoryVariables } from '../data/story/variables';
 import { saveAllState } from '../utils/state/saveState';
 import { useEventStore } from './useEventStore';
+import { characterNarratives, locationNarratives } from '../data/narratives';
 
 const INITIAL_STATE: StoryState = {
   currentChapterIndex: 0,
@@ -19,7 +20,9 @@ const INITIAL_STATE: StoryState = {
   isPlaying: true,
   activeCharacters: [],
   activeLoops: [],
-  temporaryNodes: null
+  temporaryNodes: null,
+  completedNarratives: [],
+  activeNarratives: []
 };
 
 interface StoryStore extends StoryState {
@@ -33,7 +36,8 @@ interface StoryStore extends StoryState {
   resetStoryState: () => void;
   updateVariable: (update: StoryVariableUpdate) => void;
   updateVariables: (updates: StoryVariableUpdate[]) => void;
-  loadNarrativeNodes: (nodes: StoryNode[]) => void;
+  startNarrative: (narrativeId: string) => boolean;
+  completeNarrative: (narrativeId: string) => void;
 }
 
 export const useStoryStore = create<StoryStore>()(
@@ -262,13 +266,35 @@ export const useStoryStore = create<StoryStore>()(
           saveAllState();
         },
 
-        loadNarrativeNodes: (nodes: StoryNode[]) => {
-          set(state => ({
-            ...state,
+        startNarrative: (narrativeId: string): boolean => {
+          const state = get();
+          
+          // Check if narrative is already completed or active
+          if (state.completedNarratives.includes(narrativeId) ||
+              state.activeNarratives.includes(narrativeId)) {
+            return false;
+          }
+
+          // Find the narrative
+          const narrative = characterNarratives[narrativeId] || locationNarratives[narrativeId];
+          if (!narrative) return false;
+
+          // Load narrative nodes
+          set({
+            temporaryNodes: narrative.nodes,
             currentChapterIndex: -1, // Special index for narrative content
             currentNodeIndex: 0,
             isPlaying: true,
-            temporaryNodes: nodes
+            activeNarratives: [...state.activeNarratives, narrativeId]
+          });
+
+          return true;
+        },
+
+        completeNarrative: (narrativeId: string) => {
+          set(state => ({
+            completedNarratives: [...state.completedNarratives, narrativeId],
+            activeNarratives: state.activeNarratives.filter(id => id !== narrativeId)
           }));
         }
       }),

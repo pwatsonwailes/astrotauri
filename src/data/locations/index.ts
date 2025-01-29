@@ -15,16 +15,7 @@ export const LOCATIONS: { [key: string]: Location } = {
         type: 'area',
         description: 'A small but well-equipped medical facility where you first woke up.',
         npcs: [
-          {
-            ...NPCs['dr-santos'],
-            narrativeRequirements: [
-              {
-                type: 'story',
-                chapterId: 0,
-                nodeId: 'wake_up'
-              }
-            ]
-          }
+          NPCs['dr-santos']
         ]
       },
       {
@@ -33,29 +24,13 @@ export const LOCATIONS: { [key: string]: Location } = {
         type: 'area',
         description: 'The living area for the ship\'s crew, featuring shared spaces and individual cabins.',
         npcs: [
-          {
-            ...NPCs['captain-chen'],
-            narrativeRequirements: [
-              {
-                type: 'story',
-                chapterId: 0,
-                nodeId: 'wake_up'
-              }
-            ]
-          },
-          {
-            ...NPCs['sadie'],
-            narrativeRequirements: [
-              {
-                type: 'story',
-                chapterId: 0,
-                nodeId: 'meet_sadie'
-              }
-            ]
-          }
+          NPCs['captain-chen'],
+          NPCs['sadie']
         ]
       }
     ],
+    npcs: [],
+    goals: [],
     availableDestinations: ['ceres']
   },
   'ceres': {

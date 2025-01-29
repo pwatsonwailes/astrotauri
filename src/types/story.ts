@@ -114,4 +114,6 @@ export interface StoryState {
   }>;
   activeLoops: LoopState[];
   temporaryNodes?: StoryNode[];
+  completedNarratives: string[];
+  activeNarratives: string[];
 }

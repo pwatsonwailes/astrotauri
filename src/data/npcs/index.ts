@@ -15,7 +15,8 @@ export const NPCs: Record<string, NPC> = {
       nodeId: 'wake_up'
     },
     availableNarratives: ['medical-checkup', 'discuss-condition'],
-    type: 'fixed'
+    type: 'fixed',
+    isUnlocked: true // Set to true since they're available from start
   },
   'captain-chen': {
     id: 'captain-chen',
@@ -25,7 +26,8 @@ export const NPCs: Record<string, NPC> = {
     image: 'lin',
     relationship: 0,
     availableNarratives: ['discuss-journey', 'ship-status'],
-    type: 'fixed'
+    type: 'fixed',
+    isUnlocked: true // Set to true since they're available from start
   },
   'sadie': {
     id: 'sadie',
@@ -35,6 +37,7 @@ export const NPCs: Record<string, NPC> = {
     image: 'sadie',
     relationship: 0,
     availableNarratives: ['sadie-investigation'],
-    type: 'companion'
+    type: 'companion',
+    isUnlocked: true // Set to true since they're available from start
   }
 };

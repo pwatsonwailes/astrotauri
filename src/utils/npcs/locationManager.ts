@@ -19,26 +19,16 @@ export const initializeNPCLocations = (): Record<string, NPCLocation> => {
 
 // Get all NPCs at a specific location
 export const getNPCsAtLocation = (locationId: string): string[] => {
-  const { currentLocation, npcLocations } = useGameStore.getState();
+  const { npcLocations } = useGameStore.getState();
   const npcsAtLocation: string[] = [];
 
   Object.entries(npcLocations).forEach(([npcId, data]) => {
-    // Check if NPC is a companion with player
-    if (data.isWithPlayer) {
-      if (locationId === currentLocation.id) {
-        npcsAtLocation.push(npcId);
-        return;
-      }
-    }
+    // Check if NPC is unlocked
+    const npc = NPCs[npcId];
+    if (!npc?.isUnlocked) return;
 
-    // Check fixed location
-    if (data.fixedLocation === locationId) {
-      npcsAtLocation.push(npcId);
-      return;
-    }
-
-    // Check current location
-    if (data.currentLocationId === locationId) {
+    // Check if NPC is at this location
+    if (data.currentLocationId === locationId || data.fixedLocation === locationId) {
       npcsAtLocation.push(npcId);
     }
   });

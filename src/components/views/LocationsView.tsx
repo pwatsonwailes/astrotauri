@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useGameStore } from '../../stores/useGameStore';
 import { useStoryStore } from '../../stores/useStoryStore';
 import { LOCATIONS } from '../../data/locations';
+import { NPCs } from '../../data/npcs';
 import { NPCList } from '../locations/NPCList';
 import { LocationCard } from '../locations/LocationCard';
 import { getNPCsAtLocation } from '../../utils/npcs/locationManager';
@@ -17,12 +18,7 @@ export const LocationsView: React.FC = () => {
   // Get NPCs for the current sublocation or main location
   const getRelevantNPCs = () => {
     if (selectedSubLocation) {
-      const subLocation = locationData.subLocations.find(sub => sub.id === selectedSubLocation);
-      if (!subLocation) return [];
-      const presentNPCIds = getNPCsAtLocation(selectedSubLocation);
-      return presentNPCIds
-        .map(id => subLocation.npcs.find(npc => npc.id === id))
-        .filter(npc => npc);
+      return getNPCsAtLocation(selectedSubLocation);
     }
     return [];
   };
@@ -61,7 +57,7 @@ export const LocationsView: React.FC = () => {
             <NPCList
               npcs={presentNPCs}
               onSelectNPC={(npcId) => {
-                const npc = presentNPCs.find(n => n.id === npcId);
+                const npc = NPCs[npcId];
                 if (npc?.availableNarratives?.[0]) {
                   startNarrative(npc.availableNarratives[0]);
                 }
