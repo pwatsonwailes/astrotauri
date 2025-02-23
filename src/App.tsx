@@ -1,16 +1,23 @@
-import { useEffect } from 'react';
-import { Game } from './components/Game';
-import { useGameStore } from './stores/useGameStore';
-import { useStoryStore } from './stores/useStoryStore';
+import React from 'react';
+import { useGameStore } from './store/gameStore';
+import { IntroScreen } from './components/IntroScreen';
+import { CharacterSelect } from './components/CharacterSelect';
+import { StoryScreen } from './components/StoryScreen';
+import { ShipHub } from './components/ShipHub';
+import mainStory from './stories/main.ink?raw';
 
-export function App() {
-  const initializeGame = useGameStore(state => state.initialize);
-  const initializeStory = useStoryStore(state => state.initialize);
+function App() {
+  const currentScreen = useGameStore((state) => state.currentScreen);
+  const currentStory = useGameStore((state) => state.currentStory);
 
-  useEffect(() => {
-    initializeGame();
-    initializeStory();
-  }, [initializeGame, initializeStory]);
-
-  return <Game />;
+  return (
+    <div className="min-h-screen bg-gray-900">
+      {currentScreen === 'intro' && <IntroScreen />}
+      {currentScreen === 'character-select' && <CharacterSelect />}
+      {currentScreen === 'story' && <StoryScreen storyContent={currentStory || mainStory} />}
+      {currentScreen === 'ship-hub' && <ShipHub />}
+    </div>
+  );
 }
+
+export default App;
