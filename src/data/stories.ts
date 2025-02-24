@@ -31,8 +31,6 @@ import kadeStory from '../stories/kade.ink?raw';
 import rheaStory2 from '../stories/rhea2.ink?raw';
 import jaxStory2 from '../stories/jax2.ink?raw';
 import kadeStory2 from '../stories/kade2.ink?raw';
-import mainStory from '../stories/main.ink?raw';
-import mainStory2 from '../stories/main2.ink?raw';
 
 export const stories: Story[] = [
   // Main story progression

@@ -111,13 +111,18 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     
     if (currentStory) {
       addCompletedConversation(currentStory);
-    }
-
-    const nextStory = currentStory ? getNextStory(currentStory) : null;
-    
-    if (nextStory) {
-      setCurrentStory(nextStory.content);
-      addCompletedConversation(nextStory.id);
+      
+      // Get the next story in sequence if one exists
+      const nextStory = getNextStory(currentStory);
+      
+      if (nextStory) {
+        // If there's a next story, load it immediately
+        setCurrentStory(nextStory.content);
+        addCompletedConversation(nextStory.id);
+      } else {
+        // If no next story, return to ship hub
+        setScreen('ship-hub');
+      }
     } else {
       setScreen('ship-hub');
     }

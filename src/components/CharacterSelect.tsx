@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import { useSoundSystem } from '../hooks/useSoundSystem';
 import { characters } from '../data/characters';
-import mainStory from '../stories/main.ink?raw';
+import Prologue from '../stories/main/c1/Prologue.ink?raw';
 
 export const CharacterSelect: React.FC = () => {
   const { setScreen, setCharacter, setCurrentStory, addCompletedConversation } = useGameStore();
@@ -14,7 +14,7 @@ export const CharacterSelect: React.FC = () => {
     if (character) {
       playSound('select');
       setCharacter(character);
-      setCurrentStory(mainStory);
+      setCurrentStory(Prologue);
       // Mark the initial story as completed
       addCompletedConversation('main_1');
       setScreen('story');
@@ -27,7 +27,7 @@ export const CharacterSelect: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 to-black text-white p-8">
+    <div className="min-h-screen bg-slate-900 text-white p-8">
       <button
         onClick={handleBack}
         className="flex items-center text-gray-300 hover:text-white mb-8"
