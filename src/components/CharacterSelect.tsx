@@ -1,15 +1,18 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
+import { useSoundSystem } from '../hooks/useSoundSystem';
 import { characters } from '../data/characters';
 import mainStory from '../stories/main.ink?raw';
 
 export const CharacterSelect: React.FC = () => {
   const { setScreen, setCharacter, setCurrentStory, addCompletedConversation } = useGameStore();
+  const { playSound } = useSoundSystem();
 
   const selectCharacter = (characterId: string) => {
     const character = characters.find(c => c.id === characterId);
     if (character) {
+      playSound('select');
       setCharacter(character);
       setCurrentStory(mainStory);
       // Mark the initial story as completed
@@ -18,10 +21,15 @@ export const CharacterSelect: React.FC = () => {
     }
   };
 
+  const handleBack = () => {
+    playSound('navigation');
+    setScreen('intro');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 to-black text-white p-8">
       <button
-        onClick={() => setScreen('intro')}
+        onClick={handleBack}
         className="flex items-center text-gray-300 hover:text-white mb-8"
       >
         <ArrowLeft className="mr-2" size={24} />
