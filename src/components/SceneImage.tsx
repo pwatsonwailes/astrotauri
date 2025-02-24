@@ -7,11 +7,11 @@ interface SceneImageProps {
 
 export const SceneImage: React.FC<SceneImageProps> = ({ scene }) => {
   return (
-    <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black/50">
+    <div className="screenImage relative w-full rounded-lg overflow-hidden bg-black/50">
       <img
         src={scene.image}
         alt="Current scene"
-        className="w-full h-full object-cover transition-opacity duration-1000"
+        className="transition-opacity duration-1000"
       />
       <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
         <div className="flex flex-wrap gap-3">

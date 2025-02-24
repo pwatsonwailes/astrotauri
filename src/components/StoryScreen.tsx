@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Story, Compiler } from 'inkjs/types';
 import { useGameStore } from '../store/gameStore';
 import { useStorySystem } from '../hooks/useStorySystem';
@@ -25,9 +25,17 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     speakingCharacter: undefined,
   });
 
+  const textContainerRef = useRef<HTMLDivElement>(null);
   const { selectedCharacter, setScreen, currentStory, setCurrentStory, addCompletedConversation } = useGameStore();
   const { getNextStory } = useStorySystem();
   const { playSound } = useSoundSystem();
+
+  // Scroll to bottom when new content is added
+  useEffect(() => {
+    if (textContainerRef.current) {
+      textContainerRef.current.scrollTop = textContainerRef.current.scrollHeight;
+    }
+  }, [visibleParagraphs]);
 
   useEffect(() => {
     const initStory = () => {
@@ -159,30 +167,34 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 to-black text-white p-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-        <div>
-          <SceneImage scene={sceneState} />
+    <div className="min-h-screen bg-gray-900 text-white flex">
+      {/* Left side - Image (2/3 width) */}
+      <div className="w-2/3 h-screen relative p-4">
+        <SceneImage scene={sceneState} />
+      </div>
+      
+      {/* Right side - Text and Controls (1/3 width) */}
+      <div className="w-1/3 h-screen flex flex-col p-6">
+        {/* Character info */}
+        <div className="flex items-center mb-6">
+          <img
+            src={selectedCharacter?.avatar}
+            alt={selectedCharacter?.name}
+            className="w-12 h-12 rounded-full mr-4 object-cover"
+          />
+          <h2 className="text-xl font-bold">{selectedCharacter?.name}</h2>
         </div>
-        
-        <div>
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center">
-              <img
-                src={selectedCharacter?.avatar}
-                alt={selectedCharacter?.name}
-                className="w-16 h-16 rounded-full mr-4 object-cover"
-              />
-              <h2 className="text-2xl font-bold">{selectedCharacter?.name}</h2>
-            </div>
-          </div>
 
-          <div className="bg-gray-800 rounded-lg p-6 mb-6">
+        {/* Scrollable text area */}
+        <div 
+          ref={textContainerRef}
+          className="flex-grow overflow-y-auto mb-6 pr-4 custom-scrollbar"
+        >
+          <div className="space-y-4">
             {visibleParagraphs.map((paragraph, index) => (
               <p 
                 key={`${paragraph}-${index}`}
                 className={`text-lg transition-opacity duration-500 ease-in-out
-                  ${index < visibleParagraphs.length - 1 ? 'mb-4' : ''}
                   ${index === visibleParagraphs.length - 1 && isNewContent
                     ? 'opacity-0'
                     : 'opacity-100'
@@ -192,44 +204,43 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
               </p>
             ))}
           </div>
+        </div>
 
-          <div className="space-y-4">
-            {showContinueButton && (
-              <button
-                onClick={showNextParagraph}
-                className="w-full flex items-center justify-center px-6 py-4 bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors text-lg font-medium"
-              >
-                Continue
-                <ArrowRight className="ml-2" size={20} />
-              </button>
-            )}
+        {/* Controls */}
+        <div className="space-y-4 storyControls">
+          {showContinueButton && (
+            <button
+              onClick={showNextParagraph}
+              className="continue w-full flex items-center justify-center px-6 py-4 text-lg"
+            >
+              Continue
+              <ArrowRight className="ml-2" size={20} />
+            </button>
+          )}
 
-            {showChoices && (
-              <div className="space-y-4">
-                {choices.map((choice, index) => (
-                  <button
-                    key={choice}
-                    onClick={() => makeChoice(index)}
-                    className={`w-full text-left px-6 py-4 bg-purple-600 hover:bg-purple-700 
-                      rounded-lg transition-all duration-500 ease-in-out
-                      ${isNewContent ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
-                  >
-                    {choice}
-                  </button>
-                ))}
-              </div>
-            )}
+          {showChoices && (
+            <div className="space-y-4">
+              {choices.map((choice, index) => (
+                <button
+                  key={choice}
+                  onClick={() => makeChoice(index)}
+                  className={`choice w-full text-left px-6 py-4 text-lg ${isNewContent ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
+                >
+                  {choice}
+                </button>
+              ))}
+            </div>
+          )}
 
-            {showReturnButton && (
-              <button
-                onClick={handleStoryCompletion}
-                className="w-full flex items-center justify-center px-6 py-4 bg-green-600 hover:bg-green-700 rounded-lg transition-colors text-lg font-medium"
-              >
-                <Home className="mr-2" size={20} />
-                Continue
-              </button>
-            )}
-          </div>
+          {showReturnButton && (
+            <button
+              onClick={handleStoryCompletion}
+              className="continue w-full flex items-center justify-center px-6 py-4 text-lg"
+            >
+              <Home className="mr-2" size={20} />
+              Continue
+            </button>
+          )}
         </div>
       </div>
     </div>
