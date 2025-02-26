@@ -44,16 +44,16 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
         
         newStory.variablesState["character_class"] = selectedCharacter?.id || "";
         
-        newStory.ObserveVariable('scene_image', (varName: string, newValue: string) => {
+        newStory.ObserveVariable('scene_image', (_: string, newValue: string) => {
           setSceneState(prev => ({ ...prev, image: newValue }));
         });
         
-        newStory.ObserveVariable('present_characters', (varName: string, newValue: any) => {
+        newStory.ObserveVariable('present_characters', (_: string, newValue: any) => {
           const characters = newValue.toString().split(", ");
           setSceneState(prev => ({ ...prev, presentCharacters: characters }));
         });
         
-        newStory.ObserveVariable('speaking_character', (varName: string, newValue: string) => {
+        newStory.ObserveVariable('speaking_character', (_: string, newValue: string) => {
           setSceneState(prev => ({ ...prev, speakingCharacter: newValue }));
         });
         
@@ -152,7 +152,7 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 to-black text-white p-8 flex items-center justify-center">
+      <div className="min-h-screen creamyBg text-black p-8 flex items-center justify-center">
         <div className="bg-red-900/50 rounded-lg p-6 max-w-md text-center">
           <p className="text-lg mb-4">{error}</p>
           <button
@@ -167,7 +167,7 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex">
+    <div className="min-h-screen creamyBg text-black flex">
       {/* Left side - Image (2/3 width) */}
       <div className="w-2/3 h-screen relative p-4">
         <SceneImage scene={sceneState} />
@@ -175,16 +175,6 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
       
       {/* Right side - Text and Controls (1/3 width) */}
       <div className="w-1/3 h-screen flex flex-col p-6">
-        {/* Character info */}
-        <div className="flex items-center mb-6">
-          <img
-            src={selectedCharacter?.avatar}
-            alt={selectedCharacter?.name}
-            className="w-12 h-12 rounded-full mr-4 object-cover"
-          />
-          <h2 className="text-xl font-bold">{selectedCharacter?.name}</h2>
-        </div>
-
         {/* Scrollable text area */}
         <div 
           ref={textContainerRef}

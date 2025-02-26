@@ -32,7 +32,7 @@ function App() {
   const currentStory = useGameStore((state) => state.currentStory);
 
   return (
-    <div className="min-h-screen bg-gray-900 overflow-hidden">
+    <div className="min-h-screen creamyBg overflow-hidden">
       <AnimatePresence mode="wait">
         {currentScreen === 'intro' && (
           <motion.div
