@@ -95,19 +95,31 @@ h4 {
     width: auto
 }
 
-.storyControls button.continue:hover,
 .introButtons button:hover {
     background: rgba(0,0,0,0.5);
     color: #fff;
 }
 
 .storyControls button.continue {
-    background: #7c3807;
-    color: #fff;
+  color: #090909;
+  padding: 0.7em 1.7em;
+  font-size: 18px;
+  border-radius: 0.5em;
+  background: #e8e8e8;
+  cursor: pointer;
+  border: 1px solid #e8e8e8;
+  transition: all 0.3s;
+  box-shadow: 6px 6px 12px #c5c5c5, -6px -6px 12px #ffffff;
 }
 
-.storyControls button.continue:hover {
-    background: #f97316;
+.storyControls button.continue:active {
+  color: #666;
+  box-shadow: inset 4px 4px 12px #c5c5c5, inset -4px -4px 12px #ffffff;
+}
+
+button:active {
+  color: #666;
+  box-shadow: inset 4px 4px 12px #c5c5c5, inset -4px -4px 12px #ffffff;
 }
 
 .introButtons button:hover {
@@ -156,8 +168,9 @@ h4 {
 }
 
 .screenImage img {
-    max-height: max-content;
-    max-width: max-content;
+    min-height: 100%;
+    min-width: 100%;
+    object-fit: cover;
 }
 
 /* Custom scrollbar styles */

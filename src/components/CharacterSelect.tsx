@@ -139,7 +139,7 @@ export const CharacterSelect: React.FC = () => {
         <div className="mt-6 md:mt-8 flex justify-center">
           <button
             onClick={createCharacter}
-            className="px-6 py-3 md:px-8 md:py-4 bg-slate-700 text-white rounded-lg text-base md:text-lg font-bold hover:bg-orange-600 transition-colors"
+            className="px-6 py-3 md:px-8 md:py-4 bg-slate-700 text-white rounded-lg text-base md:text-lg font-bold hover:shadow-lg hover:shadow-black/50 hover:bg-orange-600 transition-colors"
           >
             Begin Your Journey
           </button>

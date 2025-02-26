@@ -7,7 +7,7 @@ interface SceneImageProps {
 
 export const SceneImage: React.FC<SceneImageProps> = ({ scene }) => {
   return (
-    <div className="screenImage relative w-full rounded-lg overflow-hidden bg-black/50 shadow-lg shadow-stone-900/50">
+    <div className="screenImage relative w-full rounded-lg overflow-hidden bg-black/50 shadow-lg shadow-black/50">
       <img
         src={scene.image}
         alt="Current scene"
