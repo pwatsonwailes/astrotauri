@@ -81,8 +81,8 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     }
 
     const paragraphs: string[] = [];
-    while (currentStory.canContinue) {
-      const text = currentStory.Continue().trim();
+    while (currentStory !== null && currentStory.canContinue) {
+      const text = currentStory.Continue()!.trim();
       if (text) {
         paragraphs.push(text);
       }

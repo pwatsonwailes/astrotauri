@@ -12,7 +12,7 @@ export type QuestDialogue = {
 
 export type QuestInteractionOption = {
   id: string;
-  description: string;
+  text: string;
   bonus: number;
   type: 'resource' | 'time' | 'item' | 'aggressive' | 'diplomatic' | 'cautious';
   cost?: number;

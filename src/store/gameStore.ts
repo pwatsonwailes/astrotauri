@@ -14,7 +14,7 @@ export const useGameStore = create<GameState & {
   addInventoryItem: (item: InventoryItem) => void;
   removeInventoryItem: (itemId: string, quantity: number) => void;
   addManufacturingItem: (item: ManufacturingItem) => void;
-  advanceTurn: () => void;
+  advanceTurn: (state: any) => void;
   addCompletedConversation: (crewId: string) => void;
 }>((set, get) => ({
   currentScreen: 'intro',

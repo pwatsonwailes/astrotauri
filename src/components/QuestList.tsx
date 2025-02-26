@@ -1,8 +1,7 @@
 import React from 'react';
 import { useGameStore } from '../store/gameStore';
-import { Clock, AlertTriangle, CheckCircle, XCircle, MessageSquare } from 'lucide-react';
-import { QuestInteraction as QuestInteractionType } from '../types/game';
-import { alignmentModifiers } from '../data/characters';
+import { Clock, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { QuestInteraction as QuestInteractionType } from '../types/quest';
 
 export const QuestList: React.FC = () => {
   const { activeQuests, resources, inventory, updateResources, updateQuest, selectedCharacter } = useGameStore();
@@ -207,7 +206,7 @@ export const QuestList: React.FC = () => {
                         }`}
                         disabled={!canUse}
                       >
-                        <p className="font-medium mb-1">{option.description}</p>
+                        <p className="font-medium mb-1">{option.text}</p>
                         <div className="flex flex-wrap gap-2 text-sm">
                           {option.type === 'resource' && option.cost && (
                             <span className="text-red-300 px-2 py-1 bg-red-900/30 rounded">
@@ -249,7 +248,7 @@ export const QuestList: React.FC = () => {
             {currentInteraction && hasInteractionChoice && (
               <div className="bg-gray-800/50 rounded p-3">
                 <p className="text-sm text-gray-400">
-                  Choice made: {currentInteraction.options[interactionChoices[quest.id]].description}
+                  Choice made: {currentInteraction.options[interactionChoices[quest.id]].text}
                 </p>
               </div>
             )}
