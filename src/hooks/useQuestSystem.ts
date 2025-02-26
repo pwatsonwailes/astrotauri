@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { useGameStore } from '../store/gameStore';
 import { Resources, Alignment } from '../types/game';
-import { Quest, QuestInteraction } from '../types/quest';
+import { QuestInteraction } from '../types/quest';
 import { GAME_CONSTANTS } from '../constants/game';
 import { alignmentModifiers } from '../data/characters';
 

@@ -35,7 +35,6 @@ export const CharacterSelect: React.FC = () => {
   };
 
   const stats = getBaseStats(selectedBackground);
-  const alignmentMod = alignments[selectedAlignment];
 
   const createCharacter = () => {
     const character: Character = {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { QuestInteraction as QuestInteractionType } from '../types/game';
+import { QuestInteraction as QuestInteractionType } from '../types/quest';
 import { useQuestSystem } from '../hooks/useQuestSystem';
 
 interface QuestInteractionProps {

@@ -53,7 +53,6 @@ export const QuestList: React.FC = () => {
     
     let bonus = option.bonus;
     const { alignment, stats } = selectedCharacter;
-    const alignmentMod = alignmentModifiers[alignment];
     
     // Apply alignment-specific bonuses
     if (option.type === 'aggressive' && alignment === 'ruthless') {

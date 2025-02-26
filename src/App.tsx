@@ -1,6 +1,3 @@
-import React from 'react';
-import { motion } from "motion/react"
-
 import { AnimatePresence, motion } from 'motion/react';
 import { useGameStore } from './store/gameStore';
 import { IntroScreen } from './components/IntroScreen';

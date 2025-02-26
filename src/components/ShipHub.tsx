@@ -2,7 +2,7 @@ import React from 'react';
 import { useGameStore } from '../store/gameStore';
 import { useSoundSystem } from '../hooks/useSoundSystem';
 import { Location } from '../types/game';
-import { Map, Users, Radio, Clipboard, ShoppingBag, Clock, User } from 'lucide-react';
+import { Map, Users, Radio, Clipboard, ShoppingBag, Clock } from 'lucide-react';
 import { QuestList } from './QuestList';
 import { Inventory } from './Inventory';
 import { CraftingSystem } from './CraftingSystem';

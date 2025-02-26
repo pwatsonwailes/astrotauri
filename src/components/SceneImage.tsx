@@ -1,5 +1,5 @@
 import React from 'react';
-import { SceneState } from '../types/game';
+import { SceneState } from '../types/story';
 
 interface SceneImageProps {
   scene: SceneState;
