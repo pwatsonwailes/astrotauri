@@ -2,9 +2,10 @@ import React from 'react';
 import { useGameStore } from '../store/gameStore';
 import { Clock, AlertTriangle, CheckCircle, XCircle, MessageSquare } from 'lucide-react';
 import { QuestInteraction as QuestInteractionType } from '../types/game';
+import { alignmentModifiers } from '../data/characters';
 
 export const QuestList: React.FC = () => {
-  const { activeQuests, resources, inventory, updateResources, updateQuest } = useGameStore();
+  const { activeQuests, resources, inventory, updateResources, updateQuest, selectedCharacter } = useGameStore();
   const [completionNotice, setCompletionNotice] = React.useState<{
     questName: string;
     status: 'completed' | 'failed';
@@ -47,6 +48,34 @@ export const QuestList: React.FC = () => {
     return true;
   };
 
+  const getOptionBonus = (option: QuestInteractionType['options'][0], questType: string) => {
+    if (!selectedCharacter) return option.bonus;
+    
+    let bonus = option.bonus;
+    const { alignment, stats } = selectedCharacter;
+    const alignmentMod = alignmentModifiers[alignment];
+    
+    // Apply alignment-specific bonuses
+    if (option.type === 'aggressive' && alignment === 'ruthless') {
+      bonus *= 1.3;
+    } else if (option.type === 'diplomatic' && alignment === 'noble') {
+      bonus *= 1.3;
+    } else if (option.type === 'cautious' && alignment === 'stoic') {
+      bonus *= 1.2;
+    }
+    
+    // Apply stat bonuses based on quest type
+    if (questType === 'technical' && option.type === 'resource') {
+      bonus += (stats.technicalExpertise - 5) * 0.1;
+    } else if (questType === 'diplomatic' && option.type === 'diplomatic') {
+      bonus += (stats.diplomacy - 5) * 0.1;
+    } else if (questType === 'combat' && option.type === 'aggressive') {
+      bonus += (stats.riskTolerance - 5) * 0.1;
+    }
+    
+    return parseFloat(bonus.toFixed(1));
+  };
+
   const handleInteractionChoice = (
     questId: string,
     interaction: QuestInteractionType,
@@ -62,9 +91,12 @@ export const QuestList: React.FC = () => {
       updateResources({ credits: -option.cost });
     }
 
+    // Calculate bonus with character stats and alignment
+    const adjustedBonus = getOptionBonus(option, quest.type);
+
     // Update quest progress and mark interaction as used
     const updates: Partial<typeof quest> = {
-      cumulativeScore: quest.cumulativeScore + option.bonus
+      cumulativeScore: quest.cumulativeScore + adjustedBonus
     };
 
     // Add extra turn if specified
@@ -131,9 +163,20 @@ export const QuestList: React.FC = () => {
                 {getStatusIcon(quest.status)}
                 <h3 className="font-medium">{quest.name}</h3>
               </div>
-              <span className="text-sm text-gray-300">
-                Turn {quest.currentTurn}/{quest.duration}
-              </span>
+              <div className="flex items-center space-x-2">
+                <span className={`px-2 py-1 text-xs rounded ${
+                  quest.type === 'technical' ? 'bg-blue-900/50 text-blue-300' :
+                  quest.type === 'diplomatic' ? 'bg-green-900/50 text-green-300' :
+                  quest.type === 'combat' ? 'bg-red-900/50 text-red-300' :
+                  quest.type === 'strategic' ? 'bg-purple-900/50 text-purple-300' :
+                  'bg-gray-900/50 text-gray-300'
+                }`}>
+                  {quest.type}
+                </span>
+                <span className="text-sm text-gray-300">
+                  Turn {quest.currentTurn}/{quest.duration}
+                </span>
+              </div>
             </div>
             
             {currentDialogue && (
@@ -148,6 +191,8 @@ export const QuestList: React.FC = () => {
                 <div className="space-y-2">
                   {currentInteraction.options.map((option, index) => {
                     const canUse = canUseOption(option);
+                    const adjustedBonus = getOptionBonus(option, quest.type);
+                    
                     return (
                       <button
                         key={option.id}
@@ -164,22 +209,34 @@ export const QuestList: React.FC = () => {
                         disabled={!canUse}
                       >
                         <p className="font-medium mb-1">{option.description}</p>
-                        <div className="flex space-x-2 text-sm">
+                        <div className="flex flex-wrap gap-2 text-sm">
                           {option.type === 'resource' && option.cost && (
-                            <span className="text-red-300">
+                            <span className="text-red-300 px-2 py-1 bg-red-900/30 rounded">
                               Cost: {option.cost} credits
                             </span>
                           )}
                           {option.type === 'time' && option.extraTurn && (
-                            <span className="text-yellow-300">
+                            <span className="text-yellow-300 px-2 py-1 bg-yellow-900/30 rounded">
                               +{option.extraTurn} turn
                             </span>
                           )}
                           {option.type === 'item' && option.requiredItem && (
-                            <span className={`${
-                              canUse ? 'text-green-300' : 'text-red-300'
+                            <span className={`px-2 py-1 rounded ${
+                              canUse ? 'bg-green-900/30 text-green-300' : 'bg-red-900/30 text-red-300'
                             }`}>
                               Requires: {option.requiredItem}
+                            </span>
+                          )}
+                          <span className="text-blue-300 px-2 py-1 bg-blue-900/30 rounded">
+                            Bonus: +{adjustedBonus}
+                          </span>
+                          {selectedCharacter && (
+                            option.type === 'aggressive' && selectedCharacter.alignment === 'ruthless' ||
+                            option.type === 'diplomatic' && selectedCharacter.alignment === 'noble' ||
+                            option.type === 'cautious' && selectedCharacter.alignment === 'stoic'
+                          ) && (
+                            <span className="text-purple-300 px-2 py-1 bg-purple-900/30 rounded">
+                              Alignment bonus
                             </span>
                           )}
                         </div>

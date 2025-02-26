@@ -1,8 +1,8 @@
 import { Resources } from './game';
 
 export type RiskLevel = 'low' | 'medium' | 'high';
-
 export type QuestStatus = 'active' | 'completed' | 'failed';
+export type QuestType = 'technical' | 'diplomatic' | 'combat' | 'strategic' | 'general';
 
 export type QuestDialogue = {
   neutral: string;
@@ -14,7 +14,7 @@ export type QuestInteractionOption = {
   id: string;
   description: string;
   bonus: number;
-  type: 'resource' | 'time' | 'item';
+  type: 'resource' | 'time' | 'item' | 'aggressive' | 'diplomatic' | 'cautious';
   cost?: number;
   extraTurn?: number;
   requiredItem?: string;
@@ -44,6 +44,7 @@ export type Quest = {
   description: string;
   duration: number;
   riskLevel: RiskLevel;
+  type: QuestType;
   investmentCost: Partial<Resources>;
   requirements: Partial<Resources>;
   rewards: QuestRewards;

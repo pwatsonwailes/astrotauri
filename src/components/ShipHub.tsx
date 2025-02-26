@@ -2,7 +2,7 @@ import React from 'react';
 import { useGameStore } from '../store/gameStore';
 import { useSoundSystem } from '../hooks/useSoundSystem';
 import { Location } from '../types/game';
-import { Map, Users, Radio, Clipboard, ShoppingBag, Clock } from 'lucide-react';
+import { Map, Users, Radio, Clipboard, ShoppingBag, Clock, User } from 'lucide-react';
 import { QuestList } from './QuestList';
 import { Inventory } from './Inventory';
 import { CraftingSystem } from './CraftingSystem';
@@ -20,7 +20,7 @@ const locations: { id: Location; name: string; icon: React.ReactNode }[] = [
 
 export const ShipHub: React.FC = () => {
   const [selectedLocation, setSelectedLocation] = React.useState<Location>('bridge');
-  const { resources, currentTurn, advanceTurn } = useGameStore();
+  const { resources, currentTurn, advanceTurn, selectedCharacter } = useGameStore();
   const { playSound } = useSoundSystem();
 
   const handleLocationChange = (location: Location) => {
@@ -65,19 +65,37 @@ export const ShipHub: React.FC = () => {
               </button>
             </div>
           </div>
-          <div className="flex space-x-4 text-sm">
-            <div className="px-4 py-2 bg-gray-800 rounded-lg">
-              Credits: {resources.credits}
+          <div className="flex justify-between">
+            <div className="flex space-x-4 text-sm">
+              <div className="px-4 py-2 bg-gray-800 rounded-lg">
+                Credits: {resources.credits}
+              </div>
+              <div className="px-4 py-2 bg-gray-800 rounded-lg">
+                Materials: {resources.materials}
+              </div>
+              <div className="px-4 py-2 bg-gray-800 rounded-lg">
+                Tech: {resources.tech}
+              </div>
+              <div className="px-4 py-2 bg-gray-800 rounded-lg">
+                Influence: {resources.influence}
+              </div>
             </div>
-            <div className="px-4 py-2 bg-gray-800 rounded-lg">
-              Materials: {resources.materials}
-            </div>
-            <div className="px-4 py-2 bg-gray-800 rounded-lg">
-              Tech: {resources.tech}
-            </div>
-            <div className="px-4 py-2 bg-gray-800 rounded-lg">
-              Influence: {resources.influence}
-            </div>
+            
+            {selectedCharacter && (
+              <div className="flex items-center space-x-3 px-4 py-2 bg-gray-800 rounded-lg">
+                <img 
+                  src={selectedCharacter.avatar} 
+                  alt={selectedCharacter.name} 
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+                <div>
+                  <div className="text-sm font-medium">{selectedCharacter.name}</div>
+                  <div className="text-xs text-gray-400">
+                    {backgrounds[selectedCharacter.background].name} • {alignments[selectedCharacter.alignment].name}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </header>
 
@@ -115,3 +133,6 @@ export const ShipHub: React.FC = () => {
     </div>
   );
 };
+
+// Import these at the top of the file
+import { backgrounds, alignments } from '../data/characters';

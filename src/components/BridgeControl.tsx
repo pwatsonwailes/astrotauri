@@ -1,12 +1,12 @@
 import React from 'react';
-import { Map, Navigation, MessageSquare } from 'lucide-react';
+import { Map, Navigation, MessageSquare, Shield, Cpu, Users, Zap } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import { useStorySystem } from '../hooks/useStorySystem';
 import { Quest } from '../types/quest';
 import { AVAILABLE_QUESTS } from '../data/quests';
 
 export const BridgeControl: React.FC = () => {
-  const { resources, activeQuests, addQuest, setScreen, setCurrentStory, addCompletedConversation } = useGameStore();
+  const { resources, activeQuests, addQuest, setScreen, setCurrentStory, addCompletedConversation, selectedCharacter } = useGameStore();
   const { getCrewStories } = useStorySystem();
 
   // Get available captain stories
@@ -22,6 +22,58 @@ export const BridgeControl: React.FC = () => {
     return Object.entries(requirements).every(
       ([key, value]) => resources[key as keyof typeof resources] >= (value || 0)
     );
+  };
+
+  const getMissionTypeIcon = (type: string) => {
+    switch (type) {
+      case 'technical':
+        return <Cpu className="w-5 h-5 text-blue-400" />;
+      case 'diplomatic':
+        return <Users className="w-5 h-5 text-green-400" />;
+      case 'combat':
+        return <Shield className="w-5 h-5 text-red-400" />;
+      case 'strategic':
+        return <Zap className="w-5 h-5 text-purple-400" />;
+      default:
+        return <Navigation className="w-5 h-5 text-blue-400" />;
+    }
+  };
+
+  const getStatRecommendation = (mission: typeof AVAILABLE_QUESTS[0]) => {
+    if (!selectedCharacter) return null;
+    
+    const { stats } = selectedCharacter;
+    
+    let recommendedStat = '';
+    let statValue = 0;
+    
+    switch (mission.type) {
+      case 'technical':
+        recommendedStat = 'Technical Expertise';
+        statValue = stats.technicalExpertise;
+        break;
+      case 'diplomatic':
+        recommendedStat = 'Diplomacy';
+        statValue = stats.diplomacy;
+        break;
+      case 'combat':
+        recommendedStat = 'Risk Tolerance';
+        statValue = stats.riskTolerance;
+        break;
+      case 'strategic':
+        recommendedStat = 'Strategic Intelligence';
+        statValue = stats.strategicIntelligence;
+        break;
+      default:
+        recommendedStat = 'Leadership';
+        statValue = stats.leadership;
+    }
+    
+    const recommendation = statValue >= 7 ? 'Highly Suitable' : 
+                          statValue >= 5 ? 'Suitable' : 
+                          'Challenging';
+                          
+    return { stat: recommendedStat, value: statValue, recommendation };
   };
 
   const startMission = (mission: typeof AVAILABLE_QUESTS[0]) => {
@@ -83,6 +135,7 @@ export const BridgeControl: React.FC = () => {
           {availableMissions.map((mission) => {
             const isActive = activeQuests.some(q => q.id === mission.id && q.status === 'active');
             const canStart = canStartMission(mission.requirements) && !isActive;
+            const statRecommendation = getStatRecommendation(mission);
 
             return (
               <div
@@ -94,16 +147,27 @@ export const BridgeControl: React.FC = () => {
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-2">
-                    <Navigation className="w-5 h-5 text-blue-400" />
+                    {getMissionTypeIcon(mission.type)}
                     <h3 className="text-lg font-medium">{mission.name}</h3>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-sm
-                    ${mission.riskLevel === 'high' ? 'bg-red-900/50 text-red-300' :
-                      mission.riskLevel === 'medium' ? 'bg-yellow-900/50 text-yellow-300' :
-                      'bg-green-900/50 text-green-300'}`}
-                  >
-                    {mission.riskLevel} risk
-                  </span>
+                  <div className="flex space-x-2">
+                    <span className={`px-3 py-1 rounded-full text-sm
+                      ${mission.type === 'technical' ? 'bg-blue-900/50 text-blue-300' :
+                        mission.type === 'diplomatic' ? 'bg-green-900/50 text-green-300' :
+                        mission.type === 'combat' ? 'bg-red-900/50 text-red-300' :
+                        mission.type === 'strategic' ? 'bg-purple-900/50 text-purple-300' :
+                        'bg-gray-900/50 text-gray-300'}`}
+                    >
+                      {mission.type}
+                    </span>
+                    <span className={`px-3 py-1 rounded-full text-sm
+                      ${mission.riskLevel === 'high' ? 'bg-red-900/50 text-red-300' :
+                        mission.riskLevel === 'medium' ? 'bg-yellow-900/50 text-yellow-300' :
+                        'bg-green-900/50 text-green-300'}`}
+                    >
+                      {mission.riskLevel} risk
+                    </span>
+                  </div>
                 </div>
 
                 <p className="text-gray-400 mb-4">{mission.description}</p>
@@ -141,6 +205,24 @@ export const BridgeControl: React.FC = () => {
                     </div>
                   </div>
                 </div>
+
+                {statRecommendation && (
+                  <div className="mt-4 bg-gray-700/50 rounded p-3">
+                    <h4 className="text-sm font-medium text-gray-300 mb-2">Character Assessment</h4>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">
+                        Key Stat: <span className="font-medium">{statRecommendation.stat}</span> ({statRecommendation.value}/10)
+                      </span>
+                      <span className={`px-2 py-1 rounded text-xs
+                        ${statRecommendation.recommendation === 'Highly Suitable' ? 'bg-green-900/50 text-green-300' :
+                          statRecommendation.recommendation === 'Suitable' ? 'bg-yellow-900/50 text-yellow-300' :
+                          'bg-red-900/50 text-red-300'}`}
+                      >
+                        {statRecommendation.recommendation}
+                      </span>
+                    </div>
+                  </div>
+                )}
 
                 {isActive && (
                   <div className="mt-4 px-4 py-2 bg-blue-900/50 text-blue-300 rounded">
