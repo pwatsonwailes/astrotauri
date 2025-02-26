@@ -5,6 +5,8 @@ import { useSoundSystem } from '../hooks/useSoundSystem';
 import { characters } from '../data/characters';
 import Prologue from '../stories/main/c1/Prologue.ink?raw';
 
+import radial from '../assets/imgs/radial.jpg'
+
 export const CharacterSelect: React.FC = () => {
   const { setScreen, setCharacter, setCurrentStory, addCompletedConversation } = useGameStore();
   const { playSound } = useSoundSystem();
@@ -27,22 +29,30 @@ export const CharacterSelect: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white p-8">
+    <div
+      className="min-h-screen creamyBg text-black p-8 characterScreen"
+      style={{
+        backgroundImage: `url(${radial})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+      >
       <button
         onClick={handleBack}
-        className="flex items-center text-gray-300 hover:text-white mb-8"
+        className="flex items-center text-slate-400 hover:text-black mb-8 transition-colors"
       >
         <ArrowLeft className="mr-2" size={24} />
         Back to Menu
       </button>
       
-      <h2 className="text-4xl font-bold mb-8">Choose Your Character</h2>
+      <h2>Choose Your Alignment</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {characters.map((character) => (
           <div
             key={character.id}
-            className="bg-gray-800 rounded-lg p-6 cursor-pointer hover:bg-gray-700 transition-colors"
+            className={`card cursor-pointer ${character.id}`}
             onClick={() => selectCharacter(character.id)}
           >
             <img
@@ -50,8 +60,8 @@ export const CharacterSelect: React.FC = () => {
               alt={character.name}
               className="w-full h-64 object-cover rounded-lg mb-4"
             />
-            <h3 className="text-2xl font-bold mb-2">{character.name}</h3>
-            <p className="text-gray-400">{character.description}</p>
+            <p>{character.description}</p>
+            <h3 className="text-2xl font-bold">{character.name}</h3>
           </div>
         ))}
       </div>

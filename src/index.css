@@ -2,6 +2,78 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+    src: url(../public/fonts/Lexend.ttf) format("truetype");
+    font-family: "Lexend", serif;
+        font-optical-sizing: auto;
+        font-weight: normal;
+        font-style: normal;
+    font-display: swap;
+}
+
+html, body {
+    font-family: "Lexend",Helvetica,Arial,sans-serif;
+}
+
+h1, h2, h3 {
+    font-weight: 800;
+}
+
+
+h4 {
+    font-weight: 600;
+}
+
+.creamyBg {
+    background: #f6f4ee
+}
+
+.creamyBgLighter { background: #fbfbf8 }
+
+.promontory {
+    background: #fbfbf8;
+    box-shadow: 5px 5px 14px #b9b9b3,
+                             -5px -5px 14px #ffffff;
+}
+
+.promontory.dugong {
+    background: #343a40;
+    box-shadow: 5px 5px 14px #9fa3a8,
+                             -5px -5px 14px #fdffff;
+}
+
+.convex:hover,
+.concave {
+    background: linear-gradient(145deg, #ddddd7, #ffffff);
+    box-shadow: 5px 5px 14px #b9b9b3,
+                             -5px -5px 14px #ffffff;
+}
+
+.convex.rowdy:hover,
+.concave.rowdy {
+    background: linear-gradient(145deg, #ea580c, #f97316);
+    box-shadow: 5px 5px 14px #b9b9b3,
+                             -5px -5px 14px #ffffff;
+}
+
+.convex {
+    background: linear-gradient(145deg, #ffffff, #ddddd7);
+    box-shadow: 5px 5px 14px #b9b9b3,
+                             -5px -5px 14px #ffffff;
+}
+
+.convex.rowdy {
+    background: linear-gradient(145deg, #f97316, #ea580c);
+    box-shadow: 5px 5px 14px #b9b9b3,
+                             -5px -5px 14px #ffffff;
+}
+
+.depressed {
+    background: #fbfbf8;
+    box-shadow: inset 3px 3px 8px #b9b9b3,
+                            inset -3px -3px 8px #ffffff;
+}
+
 .storyControls button.continue,
 .introButtons button {
     background: rgba(0,0,0,0.25);
@@ -47,32 +119,32 @@
 }
 
 .storyControls button.choice {
-	@apply text-gray-600;
-	font-weight: 600;
-	letter-spacing: .02em;
+    color: #57534e;
+    font-weight: 600;
+    letter-spacing: .02em;
     margin-left: 2em;
     padding: 0;
-	transition: color .2s;
+    transition: color .2s;
     width: calc(100% - 2.5em);
 }
 
 .storyControls button.choice:hover {
-	color: #f97316;
-	cursor: pointer;
+    color: #f97316;
+    cursor: pointer;
 }
 
 .storyControls button.choice:before {
-	transition: color .2s;
-	content: "»";
-	position: absolute;
-	transform: translateY(-50%);
-	top: 45%;
-	color: #888;
-	left: -30px;
+    transition: color .2s;
+    content: "»";
+    position: absolute;
+    transform: translateY(-50%);
+    top: 45%;
+    color: #888;
+    left: -30px;
 }
 
 .storyControls button.choice:hover:before {
-	color: #f97316;
+    color: #f97316;
 }
 
 .screenImage {
@@ -105,4 +177,77 @@
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
+}
+
+.characterScreen h2 {
+    position: absolute;
+    bottom: 0;
+    text-transform: uppercase;
+    letter-spacing: .2em;
+    font-weight: 200;
+    font-size: 1rem;
+    width: 100%;
+    text-align: center;
+    padding: 2em 0;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    user-select: none;
+}
+
+.characterScreen .card {
+    background: #fff;
+    padding: 1.5em 1.5em 1.25em;
+    border-radius: 1em;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 66vh;
+    justify-content: end;
+}
+
+.characterScreen .card:after {
+    content: "";
+    width: 100%;
+    height: 30%;
+    z-index: 0;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+.card > p, .card > h3 {
+    color: #fff;
+    z-index: 5;
+}
+
+.card > h3 {
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    font-size: 3vw;
+    line-height: 1.2;
+    font-weight: 800;
+}
+
+.card > p {
+    font-size: 1.5vw;
+    line-height: 1.4;
+}
+
+.characterScreen .card img {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.characterScreen .card.ruthless:after {
+    background: linear-gradient(0deg, #413c34, hsl(44.83deg 10.36% 62.39% / 80%), hsl(36.35deg 9.29% 89.75% / 63%), transparent)
+}
+
+.characterScreen .card.noble:after {
+    background: linear-gradient(0deg, #413c34, hsl(44.83deg 10.36% 62.39% / 80%), hsl(36.35deg 9.29% 89.75% / 63%), transparent)
+}
+
+.characterScreen .card.stoic:after {
+    background: linear-gradient(0deg, #413c34, hsl(44.83deg 10.36% 62.39% / 80%), hsl(36.35deg 9.29% 89.75% / 63%), transparent)
 }
