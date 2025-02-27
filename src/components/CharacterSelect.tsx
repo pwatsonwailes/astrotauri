@@ -56,7 +56,7 @@ export const CharacterSelect: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen creamyBg text-black p-4 md:p-8 overflow-auto"
+      className="min-h-screen creamyBg text-black p-4 md:p-8 overflow-auto flex flex-col align-center justify-center"
       style={{
         backgroundImage: `url(${radial})`,
         backgroundSize: 'cover',
@@ -66,7 +66,7 @@ export const CharacterSelect: React.FC = () => {
     >
       <button
         onClick={handleBack}
-        className="flex items-center text-slate-400 hover:text-black mb-4 transition-colors"
+        className="flex items-center text-slate-500 hover:text-black transition-colors absolute"
       >
         <ArrowLeft className="mr-2" size={24} />
         Back to Menu
