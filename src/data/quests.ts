@@ -46,21 +46,21 @@ export const AVAILABLE_QUESTS: Omit<Quest, 'currentTurn' | 'progress' | 'cumulat
         options: [
           {
             id: "credits",
-            description: "Spend 50 credits to recalibrate sensors.",
+            text: "Spend 50 credits to recalibrate sensors.",
             bonus: 2,
             cost: 50,
             type: "resource"
           },
           {
             id: "time",
-            description: "Invest an extra turn to fine-tune equipment.",
+            text: "Invest an extra turn to fine-tune equipment.",
             bonus: 1,
             extraTurn: 1,
             type: "time"
           },
           {
             id: "intelligence",
-            description: "Use previously gathered intelligence to optimize the operation.",
+            text: "Use previously gathered intelligence to optimize the operation.",
             bonus: 3,
             requiredItem: "intel_module",
             type: "item"
@@ -123,19 +123,19 @@ export const AVAILABLE_QUESTS: Omit<Quest, 'currentTurn' | 'progress' | 'cumulat
         options: [
           {
             id: "diplomatic",
-            description: "Suggest a phased implementation of safety measures with shared costs.",
+            text: "Suggest a phased implementation of safety measures with shared costs.",
             bonus: 2,
             type: "diplomatic"
           },
           {
             id: "aggressive",
-            description: "Pressure the corporation by threatening to report safety violations to authorities.",
+            text: "Pressure the corporation by threatening to report safety violations to authorities.",
             bonus: 3,
             type: "aggressive"
           },
           {
             id: "cautious",
-            description: "Commission an independent safety audit to establish objective facts.",
+            text: "Commission an independent safety audit to establish objective facts.",
             bonus: 1,
             type: "cautious"
           }
@@ -192,19 +192,19 @@ export const AVAILABLE_QUESTS: Omit<Quest, 'currentTurn' | 'progress' | 'cumulat
         options: [
           {
             id: "aggressive",
-            description: "Launch a surprise attack with all weapons to overwhelm their defenses.",
+            text: "Launch a surprise attack with all weapons to overwhelm their defenses.",
             bonus: 3,
             type: "aggressive"
           },
           {
             id: "cautious",
-            description: "Approach cautiously, analyzing their defenses before engaging.",
+            text: "Approach cautiously, analyzing their defenses before engaging.",
             bonus: 1,
             type: "cautious"
           },
           {
             id: "diplomatic",
-            description: "Attempt to contact them and offer amnesty in exchange for surrender.",
+            text: "Attempt to contact them and offer amnesty in exchange for surrender.",
             bonus: 2,
             type: "diplomatic"
           }
