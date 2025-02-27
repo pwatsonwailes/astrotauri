@@ -20,7 +20,7 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
   const [error, setError] = useState<string>('');
   const [isNewContent, setIsNewContent] = useState(true);
   const [sceneState, setSceneState] = useState<SceneState>({
-    image: 'https://images.unsplash.com/photo-1510784722466-f2aa9c52fff6?w=1200&h=800&fit=crop',
+    image: 'familyLife',
     presentCharacters: [],
     speakingCharacter: undefined,
   });
@@ -174,11 +174,11 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
       </div>
       
       {/* Right side - Text and Controls (1/3 width) */}
-      <div className="w-1/3 h-screen flex flex-col p-6">
+      <div className="w-1/3 h-screen flex flex-col p-4">
         {/* Scrollable text area */}
         <div 
           ref={textContainerRef}
-          className="flex-grow overflow-y-auto mb-6 pr-4 custom-scrollbar"
+          className="flex-grow overflow-y-auto mb-6 p-4 custom-scrollbar textPanel"
         >
           <div className="space-y-4">
             {visibleParagraphs.map((paragraph, index) => (

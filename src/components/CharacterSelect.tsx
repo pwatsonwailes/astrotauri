@@ -41,7 +41,6 @@ export const CharacterSelect: React.FC = () => {
       id: `${selectedBackground}-${selectedAlignment}`,
       name: `${alignments[selectedAlignment].name} ${backgrounds[selectedBackground].name}`,
       description: backgrounds[selectedBackground].description,
-      avatar: 'https://images.unsplash.com/photo-1590606915023-fe67c2965e2b?w=400&h=400&fit=crop',
       background: selectedBackground,
       alignment: selectedAlignment,
       stats: stats

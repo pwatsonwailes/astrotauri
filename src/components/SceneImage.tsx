@@ -1,6 +1,8 @@
 import React from 'react';
 import { SceneState } from '../types/story';
 
+import images from '../data/images';
+
 interface SceneImageProps {
   scene: SceneState;
 }
@@ -9,7 +11,7 @@ export const SceneImage: React.FC<SceneImageProps> = ({ scene }) => {
   return (
     <div className="screenImage relative w-full rounded-lg overflow-hidden bg-black/50 shadow-lg shadow-black/50">
       <img
-        src={scene.image}
+        src={images[scene.image]}
         alt="Current scene"
         className="transition-opacity duration-1000"
       />
