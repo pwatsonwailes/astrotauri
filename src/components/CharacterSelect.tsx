@@ -14,7 +14,7 @@ const StatBar: React.FC<{ value: number; label: string }> = ({ value, label }) =
       <span className="text-sm font-medium">{label}</span>
       <span className="text-sm font-medium">{value}</span>
     </div>
-    <div className="w-full bg-gray-200 rounded-full h-2">
+    <div className="w-full bg-slate-700 rounded-full h-2">
       <div
         className="bg-orange-600 h-2 rounded-full transition-all duration-300"
         style={{ width: `${(value / 10) * 100}%` }}
@@ -77,11 +77,11 @@ export const CharacterSelect: React.FC = () => {
           <div className="md:col-span-1">
             <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-6">Background</h2>
             <div className="space-y-2 md:space-y-4">
-              {Object.entries(backgrounds).map(([key, { name, description }]) => (
+              {Object.entries(backgrounds).map(([key, { name }]) => (
                 <button
                   key={key}
                   onClick={() => setSelectedBackground(key as Background)}
-                  className={`w-full text-left p-3 md:p-4 rounded-lg transition-all text-white ${
+                  className={`w-full text-left p-3 md:p-4 rounded-lg transition-all text-white hover:shadow-lg hover:shadow-black/50 ${
                     selectedBackground === key
                       ? 'bg-orange-600 shadow-lg'
                       : 'bg-slate-700 shadow-sm hover:bg-slate-500'
@@ -96,11 +96,11 @@ export const CharacterSelect: React.FC = () => {
           <div className="md:col-span-1">
             <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-6">Alignment</h2>
             <div className="space-y-2 md:space-y-4">
-              {Object.entries(alignments).map(([key, { name, description }]) => (
+              {Object.entries(alignments).map(([key, { name }]) => (
                 <button
                   key={key}
                   onClick={() => setSelectedAlignment(key as Alignment)}
-                  className={`w-full text-left p-3 md:p-4 rounded-lg transition-all text-white ${
+                  className={`w-full text-left p-3 md:p-4 rounded-lg transition-all text-white hover:shadow-lg hover:shadow-black/50 ${
                     selectedAlignment === key
                       ? 'bg-orange-600 shadow-lg'
                       : 'bg-slate-700 shadow-sm hover:bg-slate-500'
