@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { GameState, Resources, InventoryItem, ManufacturingItem } from '../types/game';
-import { Quest } from '../types/quest';
+import { Quest, QuestStatus } from '../types/quest';
 import { GAME_CONSTANTS } from '../constants/game';
 
 export const useGameStore = create<GameState & {
@@ -14,7 +14,7 @@ export const useGameStore = create<GameState & {
   addInventoryItem: (item: InventoryItem) => void;
   removeInventoryItem: (itemId: string, quantity: number) => void;
   addManufacturingItem: (item: ManufacturingItem) => void;
-  advanceTurn: (state: any) => void;
+  advanceTurn: () => void;
   addCompletedConversation: (crewId: string) => void;
 }>((set, get) => ({
   currentScreen: 'intro',
@@ -154,7 +154,7 @@ export const useGameStore = create<GameState & {
             ...quest,
             currentTurn: quest.currentTurn + 1,
             progress: newProgress,
-            status: isComplete ? 'completed' : 'active'
+            status: isComplete ? 'completed' as QuestStatus : 'active' as QuestStatus
           };
 
           // If quest is complete, give rewards

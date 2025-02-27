@@ -66,7 +66,7 @@ export const CharacterSelect: React.FC = () => {
     >
       <button
         onClick={handleBack}
-        className="flex items-center text-slate-500 hover:text-black transition-colors absolute"
+        className="backButton flex items-center text-slate-500 hover:text-black transition-colors"
       >
         <ArrowLeft className="mr-2" size={24} />
         Back to Menu
@@ -75,7 +75,7 @@ export const CharacterSelect: React.FC = () => {
       <div className="max-w-4xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-6">
           <div className="md:col-span-1">
-            <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-6">Background</h2>
+            <h2 className="text-xl md:text-2xl font-semibold mb-3 md:mb-6">Background</h2>
             <div className="space-y-2 md:space-y-4">
               {Object.entries(backgrounds).map(([key, { name }]) => (
                 <button
@@ -87,14 +87,14 @@ export const CharacterSelect: React.FC = () => {
                       : 'bg-slate-700 shadow-sm hover:bg-slate-500'
                   }`}
                 >
-                  <h3 className="font-bold text-base md:text-lg">{name}</h3>
+                  <h3 className="text-base md:text-lg">{name}</h3>
                 </button>
               ))}
             </div>
           </div>
 
           <div className="md:col-span-1">
-            <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-6">Alignment</h2>
+            <h2 className="text-xl md:text-2xl font-semibold mb-3 md:mb-6">Alignment</h2>
             <div className="space-y-2 md:space-y-4">
               {Object.entries(alignments).map(([key, { name }]) => (
                 <button
@@ -106,23 +106,23 @@ export const CharacterSelect: React.FC = () => {
                       : 'bg-slate-700 shadow-sm hover:bg-slate-500'
                   }`}
                 >
-                  <h3 className="font-bold text-base md:text-lg">{name}</h3>
+                  <h3 className="text-base md:text-lg">{name}</h3>
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="md:col-span-3 bg-gray-800/20 rounded-lg p-4">
-            <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">{alignments[selectedAlignment].name} {backgrounds[selectedBackground].name}</h2>
+          <div className="md:col-span-3">
+            <h2 className="text-xl md:text-2xl font-semibold mb-3 md:mb-4">{alignments[selectedAlignment].name} {backgrounds[selectedBackground].name}</h2>
             
             <div className="mb-6">
               <div className="mb-4">
-                <h3 className="text-gray-700 mb-1">Background:</h3>
+                <h3 className="text-gray-700 font-semibold mb-1">Background:</h3>
                 <p className="text-sm text-gray-800">{backgrounds[selectedBackground].description}</p>
               </div>
               
               <div className="mb-4">
-                <h3 className="text-gray-700 mb-1">Alignment:</h3>
+                <h3 className="text-gray-700 font-semibold mb-1">Alignment:</h3>
                 <p className="text-sm text-gray-800">{alignments[selectedAlignment].description}</p>
               </div>
             </div>
@@ -139,7 +139,7 @@ export const CharacterSelect: React.FC = () => {
         <div className="mt-6 md:mt-8 flex justify-center">
           <button
             onClick={createCharacter}
-            className="px-6 py-3 md:px-8 md:py-4 bg-slate-700 text-white rounded-lg text-base md:text-lg font-bold hover:shadow-lg hover:shadow-black/50 hover:bg-orange-600 transition-colors"
+            className="begin px-6 py-3 md:px-8 md:py-4 bg-slate-700 text-white rounded-lg text-base md:text-lg font-bold hover:shadow-lg hover:shadow-black/50 hover:bg-orange-600 transition-colors"
           >
             Begin Your Journey
           </button>

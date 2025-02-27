@@ -201,7 +201,7 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
           {showContinueButton && (
             <button
               onClick={showNextParagraph}
-              className="continue w-full flex items-center justify-center px-6 py-4 text-lg"
+              className="continue text-white w-full flex items-center justify-center px-6 py-4 text-lg"
             >
               Continue
               <ArrowRight className="ml-2" size={20} />
