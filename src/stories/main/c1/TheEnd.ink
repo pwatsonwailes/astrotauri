@@ -3,6 +3,8 @@ VAR scene_image = "theEnd"
 LIST present_characters = You, Aharon
 VAR speaking_character = "none"
 
+=== TheEnd ===
+
 Darkness.
 
 Not the comforting kind. Not the absence of light, but the kind that presses against your chest, heavy, suffocating.

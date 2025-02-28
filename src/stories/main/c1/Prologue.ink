@@ -3,6 +3,8 @@ VAR scene_image = "familyLife"
 LIST present_characters = You, Mum, Dad
 VAR speaking_character = "none"
 
+=== Prologue ===
+
 Before the smoke. Before the sirens.
 
 Warm light spills through a cracked window, painting streaks of gold across the metal walls of the small apartment on Ceres. The hum of the vibrant life of the asteroid city is distant, as though the world is holding its breath just for this moment.

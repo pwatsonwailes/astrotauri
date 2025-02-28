@@ -77,8 +77,53 @@ export const useStorySystem = () => {
     return availableStories.some(s => s.id === storyId);
   };
 
+  const getNextStory = (currentStoryContent: string): Story | null => {
+    // Find the current story in the stories array
+    const currentStory = stories.find(s => s.content === currentStoryContent);
+    if (!currentStory) return null;
+    
+    // Find the index of the current story
+    const currentIndex = stories.findIndex(s => s.id === currentStory.id);
+    if (currentIndex === -1) return null;
+    
+    // Look for the next story in sequence
+    for (let i = currentIndex + 1; i < stories.length; i++) {
+      const nextStory = stories[i];
+      
+      // Check if this story is a direct continuation
+      if (nextStory.requirements.type === 'conversation' && 
+          nextStory.requirements.storyId === currentStory.id &&
+          nextStory.requirements.turnsAfter === 0) {
+        return nextStory;
+      }
+    }
+    
+    return null;
+  };
+  
+  const getStoryByPath = (path: string): Story | null => {
+    // First try to find a story with matching ID
+    const storyById = stories.find(s => s.id.toLowerCase() === path.toLowerCase());
+    if (storyById) return storyById;
+    
+    // Then try to find a story with matching filename (without extension)
+    const storyByFilename = stories.find(s => {
+      // Extract filename from content path if possible
+      const contentPath = s.content.split('/').pop();
+      if (contentPath) {
+        const filename = contentPath.split('.')[0].toLowerCase();
+        return filename === path.toLowerCase();
+      }
+      return false;
+    });
+    
+    return storyByFilename || null;
+  };
+
   return {
     getCrewStories,
-    isStoryAvailable
+    isStoryAvailable,
+    getNextStory,
+    getStoryByPath
   };
 };

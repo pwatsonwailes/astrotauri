@@ -27,7 +27,7 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
 
   const textContainerRef = useRef<HTMLDivElement>(null);
   const { selectedCharacter, setScreen, currentStory, setCurrentStory, addCompletedConversation } = useGameStore();
-  const { getNextStory } = useStorySystem();
+  const { getNextStory, getStoryByPath } = useStorySystem();
   const { playSound } = useSoundSystem();
 
   // Scroll to bottom when new content is added
@@ -71,6 +71,14 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
 
   const continueStory = (currentStory: Story) => {
     if (!currentStory.canContinue && currentStory.currentChoices.length === 0) {
+      // Check if there's a divert at the end of the story
+      const divertTarget = checkForDivert(currentStory);
+      
+      if (divertTarget) {
+        handleDivert(divertTarget);
+        return;
+      }
+      
       setCurrentParagraphs(['The end of your journey...']);
       setVisibleParagraphs(['The end of your journey...']);
       setChoices([]);
@@ -83,8 +91,17 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     const paragraphs: string[] = [];
     while (currentStory !== null && currentStory.canContinue) {
       const text = currentStory.Continue()!.trim();
+      
+      // Check if this text contains a divert
       if (text) {
         paragraphs.push(text);
+      }
+      
+      // Check if we just hit a divert
+      const divertTarget = checkForDivert(currentStory);
+      if (divertTarget) {
+        handleDivert(divertTarget);
+        return;
       }
     }
 
@@ -94,6 +111,67 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
 
     const currentChoices = currentStory.currentChoices;
     setChoices(currentChoices.map(choice => choice.text));
+  };
+  
+  // Function to check if the story has a divert
+  const checkForDivert = (currentStory: Story): string | null => {
+    // This is a simplified approach - in a real implementation, you'd need to
+    // access the internal state of the Ink story to check for diverts
+    // For now, we'll check if the story has a special tag or marker
+    
+    // Check if we're at a divert point
+    if (currentStory.state && currentStory.state.currentPathString) {
+      const path = currentStory.state.currentPathString;
+      if (path.includes('->')) {
+        // Extract the target from the path
+        const match = path.match(/->\s*([A-Za-z0-9_]+)/);
+        if (match && match[1]) {
+          return match[1];
+        }
+      }
+    }
+    
+    // Check for tags that might indicate a divert
+    const tags = currentStory.currentTags;
+    if (tags && tags.length > 0) {
+      for (const tag of tags) {
+        if (tag.startsWith('DIVERT:')) {
+          return tag.substring(7).trim();
+        }
+      }
+    }
+    
+    return null;
+  };
+  
+  // Handle a divert by loading the target story
+  const handleDivert = (target: string) => {
+    playSound('continue');
+    
+    // Mark current story as completed
+    if (currentStory) {
+      addCompletedConversation(currentStory);
+    }
+    
+    // Try to find the story by its path/id
+    const nextStory = getStoryByPath(target);
+    
+    if (nextStory) {
+      // Load the diverted story
+      setCurrentStory(nextStory.content);
+      addCompletedConversation(nextStory.id);
+    } else {
+      // If we can't find the exact target, try to get the next story in sequence
+      const fallbackStory = getNextStory(currentStory || '');
+      
+      if (fallbackStory) {
+        setCurrentStory(fallbackStory.content);
+        addCompletedConversation(fallbackStory.id);
+      } else {
+        // If all else fails, return to ship hub
+        setScreen('ship-hub');
+      }
+    }
   };
 
   const showNextParagraph = () => {
