@@ -35,16 +35,7 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
   // Scroll to top when story changes or knot changes
   useEffect(() => {
     if (textContainerRef.current) {
-      textContainerRef.current.scrollTop = 0;
-      // Reset paragraphs when loading a new story or changing knots
-      setCurrentParagraphs([]);
-      setVisibleParagraphs([]);
-      setChoices([]);
-      
-      // If we have a story, continue it to get the new content
-      if (story) {
-        continueStory(story);
-      }
+      textContainerRef.current.scrollTop = 0;      
     }
   }, [sceneState.currentKnot]);
 
@@ -83,23 +74,6 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
           setSceneState(prev => ({ ...prev, speakingCharacter: newValue }));
         });
         
-        // Track the current knot
-        newStory.onDidContinue = () => {
-          if (newStory.state && newStory.state.currentPathString) {
-            const pathParts = newStory.state.currentPathString.split('.');
-            const currentKnot = pathParts[0];
-            
-            setSceneState(prev => {
-              // Only trigger a reset if the knot actually changed
-              if (prev.currentKnot !== currentKnot) {
-                console.log("Knot changed to:", currentKnot);
-                return { ...prev, currentKnot };
-              }
-              return prev;
-            });
-          }
-        };
-        
         // Get the knots from the story
         // The namedContent is a Map-like object where each entry is a key-value pair
         // We need to extract the keys from this structure
@@ -134,9 +108,6 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
         setStory(newStory);
         setError('');
         setIsInitialized(true);
-        
-        // Initial content load
-        continueStory(newStory);
       } catch (err) {
         console.error('Story compilation error:', err);
         setError('Failed to load the story. Please try again.');
@@ -162,16 +133,11 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     }
   }, [storyContent, selectedCharacter]);
 
-  const continueStory = (currentStory: Story) => {
-    if (!currentStory.canContinue && currentStory.currentChoices.length === 0) {
-      // Check if there's a divert at the end of the story
-      const divertTarget = checkForDivert(currentStory);
-      
-      if (divertTarget) {
-        handleDivert(divertTarget);
-        return;
-      }
-      
+  useEffect(() => {
+    if (!story)
+      return
+    
+    if (!story.canContinue) {
       setCurrentParagraphs(['The end of your journey...']);
       setVisibleParagraphs(['The end of your journey...']);
       setChoices([]);
@@ -184,25 +150,16 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     const paragraphs: string[] = [];
     
     // Log the current state to help with debugging
-    console.log("Story state:", currentStory.state?.currentPathString);
-    console.log("Can continue:", currentStory.canContinue);
+    console.log("Story state:", story.state?.currentPathString);
     
     // Continue the story and collect paragraphs
-    while (currentStory.canContinue) {
+    while (story.canContinue) {
       try {
-        const text = currentStory.Continue().trim();
-        console.log("Continued text:", text);
+        const text = story.Continue().trim();
         
         // Only add non-empty text to paragraphs
         if (text) {
           paragraphs.push(text);
-        }
-        
-        // Check if we just hit a divert
-        const divertTarget = checkForDivert(currentStory);
-        if (divertTarget) {
-          handleDivert(divertTarget);
-          return;
         }
       } catch (err) {
         console.error("Error continuing story:", err);
@@ -218,7 +175,6 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
       setIsNewContent(true);
     } else {
       console.log("No paragraphs found in story continuation");
-      
       // If we have no paragraphs but have choices, show them
       if (currentStory.currentChoices.length > 0) {
         setCurrentParagraphs([" "]);  // Add a placeholder paragraph
@@ -227,9 +183,11 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     }
 
     const currentChoices = currentStory.currentChoices;
-    console.log("Current choices:", currentChoices.map(c => c.text));
-    setChoices(currentChoices.map(choice => choice.text));
-  };
+    console.log("Current choices:", currentChoices);
+
+    if (currentChoices)
+      setChoices(currentChoices.map(choice => choice.text));
+  }, [ story ])
   
   // Function to check if the story has a divert
   const checkForDivert = (currentStory: Story): string | null => {
@@ -275,7 +233,7 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
       setChoices([]);
       
       // Continue the story from the new knot
-      continueStory(story);
+      setStory(story);
       return;
     }
     
@@ -326,7 +284,7 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     if (story) {
       playSound('choice');
       story.ChooseChoiceIndex(index);
-      continueStory(story);
+      setStory(story);
     }
   };
 
