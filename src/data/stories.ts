@@ -1,6 +1,7 @@
-import { Story } from '../types/game';
+import { Story } from '../types/story';
 
 import Prologue from '../stories/main/c1/Prologue.ink?raw'
+import TheEnd from '../stories/main/c1/TheEnd.ink?raw'
 import Prospector from '../stories/main/c1/Prospector.ink?raw'
 //import CatalystEvent from '../stories/main/c1/CatalystEvent.ink?raw'
 //import Escape from '../stories/main/c1/Escape.ink?raw'
@@ -39,6 +40,15 @@ export const stories: Story[] = [
     crewId: 'captain',
     title: 'Prologue',
     content: Prologue,
+    requirements: {
+      type: 'initial'
+    }
+  },
+  {
+    id: 'theEnd',
+    crewId: 'captain',
+    title: 'TheEnd',
+    content: TheEnd,
     requirements: {
       type: 'initial'
     }

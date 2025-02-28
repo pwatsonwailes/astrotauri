@@ -77,24 +77,8 @@ export const useStorySystem = () => {
     return availableStories.some(s => s.id === storyId);
   };
 
-  const getNextStory = (currentStoryId: string): Story | null => {
-    const currentStoryIndex = stories.findIndex(s => s.id === currentStoryId);
-    if (currentStoryIndex === -1) return null;
-
-    // Look for the next story in sequence that's available
-    for (let i = currentStoryIndex + 1; i < stories.length; i++) {
-      const nextStory = stories[i];
-      if (isStoryAvailable(nextStory.id)) {
-        return nextStory;
-      }
-    }
-
-    return null;
-  };
-
   return {
     getCrewStories,
-    isStoryAvailable,
-    getNextStory
+    isStoryAvailable
   };
 };

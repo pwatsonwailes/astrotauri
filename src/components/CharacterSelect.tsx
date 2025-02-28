@@ -39,6 +39,7 @@ export const CharacterSelect: React.FC = () => {
   const createCharacter = () => {
     const character: Character = {
       id: `${selectedBackground}-${selectedAlignment}`,
+      avatar: '',
       name: `${alignments[selectedAlignment].name} ${backgrounds[selectedBackground].name}`,
       description: backgrounds[selectedBackground].description,
       background: selectedBackground,
@@ -49,7 +50,7 @@ export const CharacterSelect: React.FC = () => {
     playSound('select');
     setCharacter(character);
     setCurrentStory(Prologue);
-    addCompletedConversation('main_1');
+    addCompletedConversation('Prologue');
     setScreen('story');
   };
 

@@ -15,7 +15,7 @@ const SOUND_EFFECTS = {
 // Preload all audio
 Object.values(SOUND_EFFECTS).forEach(audio => {
   audio.load();
-  audio.volume = 1; // Set volume to 50%
+  audio.volume = 1;
 });
 
 export const useSoundSystem = () => {

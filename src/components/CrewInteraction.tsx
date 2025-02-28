@@ -2,7 +2,7 @@ import React from 'react';
 import { useGameStore } from '../store/gameStore';
 import { useStorySystem } from '../hooks/useStorySystem';
 import { Users, MessageSquare } from 'lucide-react';
-import { Story } from '../types/game';
+import { Story } from '../types/story';
 
 type CrewMember = {
   id: string;
