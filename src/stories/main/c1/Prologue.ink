@@ -3,7 +3,9 @@ VAR scene_image = "familyLife"
 LIST present_characters = You, Mum, Dad
 VAR speaking_character = "none"
 
-=== Prologue ===
+-> prologue
+
+=== prologue ===
 
 Before the smoke. Before the sirens.
 
@@ -75,9 +77,9 @@ You sit. You eat. You laugh.
 
 And then the world ends.
 
--> TheEnd
+-> the_end
 
-=== TheEnd ===
+=== the_end ===
 
 ~ scene_image = "black"
 

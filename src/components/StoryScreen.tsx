@@ -83,37 +83,52 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
   // Continue the story and generate text
   const continueStory = (currentStory: Story | null = story) => {
     if (!currentStory) return;
+
+    console.log(currentStory.state, currentStory.variablesState)
     
     const newParagraphs: string[] = [];
-    
-    // Continue the story and collect paragraphs
-    while (currentStory.canContinue) {
-      try {
-        const text = currentStory.Continue().trim();
-        
-        // Only add non-empty text to paragraphs
-        if (text) {
-          newParagraphs.push(text);
-        }
-      } catch (err) {
-        console.error("Error continuing story:", err);
-        break;
-      }
+
+    console.log(currentStory.canContinue)
+
+    while (currentStory.canContinue){
+      const text = currentStory.Continue();
+      console.log('text', text);
+      newParagraphs.push(text);
     }
-    
-    // Update paragraphs
-    if (newParagraphs.length > 0) {
-      setParagraphs(prev => [...prev, ...newParagraphs]);
-    }
-    
-    // Update choices
+
+    //check if there are choices
     if (currentStory.currentChoices.length > 0) {
       setChoices(currentStory.currentChoices.map(choice => ({
         text: choice.text,
         index: choice.index
       })));
-    } else {
+    }
+    else{
+      //if there are no choices, we reached the end of the story
       setChoices([]);
+    }
+    
+    // Continue the story and collect paragraphs
+    // while (currentStory.canContinue) {
+    //   try {
+    //     const text = currentStory.Continue().trim();
+    //     console.log('text', text);
+        
+    //     // Only add non-empty text to paragraphs
+    //     if (text) {
+    //       newParagraphs.push(text);
+    //     }
+    //   } catch (err) {
+    //     console.error("Error continuing story:", err);
+    //     break;
+    //   }
+    // }
+
+    console.log('newParagraphs', newParagraphs);
+
+    // Update paragraphs
+    if (newParagraphs.length > 0) {
+      setParagraphs(prev => [...prev, ...newParagraphs]);
     }
   };
 
