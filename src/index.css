@@ -206,3 +206,13 @@ html, body {
 .characterScreen .card.stoic:after {
     background: linear-gradient(0deg, #413c34, hsl(44.83deg 10.36% 62.39% / 80%), hsl(36.35deg 9.29% 89.75% / 63%), transparent)
 }
+
+/* Loading spinner animation */
+@keyframes pulse-opacity {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 0.3; }
+}
+
+.loading-pulse {
+  animation: pulse-opacity 1.5s ease-in-out infinite;
+}

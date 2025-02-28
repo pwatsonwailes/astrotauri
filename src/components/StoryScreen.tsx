@@ -19,10 +19,12 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
   const [choices, setChoices] = useState<string[]>([]);
   const [error, setError] = useState<string>('');
   const [isNewContent, setIsNewContent] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [sceneState, setSceneState] = useState<SceneState>({
     image: 'familyLife',
     presentCharacters: [],
     speakingCharacter: undefined,
+    currentKnot: undefined,
   });
 
   const textContainerRef = useRef<HTMLDivElement>(null);
@@ -30,9 +32,25 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
   const { getNextStory, getStoryByPath } = useStorySystem();
   const { playSound } = useSoundSystem();
 
-  // Scroll to bottom when new content is added
+  // Scroll to top when story changes or knot changes
   useEffect(() => {
     if (textContainerRef.current) {
+      textContainerRef.current.scrollTop = 0;
+      // Reset paragraphs when loading a new story or changing knots
+      setCurrentParagraphs([]);
+      setVisibleParagraphs([]);
+      setChoices([]);
+      
+      // If we have a story, continue it to get the new content
+      if (story) {
+        continueStory(story);
+      }
+    }
+  }, [sceneState.currentKnot]);
+
+  // Scroll to bottom when new content is added within the same story
+  useEffect(() => {
+    if (textContainerRef.current && visibleParagraphs.length > 1) {
       textContainerRef.current.scrollTop = textContainerRef.current.scrollHeight;
     }
   }, [visibleParagraphs]);
@@ -40,10 +58,18 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
   useEffect(() => {
     const initStory = () => {
       try {
+        console.log("Initializing story with content:", storyContent.substring(0, 100) + "...");
         const newStory = new Compiler(storyContent).Compile();
         
-        newStory.variablesState["character_class"] = selectedCharacter?.id || "";
+        // Log the story structure to help with debugging
+        console.log("Story structure:", newStory);
         
+        // Set character class if available
+        if (selectedCharacter?.id) {
+          newStory.variablesState["character_class"] = selectedCharacter.id;
+        }
+        
+        // Set up variable observers
         newStory.ObserveVariable('scene_image', (_: string, newValue: string) => {
           setSceneState(prev => ({ ...prev, image: newValue }));
         });
@@ -57,8 +83,59 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
           setSceneState(prev => ({ ...prev, speakingCharacter: newValue }));
         });
         
+        // Track the current knot
+        newStory.onDidContinue = () => {
+          if (newStory.state && newStory.state.currentPathString) {
+            const pathParts = newStory.state.currentPathString.split('.');
+            const currentKnot = pathParts[0];
+            
+            setSceneState(prev => {
+              // Only trigger a reset if the knot actually changed
+              if (prev.currentKnot !== currentKnot) {
+                console.log("Knot changed to:", currentKnot);
+                return { ...prev, currentKnot };
+              }
+              return prev;
+            });
+          }
+        };
+        
+        // Get the knots from the story
+        // The namedContent is a Map-like object where each entry is a key-value pair
+        // We need to extract the keys from this structure
+        const knotNames: string[] = [];
+        
+        // Access the mainContentContainer's namedContent
+        if (newStory._mainContentContainer && newStory._mainContentContainer.namedContent) {
+          // Iterate through the namedContent entries
+          // Get the keys from the namedContent
+          for (let [key, value] of newStory._mainContentContainer.namedContent.entries()) {
+            if (key !== "global decl") {  // Skip global declarations
+              knotNames.push(key);
+            }
+          }
+          
+          console.log("Found knots:", knotNames);
+          
+          // Start at the first knot if available
+          if (knotNames.length > 0) {
+            const firstKnot = knotNames[0];
+            console.log("Starting at first knot:", firstKnot);
+            
+            // Check if the knot exists and is valid
+            if (newStory.KnotContainerWithName(firstKnot)) {
+              newStory.ChoosePathString(firstKnot);
+            }
+          }
+        } else {
+          console.warn("Could not find namedContent in story");
+        }
+        
         setStory(newStory);
         setError('');
+        setIsInitialized(true);
+        
+        // Initial content load
         continueStory(newStory);
       } catch (err) {
         console.error('Story compilation error:', err);
@@ -66,7 +143,23 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
       }
     };
 
-    initStory();
+    // Reset everything when loading a new story
+    setCurrentParagraphs([]);
+    setVisibleParagraphs([]);
+    setChoices([]);
+    setIsInitialized(false);
+    setSceneState({
+      image: 'familyLife',
+      presentCharacters: [],
+      speakingCharacter: undefined,
+      currentKnot: undefined,
+    });
+    
+    if (storyContent) {
+      setTimeout(() => {
+        initStory();
+      }, 100); // Small delay to ensure clean initialization
+    }
   }, [storyContent, selectedCharacter]);
 
   const continueStory = (currentStory: Story) => {
@@ -89,36 +182,57 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     }
 
     const paragraphs: string[] = [];
-    while (currentStory !== null && currentStory.canContinue) {
-      const text = currentStory.Continue()!.trim();
-      
-      // Check if this text contains a divert
-      if (text) {
-        paragraphs.push(text);
-      }
-      
-      // Check if we just hit a divert
-      const divertTarget = checkForDivert(currentStory);
-      if (divertTarget) {
-        handleDivert(divertTarget);
-        return;
+    
+    // Log the current state to help with debugging
+    console.log("Story state:", currentStory.state?.currentPathString);
+    console.log("Can continue:", currentStory.canContinue);
+    
+    // Continue the story and collect paragraphs
+    while (currentStory.canContinue) {
+      try {
+        const text = currentStory.Continue().trim();
+        console.log("Continued text:", text);
+        
+        // Only add non-empty text to paragraphs
+        if (text) {
+          paragraphs.push(text);
+        }
+        
+        // Check if we just hit a divert
+        const divertTarget = checkForDivert(currentStory);
+        if (divertTarget) {
+          handleDivert(divertTarget);
+          return;
+        }
+      } catch (err) {
+        console.error("Error continuing story:", err);
+        break;
       }
     }
 
-    setCurrentParagraphs(paragraphs);
-    setVisibleParagraphs([paragraphs[0]]);
-    setIsNewContent(true);
+    // Only update paragraphs if we have content
+    if (paragraphs.length > 0) {
+      console.log("Got paragraphs:", paragraphs);
+      setCurrentParagraphs(paragraphs);
+      setVisibleParagraphs([paragraphs[0]]);
+      setIsNewContent(true);
+    } else {
+      console.log("No paragraphs found in story continuation");
+      
+      // If we have no paragraphs but have choices, show them
+      if (currentStory.currentChoices.length > 0) {
+        setCurrentParagraphs([" "]);  // Add a placeholder paragraph
+        setVisibleParagraphs([" "]);
+      }
+    }
 
     const currentChoices = currentStory.currentChoices;
+    console.log("Current choices:", currentChoices.map(c => c.text));
     setChoices(currentChoices.map(choice => choice.text));
   };
   
   // Function to check if the story has a divert
   const checkForDivert = (currentStory: Story): string | null => {
-    // This is a simplified approach - in a real implementation, you'd need to
-    // access the internal state of the Ink story to check for diverts
-    // For now, we'll check if the story has a special tag or marker
-    
     // Check if we're at a divert point
     if (currentStory.state && currentStory.state.currentPathString) {
       const path = currentStory.state.currentPathString;
@@ -147,6 +261,26 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
   // Handle a divert by loading the target story
   const handleDivert = (target: string) => {
     playSound('continue');
+    console.log("Handling divert to:", target);
+    
+    // First check if this is an internal knot
+    if (story && story.KnotContainerWithName(target)) {
+      console.log("Found internal knot:", target);
+      // It's an internal knot, so just navigate to it
+      story.ChoosePathString(target);
+      
+      // Reset paragraphs for the new knot
+      setCurrentParagraphs([]);
+      setVisibleParagraphs([]);
+      setChoices([]);
+      
+      // Continue the story from the new knot
+      continueStory(story);
+      return;
+    }
+    
+    // If not an internal knot, it's an external story
+    console.log("Looking for external story:", target);
     
     // Mark current story as completed
     if (currentStory) {
@@ -157,17 +291,21 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     const nextStory = getStoryByPath(target);
     
     if (nextStory) {
-      // Load the diverted story
+      console.log("Found external story:", nextStory.id);
+      // Load the diverted story - this will trigger a complete refresh of the view
       setCurrentStory(nextStory.content);
       addCompletedConversation(nextStory.id);
     } else {
+      console.log("Could not find story for target:", target);
       // If we can't find the exact target, try to get the next story in sequence
       const fallbackStory = getNextStory(currentStory || '');
       
       if (fallbackStory) {
+        console.log("Using fallback story:", fallbackStory.id);
         setCurrentStory(fallbackStory.content);
         addCompletedConversation(fallbackStory.id);
       } else {
+        console.log("No fallback story found, returning to ship hub");
         // If all else fails, return to ship hub
         setScreen('ship-hub');
       }
@@ -227,6 +365,18 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
   const showContinueButton = visibleParagraphs.length < currentParagraphs.length;
   const showChoices = visibleParagraphs.length === currentParagraphs.length && choices.length > 0;
   const showReturnButton = visibleParagraphs.length === currentParagraphs.length && choices.length === 0;
+
+  // Loading state
+  if (!isInitialized && !error) {
+    return (
+      <div className="min-h-screen creamyBg text-black p-8 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-gray-300 border-t-orange-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-lg">Loading story...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (error) {
     return (

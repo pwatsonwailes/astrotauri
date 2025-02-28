@@ -34,8 +34,8 @@ import space2 from '../assets/imgs/backgrounds/space_2.png'
 import space3 from '../assets/imgs/backgrounds/space_3.png'
 import space4 from '../assets/imgs/backgrounds/space_4.png'
 
-
-export default {
+// Create a mapping of image names to their imports
+const imageMap: Record<string, string> = {
   cover,
   black,
   adebayo,
@@ -64,4 +64,20 @@ export default {
   pallas,
   vesta,
   hygeia
-}
+};
+
+// Create a proxy to handle missing images gracefully
+const imageProxy = new Proxy(imageMap, {
+  get: (target, prop: string) => {
+    // If the image exists, return it
+    if (prop in target) {
+      return target[prop];
+    }
+    
+    // Otherwise, log a warning and return a fallback image
+    console.warn(`Image not found: ${String(prop)}`);
+    return black; // Use black as fallback
+  }
+});
+
+export default imageProxy;

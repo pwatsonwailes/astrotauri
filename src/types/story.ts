@@ -16,4 +16,5 @@ export type SceneState = {
   image: string;
   presentCharacters: string[];
   speakingCharacter?: string;
+  currentKnot?: string;
 };

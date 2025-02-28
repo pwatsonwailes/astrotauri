@@ -106,6 +106,13 @@ export const useStorySystem = () => {
     const storyById = stories.find(s => s.id.toLowerCase() === path.toLowerCase());
     if (storyById) return storyById;
     
+    // Then try to find a story with matching knot name
+    const storyByKnot = stories.find(s => {
+      const filename = s.id.split('_')[0]; // Extract base name from id
+      return filename.toLowerCase() === path.toLowerCase();
+    });
+    if (storyByKnot) return storyByKnot;
+    
     // Then try to find a story with matching filename (without extension)
     const storyByFilename = stories.find(s => {
       // Extract filename from content path if possible
