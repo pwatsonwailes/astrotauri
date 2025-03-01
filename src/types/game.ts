@@ -48,7 +48,7 @@ export type ManufacturingItem = {
 };
 
 export type GameState = {
-  currentScreen: 'intro' | 'character-select' | 'story' | 'ship-hub';
+  currentScreen: 'intro' | 'character-select' | 'story' | 'tutorial' | 'ship-hub';
   selectedCharacter: Character | null;
   storyState: any;
   currentStory: string | null;

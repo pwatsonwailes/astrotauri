@@ -4,6 +4,7 @@ import { IntroScreen } from './components/IntroScreen';
 import { CharacterSelect } from './components/CharacterSelect';
 import { StoryScreen } from './components/StoryScreen';
 import { ShipHub } from './components/ShipHub';
+import { TutorialScreen } from './components/TutorialScreen';
 import mainStory from './stories/main.ink?raw';
 
 const pageVariants = {
@@ -73,6 +74,20 @@ function App() {
             className="fixed inset-0"
           >
             <StoryScreen storyContent={currentStory || mainStory} />
+          </motion.div>
+        )}
+        
+        {currentScreen === 'tutorial' && (
+          <motion.div
+            key="tutorial"
+            initial="initial"
+            animate="in"
+            exit="out"
+            variants={pageVariants}
+            transition={pageTransition}
+            className="fixed inset-0"
+          >
+            <TutorialScreen />
           </motion.div>
         )}
         

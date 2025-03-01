@@ -20,7 +20,7 @@ const locations: { id: Location; name: string; icon: React.ReactNode }[] = [
 
 export const ShipHub: React.FC = () => {
   const [selectedLocation, setSelectedLocation] = useState<Location>('bridge');
-  const { resources, currentTurn, advanceTurn, selectedCharacter } = useGameStore();
+  const { resources, currentTurn, advanceTurn } = useGameStore();
   const { playSound } = useSoundSystem();
   const contentRef = useRef<HTMLDivElement>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
@@ -174,6 +174,3 @@ export const ShipHub: React.FC = () => {
     </div>
   );
 };
-
-// Import these at the top of the file
-import { backgrounds, alignments } from '../data/characters';

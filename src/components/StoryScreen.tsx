@@ -120,7 +120,7 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     const savedState = currentStory.state.ToJson();
     
     // Peek ahead by continuing and checking the path
-    currentStory.Continue();
+    const text = currentStory.Continue();
     const path = currentStory.state.currentPathString;
     
     // Handle null path
@@ -217,8 +217,13 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
         setCurrentStory(nextStory.content);
         addCompletedConversation(nextStory.id);
       } else {
-        // If no next story, return to ship hub
-        setScreen('ship-hub');
+        // If no next story, go to tutorial first if it's the prologue
+        if (storyContent.includes('Prologue')) {
+          setScreen('tutorial');
+        } else {
+          // Otherwise return to ship hub
+          setScreen('ship-hub');
+        }
       }
     } else {
       setScreen('ship-hub');
@@ -323,4 +328,4 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
       </div>
     </div>
   );
-};
+}
