@@ -71,16 +71,20 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
       // Get the initial content
       if (newStory.canContinue) {
         const initialText = newStory.Continue().trim();
-        if (initialText) {
-          setParagraphs([initialText]);
-          processedTexts.add(initialText);
-        }
         
         // Get the current path in the story
         const path = newStory.state.currentPathString;
         // Extract the knot name (everything before the first dot or the whole string)
-        const knotName = path.split('.')[0];
+        const knotName = path ? path.split('.')[0] : 'default';
+        
+        // Set initial knot state
         setCurrentKnot(knotName);
+        setSceneState(prev => ({ ...prev, currentKnot: knotName }));
+        
+        if (initialText) {
+          setParagraphs([initialText]);
+          processedTexts.add(initialText);
+        }
       }
       
       setStory(newStory);
@@ -108,43 +112,63 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     }
   }, [paragraphs]);
 
-  // Check if we've moved to a new knot
-  const checkForKnotChange = (currentStory: Story) => {
-    if (!currentStory) return false;
+  // Check if the next continuation will change the knot
+  const willKnotChange = (currentStory: Story): boolean => {
+    if (!currentStory || !currentStory.canContinue) return false;
     
-    // Get the current path in the story
+    // Save current state
+    const savedState = currentStory.state.ToJson();
+    
+    // Peek ahead by continuing and checking the path
+    const text = currentStory.Continue();
     const path = currentStory.state.currentPathString;
     
-    // Extract the knot name (everything before the first dot or the whole string)
-    const knotName = path.split('.')[0];
-    
-    // If we've moved to a new knot, clear the paragraphs
-    if (knotName && knotName !== currentKnot) {
-      console.log(`Moving to new knot: ${knotName} (was: ${currentKnot})`);
-      setCurrentKnot(knotName);
-      setParagraphs([]);
-      processedTexts.clear();
-      return true;
+    // Handle null path
+    if (!path) {
+      // Restore state
+      currentStory.state.LoadJson(savedState);
+      return false;
     }
     
-    return false;
+    const newKnotName = path.split('.')[0];
+    
+    // Restore state
+    currentStory.state.LoadJson(savedState);
+    
+    // Return whether the knot will change
+    return newKnotName !== currentKnot;
   };
 
   // Continue the story
   const continueStory = () => {
-    if (!story) return;
+    if (!story || !story.canContinue) return;
     
     // Play sound
     playSound('continue');
     
-    // Check for knot change
-    checkForKnotChange(story);
+    // Check if continuing will change the knot
+    const knotWillChange = willKnotChange(story);
     
-    // Continue the story if possible
-    if (story.canContinue) {
+    if (knotWillChange) {
+      // Get the text before we lose it
       const text = story.Continue().trim();
       
-      // Only add non-empty text to paragraphs
+      // Get the new knot name
+      const path = story.state.currentPathString;
+      const newKnotName = path ? path.split('.')[0] : 'default';
+      
+      // Update knot state
+      setCurrentKnot(newKnotName);
+      setSceneState(prev => ({ ...prev, currentKnot: newKnotName }));
+      
+      // Clear previous paragraphs and start fresh with this text
+      setParagraphs([text]);
+      processedTexts.clear();
+      processedTexts.add(text);
+    } else {
+      // Normal continuation within the same knot
+      const text = story.Continue().trim();
+      
       if (text && !processedTexts.has(text)) {
         processedTexts.add(text);
         setParagraphs(prev => [...prev, text]);
@@ -174,7 +198,7 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     // Choose the selected choice
     story.ChooseChoiceIndex(index);
     
-    // Continue the story
+    // Continue the story with awareness of knot changes
     continueStory();
   };
 
