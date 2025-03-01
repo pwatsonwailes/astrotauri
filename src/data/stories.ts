@@ -46,11 +46,11 @@ export const stories: Story[] = [
   {
     id: 'prospector',
     crewId: 'captain',
-    title: 'Prospector',
+    title: 'The Derelict Discovery',
     content: Prospector,
     requirements: {
       type: 'quest',
-      questId: 'M001',
+      questId: 'AHARON_DERELICT',
       status: 'completed'
     }
   },

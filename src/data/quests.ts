@@ -215,5 +215,86 @@ export const AVAILABLE_QUESTS: Omit<Quest, 'currentTurn' | 'progress' | 'cumulat
       success: "The pirate threat has been neutralized! The shipping lanes are secure once more, and your reputation for effectiveness grows.",
       failure: "The pirates escaped after inflicting heavy damage to your ship. They'll be more cautious—and better armed—next time."
     }
+  },
+  {
+    id: 'AHARON_DERELICT',
+    name: 'The Derelict Ship',
+    description: 'Aharon has discovered a derelict ship drifting in the asteroid belt. He believes it contains valuable technology and wants you to investigate before others find it.',
+    duration: 5,
+    riskLevel: 'medium',
+    type: 'strategic',
+    investmentCost: {
+      credits: 150
+    },
+    requirements: {
+      materials: 25,
+      tech: 15
+    },
+    rewards: {
+      resources: {
+        credits: 400,
+        tech: 50,
+        materials: 30
+      },
+      narrative: 'The derelict ship may hold secrets from the past.'
+    },
+    turnDialogues: {
+      1: {
+        neutral: "The Prospector approaches the coordinates Aharon provided. The derelict ship looms ahead, dark and silent.",
+        positive: "Initial scans show minimal damage to the hull. This could be a pristine find.",
+        negative: "The ship appears to have suffered significant damage. This mission may be more dangerous than anticipated."
+      },
+      2: {
+        neutral: "Your crew prepares to board the derelict. Equipment checks are underway.",
+        positive: "The boarding team reports an intact airlock. Entry should be straightforward.",
+        negative: "The airlock systems are damaged. The team will need to find an alternative entry point."
+      },
+      3: {
+        neutral: "The team moves through the abandoned corridors, searching for the ship's data core.",
+        positive: "Power systems are still partially functional, making navigation easier.",
+        negative: "The ship's interior is in worse condition than expected. Progress is slow and hazardous."
+      },
+      4: {
+        neutral: "The team locates the central computer room. Extraction of data begins.",
+        positive: "The computer systems are remarkably well-preserved. Data extraction is proceeding rapidly.",
+        negative: "The computer systems are heavily encrypted. Breaking through will take additional time."
+      },
+      5: {
+        neutral: "Final sweep of the ship before departure. The team gathers any remaining valuable items.",
+        positive: "The mission is nearly complete, with no complications.",
+        negative: "Warning sensors detect another ship approaching. The team needs to finish quickly."
+      }
+    },
+    turnInteractions: {
+      3: {
+        turn: 3,
+        prompt: "The team discovers a sealed chamber that wasn't on the ship's schematics. How do you proceed?",
+        options: [
+          {
+            id: "cautious",
+            text: "Take time to scan for traps or hazards before opening.",
+            bonus: 1,
+            type: "cautious"
+          },
+          {
+            id: "aggressive",
+            text: "Force the door open immediately - whatever's inside could be valuable.",
+            bonus: 3,
+            type: "aggressive"
+          },
+          {
+            id: "technical",
+            text: "Use tech expertise to bypass the locking mechanism properly.",
+            bonus: 2,
+            type: "resource",
+            cost: 30
+          }
+        ]
+      }
+    },
+    narrativeOutcomes: {
+      success: "Mission complete! The derelict ship yielded valuable technology and data. Aharon is pleased with your work and mentions this is just the beginning of something bigger.",
+      failure: "The mission ended with minimal findings. The derelict's secrets remain largely undiscovered, and Aharon is visibly disappointed."
+    }
   }
 ];

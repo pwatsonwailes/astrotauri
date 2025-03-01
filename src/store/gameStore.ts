@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { GameState, Resources, InventoryItem, ManufacturingItem } from '../types/game';
 import { Quest, QuestStatus } from '../types/quest';
 import { GAME_CONSTANTS } from '../constants/game';
+import { AVAILABLE_QUESTS } from '../data/quests';
 
 export const useGameStore = create<GameState & {
   setScreen: (screen: GameState['currentScreen']) => void;
@@ -16,6 +17,7 @@ export const useGameStore = create<GameState & {
   addManufacturingItem: (item: ManufacturingItem) => void;
   advanceTurn: () => void;
   addCompletedConversation: (crewId: string) => void;
+  checkForSpecialEvents: () => void;
 }>((set, get) => ({
   currentScreen: 'intro',
   selectedCharacter: null,
@@ -115,6 +117,31 @@ export const useGameStore = create<GameState & {
       manufacturingQueue: [...state.manufacturingQueue, item]
     })),
 
+  checkForSpecialEvents: () => {
+    const state = get();
+    const currentTurn = state.currentTurn;
+    
+    // Add Aharon's derelict ship mission after the first turn
+    if (currentTurn === 2) {
+      const aharonMission = AVAILABLE_QUESTS.find(q => q.id === 'AHARON_DERELICT');
+      const missionExists = state.activeQuests.some(q => q.id === 'AHARON_DERELICT');
+      
+      if (aharonMission && !missionExists) {
+        const newQuest: Quest = {
+          ...aharonMission,
+          currentTurn: 1,
+          status: 'active',
+          progress: 0,
+          cumulativeScore: 0
+        };
+        
+        set((state) => ({
+          activeQuests: [...state.activeQuests, newQuest]
+        }));
+      }
+    }
+  },
+
   advanceTurn: () =>
     set((state) => {
       const newTurn = state.currentTurn + 1;
@@ -166,6 +193,9 @@ export const useGameStore = create<GameState & {
         }
         return quest;
       });
+
+      // Check for special events after updating state
+      setTimeout(() => get().checkForSpecialEvents(), 0);
 
       return {
         currentTurn: newTurn,
