@@ -59,8 +59,8 @@ export const Communications: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-2 mb-4">
-        <Radio className="w-5 h-5" />
-        <h2 className="text-xl font-bold">Communications</h2>
+        <Radio className="w-5 h-5 text-slate-600" />
+        <h2 className="text-xl font-bold text-slate-800">Communications</h2>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
@@ -70,29 +70,31 @@ export const Communications: React.FC = () => {
           return (
             <div
               key={offer.id}
-              className={`bg-gray-800 rounded-lg p-6 ${
-                canAccept ? 'cursor-pointer hover:bg-gray-700' : 'opacity-75'
+              className={`bg-slate-50 rounded-lg p-6 border ${
+                canAccept 
+                  ? 'cursor-pointer hover:bg-orange-50 border-slate-200 hover:border-orange-200' 
+                  : 'border-slate-200 opacity-75'
               }`}
               onClick={() => canAccept && acceptOffer(offer)}
             >
               <div className="flex items-center space-x-2 mb-4">
-                <MessageSquare className="w-5 h-5 text-blue-400" />
-                <h3 className="text-lg font-medium">{offer.name}</h3>
+                <MessageSquare className="w-5 h-5 text-blue-600" />
+                <h3 className="text-lg font-medium text-slate-800">{offer.name}</h3>
               </div>
 
-              <p className="text-gray-400 mb-4">{offer.description}</p>
+              <p className="text-slate-600 mb-4">{offer.description}</p>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <h4 className="text-sm font-medium text-gray-300 mb-2">Cost</h4>
+                  <h4 className="text-sm font-medium text-slate-700 mb-2">Cost</h4>
                   <div className="flex flex-wrap gap-2">
                     {Object.entries(offer.cost).map(([key, value]) => (
                       <span
                         key={key}
                         className={`px-2 py-1 rounded text-xs
                           ${resources[key as keyof typeof resources] >= (value || 0)
-                            ? 'bg-green-900/50 text-green-300'
-                            : 'bg-red-900/50 text-red-300'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
                           }`}
                       >
                         {key}: {value}
@@ -102,17 +104,17 @@ export const Communications: React.FC = () => {
                 </div>
 
                 <div>
-                  <h4 className="text-sm font-medium text-gray-300 mb-2">Reward</h4>
+                  <h4 className="text-sm font-medium text-slate-700 mb-2">Reward</h4>
                   <div className="flex flex-wrap gap-2">
                     {Object.entries(offer.reward).map(([key, value]) => (
                       <span
                         key={key}
-                        className="px-2 py-1 rounded text-xs bg-purple-900/50 text-purple-300"
+                        className="px-2 py-1 rounded text-xs bg-purple-100 text-purple-800"
                       >
                         {key}: +{value}
                       </span>
                     ))}
-                    <span className="px-2 py-1 rounded text-xs bg-blue-900/50 text-blue-300">
+                    <span className="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
                       influence: +{offer.influence}
                     </span>
                   </div>

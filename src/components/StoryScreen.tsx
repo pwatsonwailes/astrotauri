@@ -120,7 +120,7 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     const savedState = currentStory.state.ToJson();
     
     // Peek ahead by continuing and checking the path
-    const text = currentStory.Continue();
+    currentStory.Continue();
     const path = currentStory.state.currentPathString;
     
     // Handle null path

@@ -6,11 +6,13 @@ import { Quest } from '../types/quest';
 import { AVAILABLE_QUESTS } from '../data/quests';
 
 export const BridgeControl: React.FC = () => {
-  const { resources, activeQuests, addQuest, setScreen, setCurrentStory, addCompletedConversation, selectedCharacter } = useGameStore();
+  const { resources, activeQuests, addQuest, setScreen, setCurrentStory, addCompletedConversation, selectedCharacter, completedConversations } = useGameStore();
   const { getCrewStories } = useStorySystem();
 
-  // Get available captain stories
-  const captainStories = getCrewStories('captain');
+  // Get available captain stories, excluding the Prologue
+  const captainStories = getCrewStories('captain').filter(story => 
+    story.id !== 'prologue' && !completedConversations.includes(story.id)
+  );
 
   // Filter out completed and failed missions
   const availableMissions = AVAILABLE_QUESTS.filter(mission => {
@@ -27,15 +29,15 @@ export const BridgeControl: React.FC = () => {
   const getMissionTypeIcon = (type: string) => {
     switch (type) {
       case 'technical':
-        return <Cpu className="w-5 h-5 text-blue-400" />;
+        return <Cpu className="w-5 h-5 text-blue-600" />;
       case 'diplomatic':
-        return <Users className="w-5 h-5 text-green-400" />;
+        return <Users className="w-5 h-5 text-green-600" />;
       case 'combat':
-        return <Shield className="w-5 h-5 text-red-400" />;
+        return <Shield className="w-5 h-5 text-red-600" />;
       case 'strategic':
-        return <Zap className="w-5 h-5 text-purple-400" />;
+        return <Zap className="w-5 h-5 text-purple-600" />;
       default:
-        return <Navigation className="w-5 h-5 text-blue-400" />;
+        return <Navigation className="w-5 h-5 text-blue-600" />;
     }
   };
 
@@ -99,25 +101,25 @@ export const BridgeControl: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-2 mb-4">
-        <Map className="w-5 h-5" />
-        <h2 className="text-xl font-bold">Bridge Control</h2>
+        <Map className="w-5 h-5 text-slate-600" />
+        <h2 className="text-xl font-bold text-slate-800">Available Missions</h2>
       </div>
 
       {captainStories.length > 0 && (
-        <div className="bg-gray-800 rounded-lg p-6 mb-6">
+        <div className="bg-slate-50 rounded-lg p-6 mb-6 border border-slate-200">
           <div className="flex items-center space-x-2 mb-4">
-            <MessageSquare className="w-5 h-5 text-blue-400" />
-            <h3 className="text-lg font-medium">Captain's Updates</h3>
+            <MessageSquare className="w-5 h-5 text-blue-600" />
+            <h3 className="text-lg font-medium text-slate-800">Captain's Updates</h3>
           </div>
           <div className="space-y-3">
             {captainStories.map(story => (
               <button
                 key={story.id}
                 onClick={() => startCaptainStory(story)}
-                className="w-full text-left bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition-colors"
+                className="w-full text-left bg-white hover:bg-orange-50 rounded-lg p-4 transition-colors border border-slate-200 hover:border-orange-200"
               >
-                <h4 className="font-medium text-lg mb-2">{story.title}</h4>
-                <p className="text-sm text-gray-400">The captain has important information to share.</p>
+                <h4 className="font-medium text-lg mb-2 text-slate-800">{story.title}</h4>
+                <p className="text-sm text-slate-600">The captain has important information to share.</p>
               </button>
             ))}
           </div>
@@ -125,8 +127,8 @@ export const BridgeControl: React.FC = () => {
       )}
 
       {availableMissions.length === 0 ? (
-        <div className="text-center py-8 text-gray-400">
-          <Map className="w-12 h-12 mx-auto mb-2 opacity-50" />
+        <div className="text-center py-8 text-slate-500">
+          <Map className="w-12 h-12 mx-auto mb-2 opacity-50 text-slate-400" />
           <p>No missions available at this time</p>
           <p className="text-sm mt-2">Check back after completing current missions</p>
         </div>
@@ -140,49 +142,49 @@ export const BridgeControl: React.FC = () => {
             return (
               <div
                 key={mission.id}
-                className={`bg-gray-800 rounded-lg p-6 ${
-                  canStart ? 'cursor-pointer hover:bg-gray-700' : 'opacity-75'
+                className={`bg-white rounded-lg p-6 border border-slate-200 ${
+                  canStart ? 'cursor-pointer hover:bg-orange-50 hover:border-orange-200' : 'opacity-75'
                 }`}
                 onClick={() => canStart && startMission(mission)}
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-2">
                     {getMissionTypeIcon(mission.type)}
-                    <h3 className="text-lg font-medium">{mission.name}</h3>
+                    <h3 className="text-lg font-medium text-slate-800">{mission.name}</h3>
                   </div>
                   <div className="flex space-x-2">
                     <span className={`px-3 py-1 rounded-full text-sm
-                      ${mission.type === 'technical' ? 'bg-blue-900/50 text-blue-300' :
-                        mission.type === 'diplomatic' ? 'bg-green-900/50 text-green-300' :
-                        mission.type === 'combat' ? 'bg-red-900/50 text-red-300' :
-                        mission.type === 'strategic' ? 'bg-purple-900/50 text-purple-300' :
-                        'bg-gray-900/50 text-gray-300'}`}
+                      ${mission.type === 'technical' ? 'bg-blue-100 text-blue-800' :
+                        mission.type === 'diplomatic' ? 'bg-green-100 text-green-800' :
+                        mission.type === 'combat' ? 'bg-red-100 text-red-800' :
+                        mission.type === 'strategic' ? 'bg-purple-100 text-purple-800' :
+                        'bg-slate-100 text-slate-800'}`}
                     >
                       {mission.type}
                     </span>
                     <span className={`px-3 py-1 rounded-full text-sm
-                      ${mission.riskLevel === 'high' ? 'bg-red-900/50 text-red-300' :
-                        mission.riskLevel === 'medium' ? 'bg-yellow-900/50 text-yellow-300' :
-                        'bg-green-900/50 text-green-300'}`}
+                      ${mission.riskLevel === 'high' ? 'bg-red-100 text-red-800' :
+                        mission.riskLevel === 'medium' ? 'bg-amber-100 text-amber-800' :
+                        'bg-green-100 text-green-800'}`}
                     >
                       {mission.riskLevel} risk
                     </span>
                   </div>
                 </div>
 
-                <p className="text-gray-400 mb-4">{mission.description}</p>
+                <p className="text-slate-600 mb-4">{mission.description}</p>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <h4 className="text-sm font-medium text-gray-300 mb-2">Requirements</h4>
+                    <h4 className="text-sm font-medium text-slate-700 mb-2">Requirements</h4>
                     <div className="flex flex-wrap gap-2">
                       {Object.entries(mission.requirements).map(([key, value]) => (
                         <span
                           key={key}
                           className={`px-2 py-1 rounded text-xs
                             ${resources[key as keyof typeof resources] >= (value || 0)
-                              ? 'bg-green-900/50 text-green-300'
-                              : 'bg-red-900/50 text-red-300'
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
                             }`}
                         >
                           {key}: {value}
@@ -192,12 +194,12 @@ export const BridgeControl: React.FC = () => {
                   </div>
 
                   <div>
-                    <h4 className="text-sm font-medium text-gray-300 mb-2">Rewards</h4>
+                    <h4 className="text-sm font-medium text-slate-700 mb-2">Rewards</h4>
                     <div className="flex flex-wrap gap-2">
                       {Object.entries(mission.rewards.resources).map(([key, value]) => (
                         <span
                           key={key}
-                          className="px-2 py-1 rounded text-xs bg-purple-900/50 text-purple-300"
+                          className="px-2 py-1 rounded text-xs bg-purple-100 text-purple-800"
                         >
                           {key}: +{value}
                         </span>
@@ -207,16 +209,16 @@ export const BridgeControl: React.FC = () => {
                 </div>
 
                 {statRecommendation && (
-                  <div className="mt-4 bg-gray-700/50 rounded p-3">
-                    <h4 className="text-sm font-medium text-gray-300 mb-2">Character Assessment</h4>
+                  <div className="mt-4 bg-slate-100 rounded p-3">
+                    <h4 className="text-sm font-medium text-slate-700 mb-2">Character Assessment</h4>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm">
+                      <span className="text-sm text-slate-600">
                         Key Stat: <span className="font-medium">{statRecommendation.stat}</span> ({statRecommendation.value}/10)
                       </span>
                       <span className={`px-2 py-1 rounded text-xs
-                        ${statRecommendation.recommendation === 'Highly Suitable' ? 'bg-green-900/50 text-green-300' :
-                          statRecommendation.recommendation === 'Suitable' ? 'bg-yellow-900/50 text-yellow-300' :
-                          'bg-red-900/50 text-red-300'}`}
+                        ${statRecommendation.recommendation === 'Highly Suitable' ? 'bg-green-100 text-green-800' :
+                          statRecommendation.recommendation === 'Suitable' ? 'bg-amber-100 text-amber-800' :
+                          'bg-red-100 text-red-800'}`}
                       >
                         {statRecommendation.recommendation}
                       </span>
@@ -225,7 +227,7 @@ export const BridgeControl: React.FC = () => {
                 )}
 
                 {isActive && (
-                  <div className="mt-4 px-4 py-2 bg-blue-900/50 text-blue-300 rounded">
+                  <div className="mt-4 px-4 py-2 bg-blue-100 text-blue-800 rounded">
                     Mission in progress
                   </div>
                 )}

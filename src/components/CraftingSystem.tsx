@@ -104,16 +104,16 @@ export const CraftingSystem: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-2 mb-4">
-        <Tool className="w-5 h-5" />
-        <h2 className="text-xl font-bold">Crafting Station</h2>
+        <Tool className="w-5 h-5 text-slate-600" />
+        <h2 className="text-xl font-bold text-slate-800">Engineering</h2>
       </div>
 
       {craftingStatus && (
         <div
           className={`p-3 rounded-lg ${
             craftingStatus.type === 'success'
-              ? 'bg-green-900/50 text-green-300'
-              : 'bg-red-900/50 text-red-300'
+              ? 'bg-green-100 text-green-800 border border-green-200'
+              : 'bg-red-100 text-red-800 border border-red-200'
           }`}
         >
           <div className="flex items-center space-x-2">
@@ -124,14 +124,14 @@ export const CraftingSystem: React.FC = () => {
       )}
 
       {manufacturingQueue.length > 0 && (
-        <div className="bg-gray-800/50 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-gray-300 mb-2">Manufacturing Queue</h3>
+        <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+          <h3 className="text-sm font-medium text-slate-700 mb-2">Manufacturing Queue</h3>
           <div className="space-y-2">
             {manufacturingQueue.map((item) => (
-              <div key={item.id} className="bg-gray-800 rounded p-3">
+              <div key={item.id} className="bg-white rounded p-3 border border-slate-200">
                 <div className="flex justify-between items-center">
-                  <span className="font-medium">{item.name}</span>
-                  <span className="text-sm text-gray-400">
+                  <span className="font-medium text-slate-800">{item.name}</span>
+                  <span className="text-sm text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
                     {item.turnsRemaining} {item.turnsRemaining === 1 ? 'turn' : 'turns'} remaining
                   </span>
                 </div>
@@ -150,24 +150,24 @@ export const CraftingSystem: React.FC = () => {
           return (
             <div
               key={recipe.id}
-              className={`bg-gray-800 rounded-lg p-4 cursor-pointer transition-all
-                ${isSelected ? 'ring-2 ring-purple-500' : 'hover:bg-gray-700'}
+              className={`bg-slate-50 rounded-lg p-4 cursor-pointer transition-all border
+                ${isSelected ? 'border-orange-300 ring-1 ring-orange-300' : 'border-slate-200 hover:border-orange-200'}
                 ${!craftable && 'opacity-75'}
                 ${inQueue && 'opacity-50'}`}
               onClick={() => setSelectedRecipe(isSelected ? null : recipe.id)}
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="font-medium flex items-center space-x-2">
-                    <Hammer className="w-4 h-4 text-gray-400" />
+                  <h3 className="font-medium flex items-center space-x-2 text-slate-800">
+                    <Hammer className="w-4 h-4 text-slate-500" />
                     <span>{recipe.name}</span>
                   </h3>
                   {isSelected && (
-                    <p className="text-sm text-gray-400 mt-1">{recipe.description}</p>
+                    <p className="text-sm text-slate-600 mt-1">{recipe.description}</p>
                   )}
                 </div>
                 <div className="text-right">
-                  <span className="text-xs font-medium px-2 py-1 rounded bg-gray-700 capitalize">
+                  <span className="text-xs font-medium px-2 py-1 rounded bg-slate-200 text-slate-700 capitalize">
                     {recipe.type}
                   </span>
                 </div>
@@ -176,7 +176,7 @@ export const CraftingSystem: React.FC = () => {
               {isSelected && (
                 <div className="mt-4 space-y-4">
                   <div>
-                    <h4 className="text-sm font-medium text-gray-400 mb-2">Required Resources:</h4>
+                    <h4 className="text-sm font-medium text-slate-700 mb-2">Required Resources:</h4>
                     <div className="flex flex-wrap gap-2">
                       {Object.entries(recipe.cost).map(([resource, amount]) => (
                         <div
@@ -184,8 +184,8 @@ export const CraftingSystem: React.FC = () => {
                           className={`text-xs px-2 py-1 rounded
                             ${
                               resources[resource as keyof Resources] >= (amount || 0)
-                                ? 'bg-green-900/50 text-green-300'
-                                : 'bg-red-900/50 text-red-300'
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-red-100 text-red-800'
                             }`}
                         >
                           {resource}: {amount}
@@ -195,17 +195,20 @@ export const CraftingSystem: React.FC = () => {
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-400">
+                    <span className="text-sm text-slate-600">
                       Manufacturing time: {recipe.turnsToComplete} turns
                     </span>
                     <button
-                      onClick={() => handleCraft(recipe)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCraft(recipe);
+                      }}
                       disabled={!craftable || inQueue}
-                      className={`py-2 px-4 rounded-lg transition-colors
+                      className={`py-2 px-4 rounded-lg transition-colors text-sm
                         ${
                           craftable && !inQueue
-                            ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                            : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                            ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                            : 'bg-slate-300 text-slate-500 cursor-not-allowed'
                         }`}
                     >
                       {inQueue ? 'In Production' : craftable ? 'Start Manufacturing' : 'Insufficient Resources'}

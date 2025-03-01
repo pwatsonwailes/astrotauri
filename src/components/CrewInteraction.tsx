@@ -46,8 +46,8 @@ export const CrewInteraction: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-2 mb-4">
-        <Users className="w-5 h-5" />
-        <h2 className="text-xl font-bold">Crew Quarters</h2>
+        <Users className="w-5 h-5 text-slate-600" />
+        <h2 className="text-xl font-bold text-slate-800">Crew Quarters</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -58,8 +58,10 @@ export const CrewInteraction: React.FC = () => {
           return (
             <div key={crew.id} className="space-y-4">
               <div
-                className={`bg-gray-800 rounded-lg p-4 ${
-                  hasStories ? 'cursor-pointer hover:bg-gray-700' : ''
+                className={`bg-slate-50 rounded-lg p-4 border ${
+                  hasStories 
+                    ? 'cursor-pointer hover:bg-orange-50 border-slate-200 hover:border-orange-200' 
+                    : 'border-slate-200 opacity-75'
                 } transition-all`}
                 onClick={() => hasStories && setSelectedCrew(
                   selectedCrew === crew.id ? null : crew.id
@@ -69,15 +71,15 @@ export const CrewInteraction: React.FC = () => {
                   <img
                     src={crew.avatar}
                     alt={crew.name}
-                    className={`w-12 h-12 rounded-full object-cover ${
-                      !hasStories ? 'grayscale' : ''
+                    className={`w-12 h-12 rounded-full object-cover border-2 ${
+                      hasStories ? 'border-orange-300' : 'border-slate-300 grayscale'
                     }`}
                   />
                   <div>
-                    <h3 className="font-medium">{crew.name}</h3>
-                    <p className="text-sm text-gray-400">{crew.role}</p>
+                    <h3 className="font-medium text-slate-800">{crew.name}</h3>
+                    <p className="text-sm text-slate-500">{crew.role}</p>
                     {hasStories && (
-                      <div className="flex items-center mt-1 text-blue-400">
+                      <div className="flex items-center mt-1 text-blue-600">
                         <MessageSquare className="w-4 h-4 mr-1" />
                         <span className="text-xs">
                           {availableStories.length} conversation{availableStories.length !== 1 ? 's' : ''} available
@@ -94,9 +96,10 @@ export const CrewInteraction: React.FC = () => {
                     <button
                       key={story.id}
                       onClick={() => startCrewStory(story)}
-                      className="w-full text-left bg-gray-700 hover:bg-gray-600 rounded-lg p-3 transition-colors"
+                      className="w-full text-left bg-white hover:bg-orange-50 rounded-lg p-3 transition-colors border border-slate-200 hover:border-orange-200"
                     >
-                      <h4 className="font-medium">{story.title}</h4>
+                      <h4 className="font-medium text-slate-800">{story.title}</h4>
+                      <p className="text-sm text-slate-600 mt-1">Start conversation</p>
                     </button>
                   ))}
                 </div>
