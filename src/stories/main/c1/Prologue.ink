@@ -3,9 +3,9 @@ VAR scene_image = "familyLife"
 LIST present_characters = You, Mum, Dad
 VAR speaking_character = "none"
 
--> prologue
+-> Prologue
 
-=== prologue ===
+=== Prologue ===
 
 Before the smoke. Before the sirens.
 
@@ -77,9 +77,9 @@ You sit. You eat. You laugh.
 
 And then the world ends.
 
--> the_end
+-> TheEnd
 
-=== the_end ===
+=== TheEnd ===
 
 ~ scene_image = "black"
 
@@ -164,3 +164,5 @@ He holds out his hand.
 - The world fades to black.
 
 21 years later, you wake up in the morning. And for a moment, the world is still black.
+
+-> DONE

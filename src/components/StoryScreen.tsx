@@ -24,6 +24,8 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     speakingCharacter: undefined,
     currentKnot: undefined,
   });
+  const [currentKnot, setCurrentKnot] = useState<string | null>(null);
+  const [processedTexts] = useState(new Set<string>());
 
   const textContainerRef = useRef<HTMLDivElement>(null);
   const { selectedCharacter, setScreen, setCurrentStory, addCompletedConversation } = useGameStore();
@@ -37,6 +39,12 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     try {
       setIsLoading(true);
       console.log("Initializing story...");
+      
+      // Reset state
+      setParagraphs([]);
+      setChoices([]);
+      processedTexts.clear();
+      setCurrentKnot(null);
       
       // Compile the story
       const newStory = new Compiler(storyContent).Compile();
@@ -60,12 +68,32 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
         setSceneState(prev => ({ ...prev, speakingCharacter: newValue }));
       });
       
+      // Get the initial content
+      if (newStory.canContinue) {
+        const initialText = newStory.Continue().trim();
+        if (initialText) {
+          setParagraphs([initialText]);
+          processedTexts.add(initialText);
+        }
+        
+        // Get the current path in the story
+        const path = newStory.state.currentPathString;
+        // Extract the knot name (everything before the first dot or the whole string)
+        const knotName = path.split('.')[0];
+        setCurrentKnot(knotName);
+      }
+      
       setStory(newStory);
       setError('');
       setIsLoading(false);
       
-      // Start the story
-      continueStory(newStory);
+      // Update choices if any
+      if (newStory.currentChoices.length > 0) {
+        setChoices(newStory.currentChoices.map(choice => ({
+          text: choice.text,
+          index: choice.index
+        })));
+      }
     } catch (err) {
       console.error('Story compilation error:', err);
       setError('Failed to load the story. Please try again.');
@@ -80,55 +108,57 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     }
   }, [paragraphs]);
 
-  // Continue the story and generate text
-  const continueStory = (currentStory: Story | null = story) => {
-    if (!currentStory) return;
-
-    console.log(currentStory.state, currentStory.variablesState)
+  // Check if we've moved to a new knot
+  const checkForKnotChange = (currentStory: Story) => {
+    if (!currentStory) return false;
     
-    const newParagraphs: string[] = [];
-
-    console.log(currentStory.canContinue)
-
-    while (currentStory.canContinue){
-      const text = currentStory.Continue();
-      console.log('text', text);
-      newParagraphs.push(text);
+    // Get the current path in the story
+    const path = currentStory.state.currentPathString;
+    
+    // Extract the knot name (everything before the first dot or the whole string)
+    const knotName = path.split('.')[0];
+    
+    // If we've moved to a new knot, clear the paragraphs
+    if (knotName && knotName !== currentKnot) {
+      console.log(`Moving to new knot: ${knotName} (was: ${currentKnot})`);
+      setCurrentKnot(knotName);
+      setParagraphs([]);
+      processedTexts.clear();
+      return true;
     }
+    
+    return false;
+  };
 
-    //check if there are choices
-    if (currentStory.currentChoices.length > 0) {
-      setChoices(currentStory.currentChoices.map(choice => ({
+  // Continue the story
+  const continueStory = () => {
+    if (!story) return;
+    
+    // Play sound
+    playSound('continue');
+    
+    // Check for knot change
+    checkForKnotChange(story);
+    
+    // Continue the story if possible
+    if (story.canContinue) {
+      const text = story.Continue().trim();
+      
+      // Only add non-empty text to paragraphs
+      if (text && !processedTexts.has(text)) {
+        processedTexts.add(text);
+        setParagraphs(prev => [...prev, text]);
+      }
+    }
+    
+    // Update choices
+    if (story.currentChoices.length > 0) {
+      setChoices(story.currentChoices.map(choice => ({
         text: choice.text,
         index: choice.index
       })));
-    }
-    else{
-      //if there are no choices, we reached the end of the story
+    } else {
       setChoices([]);
-    }
-    
-    // Continue the story and collect paragraphs
-    // while (currentStory.canContinue) {
-    //   try {
-    //     const text = currentStory.Continue().trim();
-    //     console.log('text', text);
-        
-    //     // Only add non-empty text to paragraphs
-    //     if (text) {
-    //       newParagraphs.push(text);
-    //     }
-    //   } catch (err) {
-    //     console.error("Error continuing story:", err);
-    //     break;
-    //   }
-    // }
-
-    console.log('newParagraphs', newParagraphs);
-
-    // Update paragraphs
-    if (newParagraphs.length > 0) {
-      setParagraphs(prev => [...prev, ...newParagraphs]);
     }
   };
 
@@ -234,7 +264,7 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
         <div className="space-y-4 storyControls">
           {story && story.canContinue && (
             <button
-              onClick={() => continueStory()}
+              onClick={continueStory}
               className="continue text-white w-full flex items-center justify-center px-6 py-4 text-lg"
             >
               Continue
