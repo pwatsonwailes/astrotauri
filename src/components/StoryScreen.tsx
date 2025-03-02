@@ -28,7 +28,13 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
   const [processedTexts] = useState(new Set<string>());
 
   const textContainerRef = useRef<HTMLDivElement>(null);
-  const { selectedCharacter, setScreen, setCurrentStory, addCompletedConversation } = useGameStore();
+  const { 
+    selectedCharacter, 
+    setScreen, 
+    setCurrentStory, 
+    addCompletedConversation,
+    saveGameState 
+  } = useGameStore();
   const { getNextStory } = useStorySystem();
   const { playSound } = useSoundSystem();
 
@@ -184,6 +190,9 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     } else {
       setChoices([]);
     }
+    
+    // Save game state after continuing
+    saveGameState();
   };
 
   // Handle choice selection
@@ -200,6 +209,9 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     
     // Continue the story with awareness of knot changes
     continueStory();
+    
+    // Save game state after making a choice
+    saveGameState();
   };
 
   // Handle story completion
@@ -232,6 +244,9 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     if (onComplete) {
       onComplete();
     }
+    
+    // Save game state after completing the story
+    saveGameState();
   };
 
   // Loading state

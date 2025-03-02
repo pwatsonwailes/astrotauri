@@ -121,21 +121,19 @@ export const QuestList: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-bold mb-4">Active Quests</h2>
-
       {completionNotice && (
         <div
           className={`p-4 rounded-lg mb-4 transition-all duration-500 ${
             completionNotice.status === 'completed'
-              ? 'bg-green-900/50 text-green-300'
-              : 'bg-red-900/50 text-red-300'
+              ? 'bg-green-100 text-green-800 border border-green-200'
+              : 'bg-red-100 text-red-800 border border-red-200'
           }`}
         >
           <div className="flex items-center space-x-2 mb-2">
             {completionNotice.status === 'completed' ? (
-              <CheckCircle className="w-5 h-5" />
+              <CheckCircle className="w-5 h-5 text-green-600" />
             ) : (
-              <XCircle className="w-5 h-5" />
+              <XCircle className="w-5 h-5 text-red-600" />
             )}
             <span className="font-medium">
               {completionNotice.status === 'completed' ? 'Completed: ' : 'Failed: '}
@@ -154,38 +152,38 @@ export const QuestList: React.FC = () => {
         return (
           <div
             key={quest.id}
-            className="bg-gray-700/50 rounded-lg p-4 space-y-4"
+            className="bg-slate-50 rounded-lg p-4 space-y-4 border border-slate-200 mb-4"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 {getStatusIcon(quest.status)}
-                <h3 className="font-medium">{quest.name}</h3>
+                <h3 className="font-medium text-slate-800">{quest.name}</h3>
               </div>
               <div className="flex items-center space-x-2">
-                <span className={`px-2 py-1 text-xs rounded ${
-                  quest.type === 'technical' ? 'bg-blue-900/50 text-blue-300' :
-                  quest.type === 'diplomatic' ? 'bg-green-900/50 text-green-300' :
-                  quest.type === 'combat' ? 'bg-red-900/50 text-red-300' :
-                  quest.type === 'strategic' ? 'bg-purple-900/50 text-purple-300' :
-                  'bg-gray-900/50 text-gray-300'
+                <span className={`px-2 py-1 text-xs rounded-full ${
+                  quest.type === 'technical' ? 'bg-blue-100 text-blue-800' :
+                  quest.type === 'diplomatic' ? 'bg-green-100 text-green-800' :
+                  quest.type === 'combat' ? 'bg-red-100 text-red-800' :
+                  quest.type === 'strategic' ? 'bg-purple-100 text-purple-800' :
+                  'bg-slate-100 text-slate-800'
                 }`}>
                   {quest.type}
                 </span>
-                <span className="text-sm text-gray-300">
+                <span className="text-sm text-slate-600">
                   Turn {quest.currentTurn}/{quest.duration}
                 </span>
               </div>
             </div>
             
             {currentDialogue && (
-              <div className="bg-gray-800/50 rounded p-3 text-sm">
+              <div className="bg-slate-100 rounded p-3 text-sm text-slate-700">
                 {currentDialogue}
               </div>
             )}
             
             {currentInteraction && !hasInteractionChoice && (
               <div className="space-y-3">
-                <p className="text-sm font-medium">{currentInteraction.prompt}</p>
+                <p className="text-sm font-medium text-slate-700">{currentInteraction.prompt}</p>
                 <div className="space-y-2">
                   {currentInteraction.options.map((option, index) => {
                     const canUse = canUseOption(option);
@@ -201,31 +199,31 @@ export const QuestList: React.FC = () => {
                         )}
                         className={`w-full text-left p-3 rounded ${
                           canUse
-                            ? 'bg-gray-800 hover:bg-gray-700'
-                            : 'bg-gray-800/50 cursor-not-allowed'
+                            ? 'bg-white hover:bg-orange-50 border border-slate-200 hover:border-orange-200'
+                            : 'bg-slate-100 cursor-not-allowed text-slate-500 border border-slate-200'
                         }`}
                         disabled={!canUse}
                       >
-                        <p className="font-medium mb-1">{option.text}</p>
+                        <p className="font-medium mb-1 text-slate-800">{option.text}</p>
                         <div className="flex flex-wrap gap-2 text-sm">
                           {option.type === 'resource' && option.cost && (
-                            <span className="text-red-300 px-2 py-1 bg-red-900/30 rounded">
+                            <span className="text-red-700 px-2 py-1 bg-red-50 rounded-full text-xs">
                               Cost: {option.cost} credits
                             </span>
                           )}
                           {option.type === 'time' && option.extraTurn && (
-                            <span className="text-yellow-300 px-2 py-1 bg-yellow-900/30 rounded">
+                            <span className="text-amber-700 px-2 py-1 bg-amber-50 rounded-full text-xs">
                               +{option.extraTurn} turn
                             </span>
                           )}
                           {option.type === 'item' && option.requiredItem && (
-                            <span className={`px-2 py-1 rounded ${
-                              canUse ? 'bg-green-900/30 text-green-300' : 'bg-red-900/30 text-red-300'
+                            <span className={`px-2 py-1 rounded-full text-xs ${
+                              canUse ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
                             }`}>
                               Requires: {option.requiredItem}
                             </span>
                           )}
-                          <span className="text-blue-300 px-2 py-1 bg-blue-900/30 rounded">
+                          <span className="text-blue-700 px-2 py-1 bg-blue-50 rounded-full text-xs">
                             Bonus: +{adjustedBonus}
                           </span>
                           {selectedCharacter && (
@@ -233,7 +231,7 @@ export const QuestList: React.FC = () => {
                             option.type === 'diplomatic' && selectedCharacter.alignment === 'noble' ||
                             option.type === 'cautious' && selectedCharacter.alignment === 'stoic'
                           ) && (
-                            <span className="text-purple-300 px-2 py-1 bg-purple-900/30 rounded">
+                            <span className="text-purple-700 px-2 py-1 bg-purple-50 rounded-full text-xs">
                               Alignment bonus
                             </span>
                           )}
@@ -246,16 +244,16 @@ export const QuestList: React.FC = () => {
             )}
 
             {currentInteraction && hasInteractionChoice && (
-              <div className="bg-gray-800/50 rounded p-3">
-                <p className="text-sm text-gray-400">
+              <div className="bg-slate-100 rounded p-3">
+                <p className="text-sm text-slate-600">
                   Choice made: {currentInteraction.options[interactionChoices[quest.id]].text}
                 </p>
               </div>
             )}
             
-            <div className="w-full bg-gray-600 rounded-full h-2">
+            <div className="w-full bg-slate-200 rounded-full h-2">
               <div
-                className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                className="bg-orange-500 h-2 rounded-full transition-all duration-500"
                 style={{ width: `${quest.progress}%` }}
               />
             </div>
@@ -264,9 +262,10 @@ export const QuestList: React.FC = () => {
       })}
 
       {visibleQuests.length === 0 && (
-        <div className="text-center py-8 text-gray-400">
-          <AlertTriangle className="w-12 h-12 mx-auto mb-2 opacity-50" />
+        <div className="text-center py-8 text-slate-500">
+          <AlertTriangle className="w-12 h-12 mx-auto mb-2 opacity-50 text-slate-400" />
           <p>No active quests</p>
+          <p className="text-sm mt-2">Visit the Bridge to start a new mission</p>
         </div>
       )}
     </div>
@@ -276,12 +275,12 @@ export const QuestList: React.FC = () => {
 const getStatusIcon = (status: string) => {
   switch (status) {
     case 'active':
-      return <Clock className="w-5 h-5 text-blue-400" />;
+      return <Clock className="w-5 h-5 text-blue-600" />;
     case 'completed':
-      return <CheckCircle className="w-5 h-5 text-green-400" />;
+      return <CheckCircle className="w-5 h-5 text-green-600" />;
     case 'failed':
-      return <XCircle className="w-5 h-5 text-red-400" />;
+      return <XCircle className="w-5 h-5 text-red-600" />;
     default:
-      return <AlertTriangle className="w-5 h-5 text-yellow-400" />;
+      return <AlertTriangle className="w-5 h-5 text-amber-600" />;
   }
 };

@@ -3,6 +3,7 @@ import { GameState, Resources, InventoryItem, ManufacturingItem } from '../types
 import { Quest, QuestStatus } from '../types/quest';
 import { GAME_CONSTANTS } from '../constants/game';
 import { AVAILABLE_QUESTS } from '../data/quests';
+import { saveGame, loadGame, hasSavedGame } from '../utils/saveSystem';
 
 export const useGameStore = create<GameState & {
   setScreen: (screen: GameState['currentScreen']) => void;
@@ -18,6 +19,10 @@ export const useGameStore = create<GameState & {
   advanceTurn: () => void;
   addCompletedConversation: (crewId: string) => void;
   checkForSpecialEvents: () => void;
+  saveGameState: () => void;
+  loadGameState: () => Promise<boolean>;
+  hasExistingSave: () => Promise<boolean>;
+  resetGame: () => void;
 }>((set, get) => ({
   currentScreen: 'intro',
   selectedCharacter: null,
@@ -30,12 +35,30 @@ export const useGameStore = create<GameState & {
   currentTurn: 1,
   completedConversations: [],
   
-  setScreen: (screen) => set({ currentScreen: screen }),
-  setCharacter: (character) => set({ selectedCharacter: character }),
-  setStoryState: (state) => set({ storyState: state }),
-  setCurrentStory: (story) => set({ currentStory: story }),
+  setScreen: (screen) => {
+    set({ currentScreen: screen });
+    // Auto-save when changing screens
+    if (screen !== 'intro') {
+      get().saveGameState();
+    }
+  },
   
-  updateResources: (resources) => 
+  setCharacter: (character) => {
+    set({ selectedCharacter: character });
+    get().saveGameState();
+  },
+  
+  setStoryState: (state) => {
+    set({ storyState: state });
+    get().saveGameState();
+  },
+  
+  setCurrentStory: (story) => {
+    set({ currentStory: story });
+    get().saveGameState();
+  },
+  
+  updateResources: (resources) => {
     set((state) => ({
       resources: {
         ...state.resources,
@@ -44,7 +67,9 @@ export const useGameStore = create<GameState & {
           [key]: Math.max(0, (state.resources[key as keyof Resources] || 0) + (value || 0))
         }), {})
       }
-    })),
+    }));
+    get().saveGameState();
+  },
     
   addQuest: (quest) => {
     const state = get();
@@ -60,9 +85,10 @@ export const useGameStore = create<GameState & {
     set((state) => ({
       activeQuests: [...state.activeQuests, quest]
     }));
+    get().saveGameState();
   },
     
-  updateQuest: (questId, updates) =>
+  updateQuest: (questId, updates) => {
     set((state) => {
       const updatedQuests = state.activeQuests.map(quest => {
         if (quest.id === questId) {
@@ -82,9 +108,11 @@ export const useGameStore = create<GameState & {
       });
       
       return { activeQuests: updatedQuests };
-    }),
+    });
+    get().saveGameState();
+  },
     
-  addInventoryItem: (item) =>
+  addInventoryItem: (item) => {
     set((state) => {
       const existingItem = state.inventory.find(i => i.id === item.id);
       if (existingItem) {
@@ -99,9 +127,11 @@ export const useGameStore = create<GameState & {
       return {
         inventory: [...state.inventory, item]
       };
-    }),
+    });
+    get().saveGameState();
+  },
     
-  removeInventoryItem: (itemId, quantity) =>
+  removeInventoryItem: (itemId, quantity) => {
     set((state) => ({
       inventory: state.inventory
         .map(item =>
@@ -110,12 +140,16 @@ export const useGameStore = create<GameState & {
             : item
         )
         .filter(item => item.quantity > 0)
-    })),
+    }));
+    get().saveGameState();
+  },
 
-  addManufacturingItem: (item) =>
+  addManufacturingItem: (item) => {
     set((state) => ({
       manufacturingQueue: [...state.manufacturingQueue, item]
-    })),
+    }));
+    get().saveGameState();
+  },
 
   checkForSpecialEvents: () => {
     const state = get();
@@ -138,11 +172,12 @@ export const useGameStore = create<GameState & {
         set((state) => ({
           activeQuests: [...state.activeQuests, newQuest]
         }));
+        get().saveGameState();
       }
     }
   },
 
-  advanceTurn: () =>
+  advanceTurn: () => {
     set((state) => {
       const newTurn = state.currentTurn + 1;
       
@@ -202,10 +237,73 @@ export const useGameStore = create<GameState & {
         manufacturingQueue: inProgress,
         activeQuests: updatedQuests
       };
-    }),
+    });
+    
+    // Auto-save after advancing turn
+    get().saveGameState();
+  },
 
-  addCompletedConversation: (crewId) =>
+  addCompletedConversation: (crewId) => {
     set((state) => ({
       completedConversations: [...state.completedConversations, crewId]
-    }))
+    }));
+    get().saveGameState();
+  },
+  
+  saveGameState: () => {
+    const state = get();
+    const saveData = {
+      selectedCharacter: state.selectedCharacter,
+      resources: state.resources,
+      activeQuests: state.activeQuests,
+      inventory: state.inventory,
+      manufacturingQueue: state.manufacturingQueue,
+      currentTurn: state.currentTurn,
+      completedConversations: state.completedConversations
+    };
+    
+    saveGame(saveData);
+  },
+  
+  loadGameState: async () => {
+    try {
+      const savedData = await loadGame();
+      if (!savedData) return false;
+      
+      set({
+        selectedCharacter: savedData.selectedCharacter,
+        resources: savedData.resources,
+        activeQuests: savedData.activeQuests,
+        inventory: savedData.inventory,
+        manufacturingQueue: savedData.manufacturingQueue,
+        currentTurn: savedData.currentTurn,
+        completedConversations: savedData.completedConversations,
+        currentScreen: 'ship-hub' // Always go to ship hub when loading a game
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Failed to load game:', error);
+      return false;
+    }
+  },
+  
+  hasExistingSave: async () => {
+    return await hasSavedGame();
+  },
+  
+  resetGame: () => {
+    set({
+      currentScreen: 'intro',
+      selectedCharacter: null,
+      storyState: null,
+      currentStory: null,
+      resources: GAME_CONSTANTS.INITIAL_RESOURCES,
+      activeQuests: [],
+      inventory: [],
+      manufacturingQueue: [],
+      currentTurn: 1,
+      completedConversations: []
+    });
+  }
 }));

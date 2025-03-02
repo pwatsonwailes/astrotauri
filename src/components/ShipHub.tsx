@@ -139,7 +139,7 @@ export const ShipHub: React.FC = () => {
         <div className="max-w-7xl mx-auto p-4 h-full">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-full">
             {/* Left column - Location content with independent scrolling */}
-            <div className="lg:col-span-2 bg-white rounded-lg shadow-md border border-slate-200 flex flex-col overflow-hidden">
+            <div className="lg:col-span-2 bg-white rounded-lg shadow-md border border-slate-200 flex flex-col">
               <div className="p-4 pb-3 border-b border-slate-200 flex-shrink-0">
                 <h2 className="text-xl font-bold text-slate-800">{locations.find(l => l.id === selectedLocation)?.name}</h2>
               </div>

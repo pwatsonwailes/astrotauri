@@ -47,6 +47,13 @@ export type ManufacturingItem = {
   turnsRemaining: number;
 };
 
+export type StoryChoice = {
+  storyId: string;
+  knotName: string | null;
+  choiceText: string;
+  timestamp: number;
+};
+
 export type GameState = {
   currentScreen: 'intro' | 'character-select' | 'story' | 'tutorial' | 'ship-hub';
   selectedCharacter: Character | null;
@@ -58,4 +65,5 @@ export type GameState = {
   manufacturingQueue: ManufacturingItem[];
   currentTurn: number;
   completedConversations: string[];
+  storyChoices: StoryChoice[];
 };
