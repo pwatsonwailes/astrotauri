@@ -20,19 +20,14 @@ const locations: { id: Location; name: string; icon: React.ReactNode }[] = [
 
 export const ShipHub: React.FC = () => {
   const [selectedLocation, setSelectedLocation] = useState<Location>('bridge');
-  const { resources, currentTurn, advanceTurn } = useGameStore();
+  const { resources, currentTurn, advanceTurn, selectedCharacter } = useGameStore();
   const { playSound } = useSoundSystem();
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [headerHeight, setHeaderHeight] = useState(0);
   const headerRef = useRef<HTMLDivElement>(null);
+  const [headerHeight, setHeaderHeight] = useState(0);
 
   const handleLocationChange = (location: Location) => {
     playSound('navigation');
     setSelectedLocation(location);
-    // Scroll to top when changing location
-    if (contentRef.current) {
-      contentRef.current.scrollTop = 0;
-    }
   };
 
   // Measure header height on mount and resize
@@ -136,36 +131,49 @@ export const ShipHub: React.FC = () => {
         </div>
       </div>
 
-      {/* Scrollable content area */}
+      {/* Content area with independent scrolling columns */}
       <div 
-        ref={contentRef}
-        className="flex-grow overflow-y-auto custom-scrollbar"
+        className="flex-grow overflow-hidden"
         style={{ height: `calc(100vh - ${headerHeight}px)` }}
       >
-        <div className="max-w-7xl mx-auto p-4">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="lg:col-span-2 bg-white rounded-lg shadow-md p-4 border border-slate-200">
-              <div className="mb-4 pb-3 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto p-4 h-full">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-full">
+            {/* Left column - Location content with independent scrolling */}
+            <div className="lg:col-span-2 bg-white rounded-lg shadow-md border border-slate-200 flex flex-col overflow-hidden">
+              <div className="p-4 pb-3 border-b border-slate-200 flex-shrink-0">
                 <h2 className="text-xl font-bold text-slate-800">{locations.find(l => l.id === selectedLocation)?.name}</h2>
               </div>
-              {renderLocationContent()}
+              <div className="p-4 overflow-y-auto custom-scrollbar flex-grow">
+                {renderLocationContent()}
+              </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="bg-white rounded-lg shadow-md p-4 border border-slate-200">
-                <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-200">
-                  <h2 className="text-lg font-bold text-slate-800">Active Missions</h2>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
+            {/* Right column with independent scrolling sections */}
+            <div className="space-y-4 h-full flex flex-col">
+              {/* Active Missions section */}
+              <div className="bg-white rounded-lg shadow-md border border-slate-200 flex flex-col flex-grow">
+                <div className="p-4 pb-2 border-b border-slate-200 flex-shrink-0">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-bold text-slate-800">Active Missions</h2>
+                    <ChevronRight className="w-4 h-4 text-slate-400" />
+                  </div>
                 </div>
-                <QuestList />
+                <div className="p-4 overflow-y-auto custom-scrollbar flex-grow">
+                  <QuestList />
+                </div>
               </div>
               
-              <div className="bg-white rounded-lg shadow-md p-4 border border-slate-200">
-                <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-200">
-                  <h2 className="text-lg font-bold text-slate-800">Inventory</h2>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
+              {/* Inventory section */}
+              <div className="bg-white rounded-lg shadow-md border border-slate-200 flex flex-col h-1/3">
+                <div className="p-4 pb-2 border-b border-slate-200 flex-shrink-0">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-bold text-slate-800">Inventory</h2>
+                    <ChevronRight className="w-4 h-4 text-slate-400" />
+                  </div>
                 </div>
-                <Inventory />
+                <div className="p-4 overflow-y-auto custom-scrollbar flex-grow">
+                  <Inventory />
+                </div>
               </div>
             </div>
           </div>
@@ -174,3 +182,6 @@ export const ShipHub: React.FC = () => {
     </div>
   );
 };
+
+// Import these at the top of the file
+import { backgrounds, alignments } from '../data/characters';
