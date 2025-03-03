@@ -2,7 +2,6 @@ import { useCallback } from 'react';
 
 import audio from '../data/audio';
 
-// Sound effects from Pixabay (free for commercial use)
 const SOUND_EFFECTS = {
   navigation: new Audio(audio.zingSfx),
   continue: new Audio(audio.continueSfx),
