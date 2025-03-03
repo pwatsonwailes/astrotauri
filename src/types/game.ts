@@ -1,4 +1,5 @@
 import { Quest } from './quest';
+import { SceneState } from './story';
 
 export type Resources = {
   credits: number;
@@ -54,10 +55,20 @@ export type StoryChoice = {
   timestamp: number;
 };
 
+export type StoryStateData = {
+  storyContent: string;
+  storyJson: string;
+  paragraphs: string[];
+  choices: { text: string; index: number }[];
+  sceneState: SceneState;
+  currentKnot: string | null;
+  processedTexts: string[];
+};
+
 export type GameState = {
   currentScreen: 'intro' | 'character-select' | 'story' | 'tutorial' | 'ship-hub';
   selectedCharacter: Character | null;
-  storyState: any;
+  storyState: StoryStateData | null;
   currentStory: string | null;
   resources: Resources;
   activeQuests: Quest[];

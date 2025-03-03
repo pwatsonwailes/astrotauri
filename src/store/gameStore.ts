@@ -34,6 +34,7 @@ export const useGameStore = create<GameState & {
   manufacturingQueue: [],
   currentTurn: 1,
   completedConversations: [],
+  storyChoices: [], // Initialize the storyChoices array
   
   setScreen: (screen) => {
     set({ currentScreen: screen });
@@ -259,7 +260,11 @@ export const useGameStore = create<GameState & {
       inventory: state.inventory,
       manufacturingQueue: state.manufacturingQueue,
       currentTurn: state.currentTurn,
-      completedConversations: state.completedConversations
+      completedConversations: state.completedConversations,
+      currentScreen: state.currentScreen,
+      currentStory: state.currentStory,
+      storyState: state.storyState,
+      storyChoices: state.storyChoices
     };
     
     saveGame(saveData);
@@ -278,7 +283,11 @@ export const useGameStore = create<GameState & {
         manufacturingQueue: savedData.manufacturingQueue,
         currentTurn: savedData.currentTurn,
         completedConversations: savedData.completedConversations,
-        currentScreen: 'ship-hub' // Always go to ship hub when loading a game
+        currentStory: savedData.currentStory,
+        storyState: savedData.storyState,
+        storyChoices: savedData.storyChoices || [], // Provide a default empty array if not present
+        // Restore the screen the player was on when they saved
+        currentScreen: savedData.currentScreen || 'ship-hub'
       });
       
       return true;
@@ -303,7 +312,8 @@ export const useGameStore = create<GameState & {
       inventory: [],
       manufacturingQueue: [],
       currentTurn: 1,
-      completedConversations: []
+      completedConversations: [],
+      storyChoices: []
     });
   }
 }));

@@ -60,7 +60,8 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
         processedTexts: processedTextsArray
       });
       
-      saveGameState();
+      // Don't call saveGameState here to avoid infinite loops
+      // The setStoryState function will trigger a state update which will be saved
     } catch (error) {
       console.error("Error saving story state:", error);
     }
@@ -71,8 +72,7 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     choices, 
     sceneState, 
     currentKnot, 
-    setStoryState, 
-    saveGameState
+    setStoryState
   ]);
 
   // Debounced save function to prevent too many saves
@@ -242,6 +242,7 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
             processedTexts: processedTextsArray
           });
           
+          // Call saveGameState directly to ensure the state is saved
           gameStore.saveGameState();
         } catch (error) {
           console.error("Error saving story state on unmount:", error);
@@ -355,6 +356,9 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     
     // Continue the story with awareness of knot changes
     continueStory();
+    
+    // Save the game state after making a choice
+    saveGameState();
   };
 
   // Handle story completion
