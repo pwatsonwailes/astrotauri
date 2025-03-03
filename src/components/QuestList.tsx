@@ -1,20 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useGameStore } from '../store/gameStore';
 import { Clock, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import { QuestInteraction as QuestInteractionType } from '../types/quest';
 
 export const QuestList: React.FC = () => {
-  const { activeQuests, resources, inventory, updateResources, updateQuest, selectedCharacter } = useGameStore();
-  const [completionNotice, setCompletionNotice] = React.useState<{
+  const { activeQuests, resources, inventory, updateResources, updateQuest, selectedCharacter, removeCompletedQuest } = useGameStore();
+  const [completionNotice, setCompletionNotice] = useState<{
     questName: string;
     status: 'completed' | 'failed';
     narrative: string;
   } | null>(null);
 
-  const [interactionChoices, setInteractionChoices] = React.useState<Record<string, number>>({});
+  const [interactionChoices, setInteractionChoices] = useState<Record<string, number>>({});
 
   // Filter out completed quests after a delay
-  React.useEffect(() => {
+  useEffect(() => {
     const completedQuest = activeQuests.find(
       quest => (quest.status === 'completed' || quest.status === 'failed') && 
       !completionNotice
@@ -29,14 +29,17 @@ export const QuestList: React.FC = () => {
         ]
       });
 
-      // Clear the notification after 5 seconds
+      // Clear the notification after 5 seconds and remove the completed quest
       const timer = setTimeout(() => {
         setCompletionNotice(null);
+        if (completedQuest.status === 'completed' || completedQuest.status === 'failed') {
+          removeCompletedQuest(completedQuest.id);
+        }
       }, 5000);
 
       return () => clearTimeout(timer);
     }
-  }, [activeQuests, completionNotice]);
+  }, [activeQuests, completionNotice, removeCompletedQuest]);
 
   const canUseOption = (option: QuestInteractionType['options'][0]) => {
     if (option.type === 'resource') {

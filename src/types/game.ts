@@ -8,7 +8,7 @@ export type Resources = {
   influence: number;
 };
 
-export type Location = 'bridge' | 'quarters' | 'comms' | 'engineering' | 'market';
+export type Location = 'bridge' | 'quarters' | 'comms' | 'engineering';
 
 export type Background = 'smuggler' | 'trader' | 'engineer' | 'pilot' | 'protection';
 

@@ -55,10 +55,6 @@ export const IntroScreen: React.FC = () => {
         backgroundRepeat: 'no-repeat'
       }}
     >
-      <div className="absolute top-4 right-4 text-3xl font-bold text-white drop-shadow-lg">
-        Astromine
-      </div>
-      
       <div className="relative z-10 mb-16 space-y-4">
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg">

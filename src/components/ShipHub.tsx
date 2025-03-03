@@ -11,11 +11,10 @@ import { BridgeControl } from './BridgeControl';
 import { Communications } from './Communications';
 
 const locations: { id: Location; name: string; icon: React.ReactNode }[] = [
-  { id: 'bridge', name: 'Mission Control', icon: <Map className="w-5 h-5" /> },
-  { id: 'quarters', name: 'Crew Quarters', icon: <Users className="w-5 h-5" /> },
-  { id: 'comms', name: 'Communications', icon: <Radio className="w-5 h-5" /> },
-  { id: 'engineering', name: 'Engineering', icon: <Clipboard className="w-5 h-5" /> },
-  { id: 'market', name: 'Market', icon: <ShoppingBag className="w-5 h-5" /> }
+  { id: 'bridge', name: 'Missions', icon: <Map className="w-5 h-5" /> },
+  { id: 'quarters', name: 'People', icon: <Users className="w-5 h-5" /> },
+  { id: 'comms', name: 'Market', icon: <ShoppingBag className="w-5 h-5" /> },
+  { id: 'engineering', name: 'Engineering', icon: <Clipboard className="w-5 h-5" /> }
 ];
 
 export const ShipHub: React.FC = () => {
@@ -139,7 +138,7 @@ export const ShipHub: React.FC = () => {
         <div className="max-w-7xl mx-auto p-4 h-full">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-full">
             {/* Left column - Location content with independent scrolling */}
-            <div className="lg:col-span-2 bg-white rounded-lg shadow-md border border-slate-200 flex flex-col">
+            <div className="lg:col-span-2 bg-white rounded-lg shadow-md border border-slate-200 flex flex-col overflow-hidden">
               <div className="p-4 pb-3 border-b border-slate-200 flex-shrink-0">
                 <h2 className="text-xl font-bold text-slate-800">{locations.find(l => l.id === selectedLocation)?.name}</h2>
               </div>
@@ -149,12 +148,12 @@ export const ShipHub: React.FC = () => {
             </div>
 
             {/* Right column with independent scrolling sections */}
-            <div className="space-y-4 h-full flex flex-col">
+            <div className="space-y-4 h-full flex flex-col overflow-hidden">
               {/* Active Missions section */}
-              <div className="bg-white rounded-lg shadow-md border border-slate-200 flex flex-col flex-grow">
+              <div className="bg-white rounded-lg shadow-md border border-slate-200 flex flex-col flex-grow overflow-hidden">
                 <div className="p-4 pb-2 border-b border-slate-200 flex-shrink-0">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-bold text-slate-800">Active Missions</h2>
+                    <h2 className="text-lg font-bold text-slate-800">Mission Tracker</h2>
                     <ChevronRight className="w-4 h-4 text-slate-400" />
                   </div>
                 </div>
@@ -164,10 +163,10 @@ export const ShipHub: React.FC = () => {
               </div>
               
               {/* Inventory section */}
-              <div className="bg-white rounded-lg shadow-md border border-slate-200 flex flex-col h-1/3">
+              <div className="bg-white rounded-lg shadow-md border border-slate-200 flex flex-col h-1/3 overflow-hidden">
                 <div className="p-4 pb-2 border-b border-slate-200 flex-shrink-0">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-bold text-slate-800">Inventory</h2>
+                    <h2 className="text-lg font-bold text-slate-800">Cargo Hold</h2>
                     <ChevronRight className="w-4 h-4 text-slate-400" />
                   </div>
                 </div>
@@ -180,8 +179,5 @@ export const ShipHub: React.FC = () => {
         </div>
       </div>
     </div>
-  );
+  )
 };
-
-// Import these at the top of the file
-import { backgrounds, alignments } from '../data/characters';

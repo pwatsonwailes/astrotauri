@@ -5,6 +5,8 @@ import { CharacterSelect } from './components/CharacterSelect';
 import { StoryScreen } from './components/StoryScreen';
 import { ShipHub } from './components/ShipHub';
 import { TutorialScreen } from './components/TutorialScreen';
+import { EscapeMenu } from './components/EscapeMenu';
+import { useEffect, useState } from 'react';
 import mainStory from './stories/main.ink?raw';
 
 const pageVariants = {
@@ -31,6 +33,19 @@ const pageTransition = {
 function App() {
   const currentScreen = useGameStore((state) => state.currentScreen);
   const currentStory = useGameStore((state) => state.currentStory);
+  const [isEscapeMenuOpen, setIsEscapeMenuOpen] = useState(false);
+
+  // Handle ESC key to open the menu
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && currentScreen !== 'intro' && currentScreen !== 'character-select') {
+        setIsEscapeMenuOpen(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentScreen]);
 
   return (
     <div className="min-h-screen creamyBg overflow-hidden">
@@ -105,6 +120,12 @@ function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Escape Menu */}
+      <EscapeMenu 
+        isOpen={isEscapeMenuOpen} 
+        onClose={() => setIsEscapeMenuOpen(false)} 
+      />
     </div>
   );
 }

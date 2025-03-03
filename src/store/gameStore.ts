@@ -13,6 +13,7 @@ export const useGameStore = create<GameState & {
   updateResources: (resources: Partial<Resources>) => void;
   addQuest: (quest: Quest) => void;
   updateQuest: (questId: string, updates: Partial<Quest>) => void;
+  removeCompletedQuest: (questId: string) => void;
   addInventoryItem: (item: InventoryItem) => void;
   removeInventoryItem: (itemId: string, quantity: number) => void;
   addManufacturingItem: (item: ManufacturingItem) => void;
@@ -110,6 +111,15 @@ export const useGameStore = create<GameState & {
       
       return { activeQuests: updatedQuests };
     });
+    get().saveGameState();
+  },
+  
+  removeCompletedQuest: (questId) => {
+    set((state) => ({
+      activeQuests: state.activeQuests.filter(quest => 
+        quest.id !== questId || (quest.status !== 'completed' && quest.status !== 'failed')
+      )
+    }));
     get().saveGameState();
   },
     

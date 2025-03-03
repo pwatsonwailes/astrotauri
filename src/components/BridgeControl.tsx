@@ -1,5 +1,5 @@
-import React from 'react';
-import { Map, Navigation, MessageSquare, Shield, Cpu, Users, Zap } from 'lucide-react';
+import React, { useState } from 'react';
+import { Map, ChevronLeft } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import { useStorySystem } from '../hooks/useStorySystem';
 import { Quest } from '../types/quest';
@@ -8,6 +8,7 @@ import { AVAILABLE_QUESTS } from '../data/quests';
 export const BridgeControl: React.FC = () => {
   const { resources, activeQuests, addQuest, setScreen, setCurrentStory, addCompletedConversation, selectedCharacter, completedConversations } = useGameStore();
   const { getCrewStories } = useStorySystem();
+  const [selectedMission, setSelectedMission] = useState<typeof AVAILABLE_QUESTS[0] | null>(null);
 
   // Get available captain stories, excluding the Prologue
   const captainStories = getCrewStories('captain').filter(story => 
@@ -90,6 +91,7 @@ export const BridgeControl: React.FC = () => {
     };
 
     addQuest(newQuest);
+    setSelectedMission(null);
   };
 
   const startCaptainStory = (story: typeof captainStories[0]) => {
@@ -98,13 +100,34 @@ export const BridgeControl: React.FC = () => {
     addCompletedConversation(story.id);
   };
 
+  const getRiskLevelColor = (riskLevel: string) => {
+    switch (riskLevel) {
+      case 'high':
+        return 'bg-red-100 text-red-800';
+      case 'medium':
+        return 'bg-amber-100 text-amber-800';
+      default:
+        return 'bg-green-100 text-green-800';
+    }
+  };
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'technical':
+        return 'bg-blue-100 text-blue-800';
+      case 'diplomatic':
+        return 'bg-green-100 text-green-800';
+      case 'combat':
+        return 'bg-red-100 text-red-800';
+      case 'strategic':
+        return 'bg-purple-100 text-purple-800';
+      default:
+        return 'bg-slate-100 text-slate-800';
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center space-x-2 mb-4">
-        <Map className="w-5 h-5 text-slate-600" />
-        <h2 className="text-xl font-bold text-slate-800">Available Missions</h2>
-      </div>
-
       {captainStories.length > 0 && (
         <div className="bg-slate-50 rounded-lg p-6 mb-6 border border-slate-200">
           <div className="flex items-center space-x-2 mb-4">
@@ -126,91 +149,75 @@ export const BridgeControl: React.FC = () => {
         </div>
       )}
 
-      {availableMissions.length === 0 ? (
-        <div className="text-center py-8 text-slate-500">
-          <Map className="w-12 h-12 mx-auto mb-2 opacity-50 text-slate-400" />
-          <p>No missions available at this time</p>
-          <p className="text-sm mt-2">Check back after completing current missions</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-4">
-          {availableMissions.map((mission) => {
-            const isActive = activeQuests.some(q => q.id === mission.id && q.status === 'active');
-            const canStart = canStartMission(mission.requirements) && !isActive;
-            const statRecommendation = getStatRecommendation(mission);
-
-            return (
-              <div
-                key={mission.id}
-                className={`bg-white rounded-lg p-6 border border-slate-200 ${
-                  canStart ? 'cursor-pointer hover:bg-orange-50 hover:border-orange-200' : 'opacity-75'
-                }`}
-                onClick={() => canStart && startMission(mission)}
+      {selectedMission ? (
+        // Mission details view
+        <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+          <div className="p-4 bg-slate-50 border-b border-slate-200">
+            <div className="flex items-center justify-between">
+              <button 
+                onClick={() => setSelectedMission(null)}
+                className="flex items-center text-slate-600 hover:text-orange-600 transition-colors"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-2">
-                    {getMissionTypeIcon(mission.type)}
-                    <h3 className="text-lg font-medium text-slate-800">{mission.name}</h3>
-                  </div>
-                  <div className="flex space-x-2">
-                    <span className={`px-3 py-1 rounded-full text-sm
-                      ${mission.type === 'technical' ? 'bg-blue-100 text-blue-800' :
-                        mission.type === 'diplomatic' ? 'bg-green-100 text-green-800' :
-                        mission.type === 'combat' ? 'bg-red-100 text-red-800' :
-                        mission.type === 'strategic' ? 'bg-purple-100 text-purple-800' :
-                        'bg-slate-100 text-slate-800'}`}
+                <ChevronLeft className="w-5 h-5 mr-1" />
+                <span>Back to missions</span>
+              </button>
+              <div className="flex space-x-2">
+                <span className={`px-3 py-1 rounded-full text-sm ${getTypeColor(selectedMission.type)}`}>
+                  {selectedMission.type}
+                </span>
+                <span className={`px-3 py-1 rounded-full text-sm ${getRiskLevelColor(selectedMission.riskLevel)}`}>
+                  {selectedMission.riskLevel} risk
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-6">
+            <h3 className="text-xl font-bold text-slate-800 mb-2">{selectedMission.name}</h3>
+            <p className="text-slate-600 mb-6">{selectedMission.description}</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <h4 className="text-sm font-medium text-slate-700 mb-3">Requirements</h4>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(selectedMission.requirements).map(([key, value]) => (
+                    <span
+                      key={key}
+                      className={`px-2 py-1 rounded text-xs
+                        ${resources[key as keyof typeof resources] >= (value || 0)
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                        }`}
                     >
-                      {mission.type}
+                      {key}: {value}
                     </span>
-                    <span className={`px-3 py-1 rounded-full text-sm
-                      ${mission.riskLevel === 'high' ? 'bg-red-100 text-red-800' :
-                        mission.riskLevel === 'medium' ? 'bg-amber-100 text-amber-800' :
-                        'bg-green-100 text-green-800'}`}
+                  ))}
+                </div>
+              </div>
+              
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <h4 className="text-sm font-medium text-slate-700 mb-3">Rewards</h4>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(selectedMission.rewards.resources).map(([key, value]) => (
+                    <span
+                      key={key}
+                      className="px-2 py-1 rounded text-xs bg-purple-100 text-purple-800"
                     >
-                      {mission.riskLevel} risk
+                      {key}: +{value}
                     </span>
-                  </div>
+                  ))}
                 </div>
-
-                <p className="text-slate-600 mb-4">{mission.description}</p>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="text-sm font-medium text-slate-700 mb-2">Requirements</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {Object.entries(mission.requirements).map(([key, value]) => (
-                        <span
-                          key={key}
-                          className={`px-2 py-1 rounded text-xs
-                            ${resources[key as keyof typeof resources] >= (value || 0)
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
-                            }`}
-                        >
-                          {key}: {value}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="text-sm font-medium text-slate-700 mb-2">Rewards</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {Object.entries(mission.rewards.resources).map(([key, value]) => (
-                        <span
-                          key={key}
-                          className="px-2 py-1 rounded text-xs bg-purple-100 text-purple-800"
-                        >
-                          {key}: +{value}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {statRecommendation && (
-                  <div className="mt-4 bg-slate-100 rounded p-3">
-                    <h4 className="text-sm font-medium text-slate-700 mb-2">Character Assessment</h4>
+              </div>
+            </div>
+            
+            {selectedCharacter && (
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 mb-6">
+                <h4 className="text-sm font-medium text-slate-700 mb-3">Character Assessment</h4>
+                {(() => {
+                  const statRecommendation = getStatRecommendation(selectedMission);
+                  if (!statRecommendation) return null;
+                  
+                  return (
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-slate-600">
                         Key Stat: <span className="font-medium">{statRecommendation.stat}</span> ({statRecommendation.value}/10)
@@ -223,18 +230,70 @@ export const BridgeControl: React.FC = () => {
                         {statRecommendation.recommendation}
                       </span>
                     </div>
-                  </div>
-                )}
-
-                {isActive && (
-                  <div className="mt-4 px-4 py-2 bg-blue-100 text-blue-800 rounded">
-                    Mission in progress
-                  </div>
-                )}
+                  );
+                })()}
               </div>
-            );
-          })}
+            )}
+            
+            <div className="flex justify-end">
+              <button
+                onClick={() => startMission(selectedMission)}
+                disabled={!canStartMission(selectedMission.requirements)}
+                className={`px-6 py-3 rounded-lg transition-colors ${
+                  canStartMission(selectedMission.requirements)
+                    ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                    : 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                }`}
+              >
+                {canStartMission(selectedMission.requirements) ? 'Start Mission' : 'Insufficient Resources'}
+              </button>
+            </div>
+          </div>
         </div>
+      ) : (
+        // Mission list view
+        availableMissions.length === 0 ? (
+          <div className="text-center py-8 text-slate-500">
+            <Map className="w-12 h-12 mx-auto mb-2 opacity-50 text-slate-400" />
+            <p>No missions available at this time</p>
+            <p className="text-sm mt-2">Check back after completing current missions</p>
+          </div>
+        ) : (
+          <div className="overflow-hidden">
+            {availableMissions.map((mission) => {
+              const isActive = activeQuests.some(q => q.id === mission.id && q.status === 'active');
+              const canStart = canStartMission(mission.requirements) && !isActive;
+              
+              return (
+                <div
+                  key={mission.id}
+                  onClick={() => setSelectedMission(mission)}
+                  className={`py-4 cursor-pointer mission ${
+                    !canStart ? 'opacity-75' : ''
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <h3 className="font-medium text-slate-800">{mission.name}</h3>
+                    </div>
+                    <div className="flex space-x-2">
+                      <span className={`px-2 py-1 rounded-full text-xs ${getTypeColor(mission.type)}`}>
+                        {mission.type}
+                      </span>
+                      <span className={`px-2 py-1 rounded-full text-xs ${getRiskLevelColor(mission.riskLevel)}`}>
+                        {mission.riskLevel}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-2 flex items-center justify-between">
+                    <p className="text-sm text-slate-600 line-clamp-1">{mission.description}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )
       )}
     </div>
   );
