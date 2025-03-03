@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Story, Compiler } from 'inkjs/types';
 import { useGameStore } from '../store/gameStore';
 import { useStorySystem } from '../hooks/useStorySystem';
@@ -25,7 +25,9 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     currentKnot: undefined,
   });
   const [currentKnot, setCurrentKnot] = useState<string | null>(null);
-  const [processedTexts] = useState(new Set<string>());
+  const processedTextsRef = useRef(new Set<string>());
+  const saveTimeoutRef = useRef<number | null>(null);
+  const storyInitializedRef = useRef(false);
 
   const textContainerRef = useRef<HTMLDivElement>(null);
   const { 
@@ -33,83 +35,227 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     setScreen, 
     setCurrentStory, 
     addCompletedConversation,
-    saveGameState 
+    saveGameState,
+    storyState,
+    setStoryState
   } = useGameStore();
   const { getNextStory } = useStorySystem();
   const { playSound } = useSoundSystem();
 
+  // Save story state function - separated to avoid dependency cycles
+  const saveCurrentState = useCallback(() => {
+    if (!story) return;
+    
+    try {
+      const storyJson = story.state.ToJson();
+      const processedTextsArray = Array.from(processedTextsRef.current);
+      
+      setStoryState({
+        storyContent,
+        storyJson,
+        paragraphs,
+        choices,
+        sceneState,
+        currentKnot,
+        processedTexts: processedTextsArray
+      });
+      
+      saveGameState();
+    } catch (error) {
+      console.error("Error saving story state:", error);
+    }
+  }, [
+    story, 
+    storyContent, 
+    paragraphs, 
+    choices, 
+    sceneState, 
+    currentKnot, 
+    setStoryState, 
+    saveGameState
+  ]);
+
+  // Debounced save function to prevent too many saves
+  const requestSave = useCallback(() => {
+    // Clear any existing timeout
+    if (saveTimeoutRef.current) {
+      window.clearTimeout(saveTimeoutRef.current);
+    }
+    
+    // Set a new timeout
+    saveTimeoutRef.current = window.setTimeout(() => {
+      saveCurrentState();
+      saveTimeoutRef.current = null;
+    }, 500);
+  }, [saveCurrentState]);
+
   // Initialize the story
   useEffect(() => {
-    if (!storyContent) return;
+    if (!storyContent || storyInitializedRef.current) return;
+    
+    storyInitializedRef.current = true;
     
     try {
       setIsLoading(true);
       console.log("Initializing story...");
       
-      // Reset state
-      setParagraphs([]);
-      setChoices([]);
-      processedTexts.clear();
-      setCurrentKnot(null);
-      
-      // Compile the story
-      const newStory = new Compiler(storyContent).Compile();
-      
-      // Set character class if available
-      if (selectedCharacter?.id) {
-        newStory.variablesState["character_class"] = selectedCharacter.id;
-      }
-      
-      // Set up variable observers
-      newStory.ObserveVariable('scene_image', (_: string, newValue: string) => {
-        setSceneState(prev => ({ ...prev, image: newValue }));
-      });
-      
-      newStory.ObserveVariable('present_characters', (_: string, newValue: any) => {
-        const characters = newValue.toString().split(", ");
-        setSceneState(prev => ({ ...prev, presentCharacters: characters }));
-      });
-      
-      newStory.ObserveVariable('speaking_character', (_: string, newValue: string) => {
-        setSceneState(prev => ({ ...prev, speakingCharacter: newValue }));
-      });
-      
-      // Get the initial content
-      if (newStory.canContinue) {
-        const initialText = newStory.Continue().trim();
+      // Reset state if we don't have saved state
+      if (!storyState || storyState.storyContent !== storyContent) {
+        setParagraphs([]);
+        setChoices([]);
+        processedTextsRef.current.clear();
+        setCurrentKnot(null);
         
-        // Get the current path in the story
-        const path = newStory.state.currentPathString;
-        // Extract the knot name (everything before the first dot or the whole string)
-        const knotName = path ? path.split('.')[0] : 'default';
+        // Compile the story
+        const newStory = new Compiler(storyContent).Compile();
         
-        // Set initial knot state
-        setCurrentKnot(knotName);
-        setSceneState(prev => ({ ...prev, currentKnot: knotName }));
-        
-        if (initialText) {
-          setParagraphs([initialText]);
-          processedTexts.add(initialText);
+        // Set character class if available
+        if (selectedCharacter?.id) {
+          newStory.variablesState["character_class"] = selectedCharacter.id;
         }
+        
+        // Set up variable observers
+        newStory.ObserveVariable('scene_image', (_: string, newValue: string) => {
+          setSceneState(prev => ({ ...prev, image: newValue }));
+        });
+        
+        newStory.ObserveVariable('present_characters', (_: string, newValue: any) => {
+          const characters = newValue.toString().split(", ");
+          setSceneState(prev => ({ ...prev, presentCharacters: characters }));
+        });
+        
+        newStory.ObserveVariable('speaking_character', (_: string, newValue: string) => {
+          setSceneState(prev => ({ ...prev, speakingCharacter: newValue }));
+        });
+        
+        // Get the initial content
+        if (newStory.canContinue) {
+          const initialText = newStory.Continue().trim();
+          
+          // Get the current path in the story
+          const path = newStory.state.currentPathString;
+          // Extract the knot name (everything before the first dot or the whole string)
+          const knotName = path ? path.split('.')[0] : 'default';
+          
+          // Set initial knot state
+          setCurrentKnot(knotName);
+          setSceneState(prev => ({ ...prev, currentKnot: knotName }));
+          
+          if (initialText) {
+            setParagraphs([initialText]);
+            processedTextsRef.current.add(initialText);
+          }
+        }
+        
+        setStory(newStory);
+        setError('');
+        
+        // Update choices if any
+        if (newStory.currentChoices.length > 0) {
+          setChoices(newStory.currentChoices.map(choice => ({
+            text: choice.text,
+            index: choice.index
+          })));
+        }
+      } else {
+        // Restore from saved state
+        console.log("Restoring from saved state...");
+        const newStory = new Compiler(storyContent).Compile();
+        
+        // Set character class if available
+        if (selectedCharacter?.id) {
+          newStory.variablesState["character_class"] = selectedCharacter.id;
+        }
+        
+        // Set up variable observers
+        newStory.ObserveVariable('scene_image', (_: string, newValue: string) => {
+          setSceneState(prev => ({ ...prev, image: newValue }));
+        });
+        
+        newStory.ObserveVariable('present_characters', (_: string, newValue: any) => {
+          const characters = newValue.toString().split(", ");
+          setSceneState(prev => ({ ...prev, presentCharacters: characters }));
+        });
+        
+        newStory.ObserveVariable('speaking_character', (_: string, newValue: string) => {
+          setSceneState(prev => ({ ...prev, speakingCharacter: newValue }));
+        });
+        
+        // Restore story state
+        if (storyState.storyJson) {
+          newStory.state.LoadJson(storyState.storyJson);
+        }
+        
+        // Restore other state
+        setParagraphs(storyState.paragraphs || []);
+        setChoices(storyState.choices || []);
+        setSceneState(storyState.sceneState || {
+          image: 'familyLife',
+          presentCharacters: [],
+          speakingCharacter: undefined,
+          currentKnot: undefined,
+        });
+        setCurrentKnot(storyState.currentKnot || null);
+        
+        // Restore processed texts
+        if (storyState.processedTexts) {
+          processedTextsRef.current.clear();
+          storyState.processedTexts.forEach((text: string) => processedTextsRef.current.add(text));
+        }
+        
+        setStory(newStory);
+        setError('');
       }
       
-      setStory(newStory);
-      setError('');
       setIsLoading(false);
-      
-      // Update choices if any
-      if (newStory.currentChoices.length > 0) {
-        setChoices(newStory.currentChoices.map(choice => ({
-          text: choice.text,
-          index: choice.index
-        })));
-      }
     } catch (err) {
       console.error('Story compilation error:', err);
       setError('Failed to load the story. Please try again.');
       setIsLoading(false);
     }
-  }, [storyContent, selectedCharacter]);
+  }, [storyContent, selectedCharacter, storyState]);
+
+  // Save story state when component unmounts
+  useEffect(() => {
+    return () => {
+      if (story) {
+        // Clear any pending timeout
+        if (saveTimeoutRef.current) {
+          window.clearTimeout(saveTimeoutRef.current);
+          saveTimeoutRef.current = null;
+        }
+        
+        // Save directly without using setState
+        try {
+          const storyJson = story.state.ToJson();
+          const processedTextsArray = Array.from(processedTextsRef.current);
+          
+          // Use direct function call to avoid React state updates during unmount
+          const gameStore = useGameStore.getState();
+          gameStore.setStoryState({
+            storyContent,
+            storyJson,
+            paragraphs,
+            choices,
+            sceneState,
+            currentKnot,
+            processedTexts: processedTextsArray
+          });
+          
+          gameStore.saveGameState();
+        } catch (error) {
+          console.error("Error saving story state on unmount:", error);
+        }
+      }
+    };
+  }, [
+    story, 
+    storyContent, 
+    paragraphs, 
+    choices, 
+    sceneState, 
+    currentKnot
+  ]);
 
   // Scroll to bottom when new content is added
   useEffect(() => {
@@ -169,14 +315,14 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
       
       // Clear previous paragraphs and start fresh with this text
       setParagraphs([text]);
-      processedTexts.clear();
-      processedTexts.add(text);
+      processedTextsRef.current.clear();
+      processedTextsRef.current.add(text);
     } else {
       // Normal continuation within the same knot
       const text = story.Continue().trim();
       
-      if (text && !processedTexts.has(text)) {
-        processedTexts.add(text);
+      if (text && !processedTextsRef.current.has(text)) {
+        processedTextsRef.current.add(text);
         setParagraphs(prev => [...prev, text]);
       }
     }
@@ -191,8 +337,8 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
       setChoices([]);
     }
     
-    // Save game state after continuing
-    saveGameState();
+    // Request a save after state updates have settled
+    requestSave();
   };
 
   // Handle choice selection
@@ -209,9 +355,6 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     
     // Continue the story with awareness of knot changes
     continueStory();
-    
-    // Save game state after making a choice
-    saveGameState();
   };
 
   // Handle story completion
@@ -228,6 +371,9 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
         // If there's a next story, load it immediately
         setCurrentStory(nextStory.content);
         addCompletedConversation(nextStory.id);
+        
+        // Clear the story state since we're moving to a new story
+        setStoryState(null);
       } else {
         // If no next story, go to tutorial first if it's the prologue
         if (storyContent.includes('Prologue')) {
@@ -236,9 +382,13 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
           // Otherwise return to ship hub
           setScreen('ship-hub');
         }
+        
+        // Clear the story state
+        setStoryState(null);
       }
     } else {
       setScreen('ship-hub');
+      setStoryState(null);
     }
     
     if (onComplete) {

@@ -8,9 +8,17 @@ async function initStore() {
   if (store) return store;
   
   try {
-    // Use a simple try-catch approach instead of relying on isClient
-    store = new Store('.settings.dat');
-    return store;
+    // Check if we're in a Tauri environment
+    const isTauri = 'window' in globalThis && 
+                   'tauri' in window && 
+                   typeof window.tauri === 'object';
+    
+    if (isTauri) {
+      store = new Store('.settings.dat');
+      return store;
+    } else {
+      console.warn('Not in Tauri environment, using localStorage fallback');
+    }
   } catch (error) {
     console.warn('Tauri store not available, using localStorage fallback', error);
   }
@@ -58,7 +66,16 @@ const localStorageFallback = {
  */
 export async function saveGame(gameState: any): Promise<void> {
   try {
-    // Always use localStorage fallback for now since Tauri store is causing issues
+    // Try to use Tauri store first
+    const tauriStore = await initStore();
+    if (tauriStore) {
+      await tauriStore.set('astromine_gameState', gameState);
+      await tauriStore.save();
+      console.log('Game saved successfully to Tauri store');
+      return;
+    }
+    
+    // Fallback to localStorage
     await localStorageFallback.save('astromine_gameState', gameState);
     console.log('Game saved successfully to localStorage');
   } catch (error) {
@@ -72,7 +89,21 @@ export async function saveGame(gameState: any): Promise<void> {
  */
 export async function loadGame(): Promise<any | null> {
   try {
-    // Always use localStorage fallback for now
+    // Try to use Tauri store first
+    const tauriStore = await initStore();
+    if (tauriStore) {
+      const gameState = await tauriStore.get('astromine_gameState');
+      console.log('Game loaded successfully from Tauri store');
+      
+      if (!gameState) {
+        console.log('No save data found in Tauri store');
+        return null;
+      }
+      
+      return gameState;
+    }
+    
+    // Fallback to localStorage
     const gameState = await localStorageFallback.load('astromine_gameState');
     console.log('Game loaded successfully from localStorage');
     
@@ -93,7 +124,14 @@ export async function loadGame(): Promise<any | null> {
  */
 export async function hasSavedGame(): Promise<boolean> {
   try {
-    // Always use localStorage fallback for now
+    // Try to use Tauri store first
+    const tauriStore = await initStore();
+    if (tauriStore) {
+      const exists = await tauriStore.has('astromine_gameState');
+      return exists;
+    }
+    
+    // Fallback to localStorage
     return await localStorageFallback.has('astromine_gameState');
   } catch (error) {
     console.error('Failed to check for saved game:', error);
@@ -106,7 +144,16 @@ export async function hasSavedGame(): Promise<boolean> {
  */
 export async function deleteSavedGame(): Promise<boolean> {
   try {
-    // Always use localStorage fallback for now
+    // Try to use Tauri store first
+    const tauriStore = await initStore();
+    if (tauriStore) {
+      await tauriStore.delete('astromine_gameState');
+      await tauriStore.save();
+      console.log('Save data deleted successfully from Tauri store');
+      return true;
+    }
+    
+    // Fallback to localStorage
     await localStorageFallback.delete('astromine_gameState');
     console.log('Save data deleted successfully from localStorage');
     return true;
