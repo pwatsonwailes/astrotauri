@@ -1,65 +1,86 @@
-import { invoke } from '@tauri-apps/api/tauri';
-import { appDataDir } from '@tauri-apps/api/path';
-import { readTextFile, writeTextFile, exists, createDir } from '@tauri-apps/api/fs';
+import { Store } from '@tauri-apps/plugin-store';
 
-const SAVE_FILENAME = 'astromine_save.json';
+// Create a store instance for Tauri
+let store: Store | null = null;
 
-/**
- * Gets the full path to the save file
- */
-async function getSavePath(): Promise<string> {
-  const appDataDirPath = await appDataDir();
-  return `${appDataDirPath}${SAVE_FILENAME}`;
-}
-
-/**
- * Ensures the save directory exists
- */
-async function ensureSaveDirectory(): Promise<void> {
-  const appDataDirPath = await appDataDir();
+// Initialize store if in Tauri environment
+async function initStore() {
+  if (store) return store;
+  
   try {
-    const dirExists = await exists(appDataDirPath);
-    if (!dirExists) {
-      await createDir(appDataDirPath, { recursive: true });
-    }
+    // Use a simple try-catch approach instead of relying on isClient
+    store = new Store('.settings.dat');
+    return store;
   } catch (error) {
-    console.error('Failed to create save directory:', error);
-    throw error;
+    console.warn('Tauri store not available, using localStorage fallback', error);
   }
+  
+  return null;
 }
 
+// Browser localStorage fallback implementation
+const localStorageFallback = {
+  async save(key: string, data: any): Promise<void> {
+    try {
+      localStorage.setItem(key, JSON.stringify(data));
+    } catch (error) {
+      console.error('Failed to save to localStorage:', error);
+      throw error; // Re-throw to allow caller to handle
+    }
+  },
+  
+  async load(key: string): Promise<any> {
+    try {
+      const data = localStorage.getItem(key);
+      return data ? JSON.parse(data) : null;
+    } catch (error) {
+      console.error('Failed to load from localStorage:', error);
+      throw error; // Re-throw to allow caller to handle
+    }
+  },
+  
+  async delete(key: string): Promise<void> {
+    try {
+      localStorage.removeItem(key);
+    } catch (error) {
+      console.error('Failed to delete from localStorage:', error);
+      throw error; // Re-throw to allow caller to handle
+    }
+  },
+  
+  async has(key: string): Promise<boolean> {
+    return localStorage.getItem(key) !== null;
+  }
+};
+
 /**
- * Saves the game state to a file
+ * Saves the game state
  */
 export async function saveGame(gameState: any): Promise<void> {
   try {
-    await ensureSaveDirectory();
-    const savePath = await getSavePath();
-    const saveData = JSON.stringify(gameState, null, 2);
-    await writeTextFile(savePath, saveData);
-    console.log('Game saved successfully');
+    // Always use localStorage fallback for now since Tauri store is causing issues
+    await localStorageFallback.save('astromine_gameState', gameState);
+    console.log('Game saved successfully to localStorage');
   } catch (error) {
     console.error('Failed to save game:', error);
-    // Optionally show an error notification to the user
+    // Don't throw the error to prevent app crashes
   }
 }
 
 /**
- * Loads the game state from a file
+ * Loads the game state
  */
 export async function loadGame(): Promise<any | null> {
   try {
-    const savePath = await getSavePath();
-    const fileExists = await exists(savePath);
+    // Always use localStorage fallback for now
+    const gameState = await localStorageFallback.load('astromine_gameState');
+    console.log('Game loaded successfully from localStorage');
     
-    if (!fileExists) {
-      console.log('No save file found');
+    if (!gameState) {
+      console.log('No save data found');
       return null;
     }
     
-    const saveData = await readTextFile(savePath);
-    const gameState = JSON.parse(saveData);
-    console.log('Game loaded successfully');
     return gameState;
   } catch (error) {
     console.error('Failed to load game:', error);
@@ -72,8 +93,8 @@ export async function loadGame(): Promise<any | null> {
  */
 export async function hasSavedGame(): Promise<boolean> {
   try {
-    const savePath = await getSavePath();
-    return await exists(savePath);
+    // Always use localStorage fallback for now
+    return await localStorageFallback.has('astromine_gameState');
   } catch (error) {
     console.error('Failed to check for saved game:', error);
     return false;
@@ -81,22 +102,16 @@ export async function hasSavedGame(): Promise<boolean> {
 }
 
 /**
- * Deletes the saved game file
+ * Deletes the saved game data
  */
 export async function deleteSavedGame(): Promise<boolean> {
   try {
-    const savePath = await getSavePath();
-    const fileExists = await exists(savePath);
-    
-    if (fileExists) {
-      await invoke('plugin:fs|remove_file', { path: savePath });
-      console.log('Save file deleted successfully');
-      return true;
-    }
-    
-    return false;
+    // Always use localStorage fallback for now
+    await localStorageFallback.delete('astromine_gameState');
+    console.log('Save data deleted successfully from localStorage');
+    return true;
   } catch (error) {
-    console.error('Failed to delete save file:', error);
+    console.error('Failed to delete save data:', error);
     return false;
   }
 }
