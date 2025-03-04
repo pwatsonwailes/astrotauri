@@ -66,7 +66,7 @@ export const ShipHub: React.FC = () => {
     <div className="h-screen flex flex-col bg-gradient-to-br from-slate-100 to-amber-50 text-slate-800 overflow-hidden">
       {/* Fixed header */}
       <div ref={headerRef} className="flex-shrink-0 border-b border-slate-200 bg-white shadow-sm z-10">
-        <div className="max-w-7xl mx-auto px-4 py-3">
+        <div className="max-w-7xl mx-auto px-4 pt-3">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-slate-800">The Prospector</h1>
             
@@ -110,14 +110,14 @@ export const ShipHub: React.FC = () => {
           </div>
           
           {/* Location tabs */}
-          <div className="flex space-x-1 mt-3 overflow-x-auto pb-1 scrollbar-hide">
+          <div className="flex space-x-1 mt-3 overflow-x-auto scrollbar-hide">
             {locations.map((location) => (
               <button
                 key={location.id}
                 onClick={() => handleLocationChange(location.id)}
                 className={`px-3 py-2 rounded-t-lg transition-all flex items-center space-x-1 text-sm
                   ${selectedLocation === location.id
-                    ? 'bg-white text-orange-600 border-t border-l border-r border-slate-200 font-medium'
+                    ? 'bg-white text-orange-600 font-medium'
                     : 'bg-slate-100 hover:bg-slate-50 text-slate-700 hover:text-orange-600'}`}
                 aria-label={`Go to ${location.name}`}
                 aria-pressed={selectedLocation === location.id}
@@ -138,13 +138,8 @@ export const ShipHub: React.FC = () => {
         <div className="max-w-7xl mx-auto p-4 h-full">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-full">
             {/* Left column - Location content with independent scrolling */}
-            <div className="lg:col-span-2 bg-white rounded-lg shadow-md border border-slate-200 flex flex-col overflow-hidden">
-              <div className="p-4 pb-3 border-b border-slate-200 flex-shrink-0">
-                <h2 className="text-xl font-bold text-slate-800">{locations.find(l => l.id === selectedLocation)?.name}</h2>
-              </div>
-              <div className="p-4 overflow-y-auto custom-scrollbar flex-grow">
-                {renderLocationContent()}
-              </div>
+            <div className="lg:col-span-2 overflow-hidden">
+              {renderLocationContent()}
             </div>
 
             {/* Right column with independent scrolling sections */}

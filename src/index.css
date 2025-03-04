@@ -12,6 +12,7 @@
 
 html, body {
     font-family: "Lexend",Helvetica,Arial,sans-serif;
+    user-select: none;
 }
 
 .creamyBg {

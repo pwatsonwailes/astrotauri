@@ -8,7 +8,8 @@ export const IntroScreen: React.FC = () => {
   const { setScreen, loadGameState, hasExistingSave, resetGame } = useGameStore();
   const { playSound } = useSoundSystem();
   const [hasSave, setHasSave] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
     // Check if there's a saved game when the component mounts
@@ -18,6 +19,21 @@ export const IntroScreen: React.FC = () => {
     };
     
     checkForSave();
+
+    // Preload the cover image
+    const img = new Image();
+    img.src = coverImage;
+    img.onload = () => {
+      setImageLoaded(true);
+      // Add a small delay to ensure smooth transition
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
+    };
+    img.onerror = () => {
+      console.error('Failed to load cover image');
+      setIsLoading(false);
+    };
   }, [hasExistingSave]);
 
   const handleNewGame = () => {
@@ -45,9 +61,16 @@ export const IntroScreen: React.FC = () => {
     }
   };
 
+  if (isLoading || !imageLoaded) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+      </div>
+    );
+  }
+
   return (
     <div 
-      className="flex flex-col items-center justify-end min-h-screen text-white p-4 relative"
+      className="flex flex-col items-center justify-end min-h-screen text-white p-4 relative transition-opacity duration-1000 ease-in-out"
       style={{
         backgroundImage: `url(${coverImage})`,
         backgroundSize: 'cover',
@@ -55,14 +78,14 @@ export const IntroScreen: React.FC = () => {
         backgroundRepeat: 'no-repeat'
       }}
     >
-      <div className="relative z-10 mb-16 space-y-4">
+      <div className="relative z-10">
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg">
             <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
           </div>
         )}
         
-        <div className="space-y-4 introButtons flex flex-col items-center">
+        <div className="space-x-8 introButtons flex items-center">
           <button 
             onClick={handleNewGame} 
             className='shadow-black shadow-sm hover:shadow-black hover:shadow-lg w-64'

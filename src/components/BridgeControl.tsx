@@ -151,33 +151,31 @@ export const BridgeControl: React.FC = () => {
 
       {selectedMission ? (
         // Mission details view
-        <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-          <div className="p-4 bg-slate-50 border-b border-slate-200">
-            <div className="flex items-center justify-between">
-              <button 
-                onClick={() => setSelectedMission(null)}
-                className="flex items-center text-slate-600 hover:text-orange-600 transition-colors"
-              >
-                <ChevronLeft className="w-5 h-5 mr-1" />
-                <span>Back to missions</span>
-              </button>
-              <div className="flex space-x-2">
-                <span className={`px-3 py-1 rounded-full text-sm ${getTypeColor(selectedMission.type)}`}>
-                  {selectedMission.type}
-                </span>
-                <span className={`px-3 py-1 rounded-full text-sm ${getRiskLevelColor(selectedMission.riskLevel)}`}>
-                  {selectedMission.riskLevel} risk
-                </span>
-              </div>
+        <div className="overflow-hidden">
+          <div className="flex items-center justify-between">
+            <button 
+              onClick={() => setSelectedMission(null)}
+              className="flex items-center text-slate-600 hover:text-orange-600 transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5 mr-1" />
+              <span>Back to missions</span>
+            </button>
+            <div className="flex space-x-2">
+              <span className={`px-3 py-1 rounded-full text-sm ${getTypeColor(selectedMission.type)}`}>
+                {selectedMission.type}
+              </span>
+              <span className={`px-3 py-1 rounded-full text-sm ${getRiskLevelColor(selectedMission.riskLevel)}`}>
+                {selectedMission.riskLevel} risk
+              </span>
             </div>
           </div>
           
-          <div className="p-6">
+          <div className="py-6">
             <h3 className="text-xl font-bold text-slate-800 mb-2">{selectedMission.name}</h3>
             <p className="text-slate-600 mb-6">{selectedMission.description}</p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <div>
                 <h4 className="text-sm font-medium text-slate-700 mb-3">Requirements</h4>
                 <div className="flex flex-wrap gap-2">
                   {Object.entries(selectedMission.requirements).map(([key, value]) => (
@@ -195,7 +193,7 @@ export const BridgeControl: React.FC = () => {
                 </div>
               </div>
               
-              <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <div>
                 <h4 className="text-sm font-medium text-slate-700 mb-3">Rewards</h4>
                 <div className="flex flex-wrap gap-2">
                   {Object.entries(selectedMission.rewards.resources).map(([key, value]) => (
@@ -209,31 +207,6 @@ export const BridgeControl: React.FC = () => {
                 </div>
               </div>
             </div>
-            
-            {selectedCharacter && (
-              <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 mb-6">
-                <h4 className="text-sm font-medium text-slate-700 mb-3">Character Assessment</h4>
-                {(() => {
-                  const statRecommendation = getStatRecommendation(selectedMission);
-                  if (!statRecommendation) return null;
-                  
-                  return (
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-slate-600">
-                        Key Stat: <span className="font-medium">{statRecommendation.stat}</span> ({statRecommendation.value}/10)
-                      </span>
-                      <span className={`px-2 py-1 rounded text-xs
-                        ${statRecommendation.recommendation === 'Highly Suitable' ? 'bg-green-100 text-green-800' :
-                          statRecommendation.recommendation === 'Suitable' ? 'bg-amber-100 text-amber-800' :
-                          'bg-red-100 text-red-800'}`}
-                      >
-                        {statRecommendation.recommendation}
-                      </span>
-                    </div>
-                  );
-                })()}
-              </div>
-            )}
             
             <div className="flex justify-end">
               <button
