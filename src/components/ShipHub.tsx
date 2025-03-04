@@ -79,11 +79,28 @@ export const ShipHub: React.FC = () => {
       }}
       >
       {/* Fixed header */}
-      <div ref={headerRef} className="flex-shrink-0 border-b border-slate-200 bg-white/30 shadow-sm z-10">
+      <div ref={headerRef} className="flex-shrink-0 border-b border-slate-300 shadow-sm z-10">
         <div className="max-w-7xl mx-auto px-4 pt-3">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-slate-800">The Prospector</h1>
-            
+            {/* Location tabs */}
+            <div className="flex space-x-1 overflow-x-auto scrollbar-hide">
+              {locations.map((location) => (
+                <button
+                  key={location.id}
+                  onClick={() => handleLocationChange(location.id)}
+                  className={`px-3 py-4 rounded-t-lg transition-all flex items-center space-x-1 text-sm
+                    ${selectedLocation === location.id
+                      ? 'text-orange-600 font-medium'
+                      : 'text-slate-700 hover:text-orange-600'}`}
+                  aria-label={`Go to ${location.name}`}
+                  aria-pressed={selectedLocation === location.id}
+                >
+                  {location.icon}
+                  <span>{location.name}</span>
+                </button>
+              ))}
+            </div>
+
             <div className="flex items-center space-x-2 md:space-x-4">
               {/* Resource indicators */}
               <div className="flex space-x-2">
@@ -104,7 +121,7 @@ export const ShipHub: React.FC = () => {
                   <span>{resources.influence}</span>
                 </div>
               </div>
-              
+
               {/* Turn indicator and button */}
               <div className="flex items-center space-x-2">
                 <div className="flex items-center bg-amber-100 px-2 py-1 rounded-full text-amber-800 text-xs font-medium">
@@ -128,24 +145,6 @@ export const ShipHub: React.FC = () => {
             </div>
           </div>
           
-          {/* Location tabs */}
-          <div className="flex space-x-1 mt-3 overflow-x-auto scrollbar-hide">
-            {locations.map((location) => (
-              <button
-                key={location.id}
-                onClick={() => handleLocationChange(location.id)}
-                className={`px-3 py-2 rounded-t-lg transition-all flex items-center space-x-1 text-sm
-                  ${selectedLocation === location.id
-                    ? 'bg-white text-orange-600 font-medium'
-                    : 'bg-slate-100 hover:bg-slate-50 text-slate-700 hover:text-orange-600'}`}
-                aria-label={`Go to ${location.name}`}
-                aria-pressed={selectedLocation === location.id}
-              >
-                {location.icon}
-                <span>{location.name}</span>
-              </button>
-            ))}
-          </div>
         </div>
       </div>
 
