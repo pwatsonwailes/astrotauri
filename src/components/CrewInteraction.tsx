@@ -58,9 +58,9 @@ export const CrewInteraction: React.FC = () => {
           return (
             <div key={crew.id} className="space-y-4">
               <div
-                className={`bg-slate-50 rounded-lg p-4 border ${
+                className={`bg-white/50 rounded-lg p-4 border ${
                   hasStories 
-                    ? 'cursor-pointer hover:bg-orange-50 border-slate-200 hover:border-orange-200' 
+                    ? 'cursor-pointer hover:border-orange-600' 
                     : 'border-slate-200 opacity-75'
                 } transition-all`}
                 onClick={() => hasStories && setSelectedCrew(

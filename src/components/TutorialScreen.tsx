@@ -33,9 +33,8 @@ const tutorialSteps = [
     details: [
       { icon: <Map className="w-5 h-5 text-blue-600" />, name: "Mission Control", desc: "Browse and accept available missions" },
       { icon: <Users className="w-5 h-5 text-green-600" />, name: "Crew Quarters", desc: "Interact with your crew members" },
-      { icon: <Radio className="w-5 h-5 text-purple-600" />, name: "Communications", desc: "Trade resources and gather intelligence" },
+      { icon: <ShoppingBag className="w-5 h-5 text-purple-600" />, name: "Market", desc: "Trade resources and gather intelligence" },
       { icon: <Clipboard className="w-5 h-5 text-amber-600" />, name: "Engineering", desc: "Craft upgrades and tools" },
-      { icon: <ShoppingBag className="w-5 h-5 text-slate-600" />, name: "Market", desc: "Buy and sell items" }
     ],
     icon: <Map className="w-12 h-12 text-orange-600" />
   },

@@ -29,7 +29,7 @@ const TRADE_OFFERS = [
   }
 ];
 
-export const Communications: React.FC = () => {
+export const Market: React.FC = () => {
   const { resources, updateResources } = useGameStore();
 
   const canAcceptOffer = (cost: Partial<typeof resources>) => {
@@ -60,19 +60,19 @@ export const Communications: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center space-x-2 mb-4">
         <Radio className="w-5 h-5 text-slate-600" />
-        <h2 className="text-xl font-bold text-slate-800">Communications</h2>
+        <h2 className="text-xl font-bold text-slate-800">Market</h2>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         {TRADE_OFFERS.map((offer) => {
           const canAccept = canAcceptOffer(offer.cost);
 
           return (
             <div
               key={offer.id}
-              className={`bg-slate-50 rounded-lg p-6 border ${
+              className={`bg-white/50 rounded-lg p-6 border ${
                 canAccept 
-                  ? 'cursor-pointer hover:bg-orange-50 border-slate-200 hover:border-orange-200' 
+                  ? 'cursor-pointer hover:border-orange-600' 
                   : 'border-slate-200 opacity-75'
               }`}
               onClick={() => canAccept && acceptOffer(offer)}

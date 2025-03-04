@@ -2,32 +2,41 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useGameStore } from '../store/gameStore';
 import { useSoundSystem } from '../hooks/useSoundSystem';
 import { Location } from '../types/game';
-import { Map, Users, Radio, Clipboard, ShoppingBag, Clock, ChevronRight } from 'lucide-react';
-import { QuestList } from './QuestList';
-import { Inventory } from './Inventory';
-import { CraftingSystem } from './CraftingSystem';
-import { CrewInteraction } from './CrewInteraction';
+import { Map, Users, Radio, Clipboard, ShoppingBag, Clock, Package } from 'lucide-react';
 import { BridgeControl } from './BridgeControl';
-import { Communications } from './Communications';
+import { CrewInteraction } from './CrewInteraction';
+import { Market } from './Market';
+import { CraftingSystem } from './CraftingSystem';
+import { Inventory } from './Inventory';
 
-const locations: { id: Location; name: string; icon: React.ReactNode }[] = [
+import radial from '../assets/imgs/radial.jpg';
+
+const locations: { id: Location | 'cargo'; name: string; icon: React.ReactNode }[] = [
   { id: 'bridge', name: 'Missions', icon: <Map className="w-5 h-5" /> },
   { id: 'quarters', name: 'People', icon: <Users className="w-5 h-5" /> },
-  { id: 'comms', name: 'Market', icon: <ShoppingBag className="w-5 h-5" /> },
-  { id: 'engineering', name: 'Engineering', icon: <Clipboard className="w-5 h-5" /> }
+  { id: 'market', name: 'Market', icon: <ShoppingBag className="w-5 h-5" /> },
+  { id: 'engineering', name: 'Engineering', icon: <Clipboard className="w-5 h-5" /> },
+  { id: 'cargo', name: 'Cargo Hold', icon: <Package className="w-5 h-5" /> }
 ];
 
 export const ShipHub: React.FC = () => {
-  const [selectedLocation, setSelectedLocation] = useState<Location>('bridge');
-  const { resources, currentTurn, advanceTurn, selectedCharacter } = useGameStore();
+  const [selectedLocation, setSelectedLocation] = useState<Location | 'cargo'>('bridge');
+  const { resources, currentTurn, advanceTurn, activeQuests } = useGameStore();
   const { playSound } = useSoundSystem();
   const headerRef = useRef<HTMLDivElement>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
 
-  const handleLocationChange = (location: Location) => {
+  const handleLocationChange = (location: Location | 'cargo') => {
     playSound('navigation');
     setSelectedLocation(location);
   };
+
+  // Check if any missions need attention
+  const canAdvanceTurn = !activeQuests.some(quest => 
+    quest.status === 'active' && 
+    quest.turnInteractions[quest.currentTurn] && 
+    !quest.turnInteractions[quest.currentTurn].processed
+  );
 
   // Measure header height on mount and resize
   useEffect(() => {
@@ -50,22 +59,27 @@ export const ShipHub: React.FC = () => {
         return <CraftingSystem />;
       case 'quarters':
         return <CrewInteraction />;
-      case 'comms':
-        return <Communications />;
+      case 'market':
+        return <Market />;
+      case 'cargo':
+        return <Inventory />;
       default:
-        return (
-          <>
-            <h2 className="text-2xl font-bold mb-4">Location View</h2>
-            <p className="text-gray-600">Select a different location to view its content.</p>
-          </>
-        );
+        return null;
     }
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-100 to-amber-50 text-slate-800 overflow-hidden">
+    <div
+      className="h-screen flex flex-col bg-gradient-to-br from-slate-100 to-amber-50 text-slate-800 overflow-hidden"
+      style={{
+        backgroundImage: `url(${radial})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+      >
       {/* Fixed header */}
-      <div ref={headerRef} className="flex-shrink-0 border-b border-slate-200 bg-white shadow-sm z-10">
+      <div ref={headerRef} className="flex-shrink-0 border-b border-slate-200 bg-white/30 shadow-sm z-10">
         <div className="max-w-7xl mx-auto px-4 pt-3">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-slate-800">The Prospector</h1>
@@ -99,7 +113,12 @@ export const ShipHub: React.FC = () => {
                 </div>
                 <button
                   onClick={advanceTurn}
-                  className="flex items-center px-3 py-1 bg-orange-600 hover:bg-orange-700 text-white rounded transition-colors text-xs font-medium"
+                  disabled={!canAdvanceTurn}
+                  className={`flex items-center px-3 py-1 rounded transition-colors text-xs font-medium ${
+                    canAdvanceTurn
+                      ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                      : 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                  }`}
                   aria-label="Advance to next turn"
                 >
                   <Clock className="w-3 h-3 mr-1" />
@@ -130,49 +149,15 @@ export const ShipHub: React.FC = () => {
         </div>
       </div>
 
-      {/* Content area with independent scrolling columns */}
+      {/* Content area */}
       <div 
         className="flex-grow overflow-hidden"
         style={{ height: `calc(100vh - ${headerHeight}px)` }}
       >
-        <div className="max-w-7xl mx-auto p-4 h-full">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-full">
-            {/* Left column - Location content with independent scrolling */}
-            <div className="lg:col-span-2 overflow-hidden">
-              {renderLocationContent()}
-            </div>
-
-            {/* Right column with independent scrolling sections */}
-            <div className="space-y-4 h-full flex flex-col overflow-hidden">
-              {/* Active Missions section */}
-              <div className="bg-white rounded-lg shadow-md border border-slate-200 flex flex-col flex-grow overflow-hidden">
-                <div className="p-4 pb-2 border-b border-slate-200 flex-shrink-0">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-bold text-slate-800">Mission Tracker</h2>
-                    <ChevronRight className="w-4 h-4 text-slate-400" />
-                  </div>
-                </div>
-                <div className="p-4 overflow-y-auto custom-scrollbar flex-grow">
-                  <QuestList />
-                </div>
-              </div>
-              
-              {/* Inventory section */}
-              <div className="bg-white rounded-lg shadow-md border border-slate-200 flex flex-col h-1/3 overflow-hidden">
-                <div className="p-4 pb-2 border-b border-slate-200 flex-shrink-0">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-bold text-slate-800">Cargo Hold</h2>
-                    <ChevronRight className="w-4 h-4 text-slate-400" />
-                  </div>
-                </div>
-                <div className="p-4 overflow-y-auto custom-scrollbar flex-grow">
-                  <Inventory />
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="max-w-7xl mx-auto py-8 px-4 h-full">
+          {renderLocationContent()}
         </div>
       </div>
     </div>
-  )
+  );
 };

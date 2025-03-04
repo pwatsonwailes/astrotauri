@@ -141,7 +141,7 @@ export const CraftingSystem: React.FC = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         {CRAFTING_RECIPES.map((recipe) => {
           const isSelected = selectedRecipe === recipe.id;
           const craftable = canCraft(recipe);
