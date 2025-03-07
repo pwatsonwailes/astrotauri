@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Map, ChevronLeft, Cpu, Users, Shield, Zap, Navigation, AlertCircle, Package } from 'lucide-react';
+import { Map, ChevronLeft, Cpu, Users, Shield, Zap, Navigation, AlertCircle } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
-import { useStorySystem } from '../hooks/useStorySystem';
 import { Quest } from '../types/quest';
 import { AVAILABLE_QUESTS } from '../data/quests';
 
@@ -10,20 +9,10 @@ export const BridgeControl: React.FC = () => {
     resources, 
     activeQuests, 
     addQuest, 
-    setScreen, 
-    setCurrentStory, 
-    addCompletedConversation, 
     selectedCharacter, 
-    completedConversations,
     inventory 
   } = useGameStore();
-  const { getCrewStories } = useStorySystem();
   const [selectedMission, setSelectedMission] = useState<typeof AVAILABLE_QUESTS[0] | null>(null);
-
-  // Get available captain stories, excluding the Prologue
-  const captainStories = getCrewStories('captain').filter(story => 
-    story.id !== 'prologue' && !completedConversations.includes(story.id)
-  );
 
   // Get all missions, including active ones
   const allMissions = [...AVAILABLE_QUESTS].map(mission => {
@@ -104,12 +93,6 @@ export const BridgeControl: React.FC = () => {
     setSelectedMission(null);
   };
 
-  const startCaptainStory = (story: typeof captainStories[0]) => {
-    setCurrentStory(story.content);
-    setScreen('story');
-    addCompletedConversation(story.id);
-  };
-
   const getRiskLevelColor = (riskLevel: string) => {
     switch (riskLevel) {
       case 'high':
@@ -160,29 +143,8 @@ export const BridgeControl: React.FC = () => {
       {/* Left Column - Mission List */}
       <div className="overflow-auto pr-4">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-slate-800">Missions</h2>
+          <h2 className="text-xl font-bold text-slate-800">Opportunities</h2>
         </div>
-
-        {captainStories.length > 0 && (
-          <div className="bg-slate-50 rounded-lg p-6 mb-6 border border-slate-200">
-            <div className="flex items-center space-x-2 mb-4">
-              <Map className="w-5 h-5 text-blue-600" />
-              <h3 className="text-lg font-medium text-slate-800">Captain's Updates</h3>
-            </div>
-            <div className="space-y-3">
-              {captainStories.map(story => (
-                <button
-                  key={story.id}
-                  onClick={() => startCaptainStory(story)}
-                  className="w-full text-left bg-white hover:bg-orange-50 rounded-lg p-4 transition-colors border border-slate-200 hover:border-orange-200"
-                >
-                  <h4 className="font-medium text-lg mb-2 text-slate-800">{story.title}</h4>
-                  <p className="text-sm text-slate-600">The captain has important information to share.</p>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
 
         <div className="space-y-4">
           {allMissions.map((mission) => {
@@ -193,7 +155,7 @@ export const BridgeControl: React.FC = () => {
             return (
               <div
                 key={mission.id}
-                onClick={() => setSelectedMission(mission)}
+                onClick={() => setSelectedMission(selectedMission?.id === mission.id ? null : mission)}
                 className={`bg-white/70 rounded-lg p-4 cursor-pointer transition-all border relative ${
                   selectedMission?.id === mission.id 
                     ? 'border-orange-300 ring-1 ring-orange-300' 
@@ -241,7 +203,7 @@ export const BridgeControl: React.FC = () => {
           {allMissions.length === 0 && (
             <div className="text-center py-8 text-slate-500">
               <Map className="w-12 h-12 mx-auto mb-2 opacity-50 text-slate-400" />
-              <p>No missions available at this time</p>
+              <p>No opportunities available at this time</p>
               <p className="text-sm mt-2">Check back after completing current missions</p>
             </div>
           )}
@@ -303,8 +265,6 @@ export const BridgeControl: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  
-                  {/* Mission interaction UI would go here */}
                 </div>
               ) : (
                 <div className="grid grid-cols-1 gap-6 mb-6">
