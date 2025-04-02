@@ -3,8 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import { useSoundSystem } from '../hooks/useSoundSystem';
 import { backgrounds, alignments, getBaseStats } from '../data/characters';
-import { Background, Alignment, Character } from '../types/game';
-import Prologue from '../stories/main/c1/Prologue.ink?raw';
+import { Background, Alignment, PlayerCharacter } from '../types/game';
 
 import radial from '../assets/imgs/radial.jpg';
 
@@ -24,7 +23,7 @@ const StatBar: React.FC<{ value: number; label: string }> = ({ value, label }) =
 );
 
 export const CharacterSelect: React.FC = () => {
-  const { setScreen, setCharacter, setCurrentStory, addCompletedConversation } = useGameStore();
+  const { setScreen, setCharacter } = useGameStore();
   const { playSound } = useSoundSystem();
   const [selectedBackground, setSelectedBackground] = useState<Background>('smuggler');
   const [selectedAlignment, setSelectedAlignment] = useState<Alignment>('ruthless');
@@ -37,7 +36,7 @@ export const CharacterSelect: React.FC = () => {
   const stats = getBaseStats(selectedBackground);
 
   const createCharacter = () => {
-    const character: Character = {
+    const character: PlayerCharacter = {
       id: `${selectedBackground}-${selectedAlignment}`,
       avatar: '',
       name: `${alignments[selectedAlignment].name} ${backgrounds[selectedBackground].name}`,
@@ -49,9 +48,7 @@ export const CharacterSelect: React.FC = () => {
 
     playSound('select');
     setCharacter(character);
-    setCurrentStory(Prologue);
-    addCompletedConversation('Prologue');
-    setScreen('story');
+    setScreen('nexus');
   };
 
   return (

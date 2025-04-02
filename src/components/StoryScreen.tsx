@@ -3,6 +3,7 @@ import { Story } from 'inkjs/types';
 import { useGameStore } from '../store/gameStore';
 import { useStorySystem } from '../hooks/useStorySystem';
 import { useSoundSystem } from '../hooks/useSoundSystem';
+import { useNexusSystem } from '../hooks/useNexusSystem';
 import { SceneImage } from './SceneImage';
 import { SceneState } from '../types/story';
 import { StoryContent } from './story/StoryContent';
@@ -12,10 +13,9 @@ import { StoryLoader } from './story/StoryLoader';
 
 interface StoryScreenProps {
   storyContent: string;
-  onComplete?: () => void;
 }
 
-export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComplete }) => {
+export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent }) => {
   const [story, setStory] = useState<Story | null>(null);
   const [paragraphs, setParagraphs] = useState<string[]>([]);
   const [choices, setChoices] = useState<{ text: string; index: number }[]>([]);
@@ -27,15 +27,14 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     speakingCharacter: undefined,
     currentKnot: undefined,
   });
-  const [currentKnot, setCurrentKnot] = useState<string | null>(null);
 
   const { 
     setScreen, 
-    setCurrentStory, 
+    setCurrentStory,
     addCompletedConversation,
     saveGameState
   } = useGameStore();
-  const { getNextStory } = useStorySystem();
+  const { handleNodeCompletion } = useNexusSystem();
   const { playSound } = useSoundSystem();
 
   // Handle story ready
@@ -49,7 +48,6 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     if (!story) return;
     playSound('continue');
     
-    // Call the continue method on the enhanced story object
     const enhancedStory = story as Story & { continueStory?: () => void };
     if (enhancedStory.continueStory) {
       enhancedStory.continueStory();
@@ -61,13 +59,11 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     if (!story) return;
     playSound('choice');
     
-    // Call the makeChoice method on the enhanced story object
     const enhancedStory = story as Story & { makeChoice?: (index: number) => void };
     if (enhancedStory.makeChoice) {
       enhancedStory.makeChoice(index);
     }
     
-    // Save the game state after making a choice
     saveGameState();
   }, [story, playSound, saveGameState]);
 
@@ -76,44 +72,28 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     playSound('complete');
     
     if (storyContent) {
+      // Mark the story as completed in conversations
       addCompletedConversation(storyContent);
       
-      // Get the next story in sequence if one exists
-      const nextStory = getNextStory(storyContent);
-      
-      if (nextStory) {
-        // If there's a next story, load it immediately
-        setCurrentStory(nextStory.content);
-        addCompletedConversation(nextStory.id);
-      } else {
-        // If no next story, go to tutorial first if it's the prologue
-        if (storyContent.includes('Prologue')) {
-          setScreen('tutorial');
-        } else {
-          // Otherwise return to ship hub
-          setScreen('ship-hub');
-        }
+      // Get the node ID from the story content
+      let nodeId = '';
+      if (storyContent.includes('Prologue')) {
+        nodeId = 'prologue';
+      } else if (storyContent.includes('salvage-mission')) {
+        nodeId = 'salvage-mission';
       }
-    } else {
-      setScreen('ship-hub');
+      
+      // Handle node completion if we have a valid node ID
+      if (nodeId) {
+        handleNodeCompletion(nodeId);
+      }
+      
+      // Return to the nexus board
+      setScreen('nexus');
     }
     
-    if (onComplete) {
-      onComplete();
-    }
-    
-    // Save game state after completing the story
     saveGameState();
-  }, [
-    storyContent, 
-    playSound, 
-    addCompletedConversation, 
-    getNextStory, 
-    setCurrentStory, 
-    setScreen, 
-    onComplete, 
-    saveGameState
-  ]);
+  }, [storyContent, playSound, addCompletedConversation, handleNodeCompletion, setScreen, saveGameState]);
 
   return (
     <>
@@ -125,17 +105,13 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
       
       {!isLoading && !error && (
         <div className="min-h-screen creamyBg text-black flex">
-          {/* Left side - Image (2/3 width) */}
           <div className="w-2/3 h-screen relative p-4">
             <SceneImage scene={sceneState} />
           </div>
           
-          {/* Right side - Text and Controls (1/3 width) */}
           <div className="w-1/3 h-screen flex flex-col p-4">
-            {/* Scrollable text area */}
             <StoryContent paragraphs={paragraphs} />
 
-            {/* Controls */}
             <StoryControls 
               story={story}
               choices={choices}
@@ -147,14 +123,12 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
         </div>
       )}
       
-      {/* Story Engine - Logic only component */}
       <StoryEngine 
         storyContent={storyContent}
         onStoryReady={handleStoryReady}
         onParagraphsUpdate={setParagraphs}
         onChoicesUpdate={setChoices}
         onSceneUpdate={setSceneState}
-        onKnotUpdate={setCurrentKnot}
         onError={setError}
       />
     </>

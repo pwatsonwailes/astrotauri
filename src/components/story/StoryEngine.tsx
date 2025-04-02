@@ -9,7 +9,6 @@ interface StoryEngineProps {
   onParagraphsUpdate: (paragraphs: string[]) => void;
   onChoicesUpdate: (choices: { text: string; index: number }[]) => void;
   onSceneUpdate: (scene: SceneState) => void;
-  onKnotUpdate: (knot: string | null) => void;
   onError: (error: string) => void;
 }
 
@@ -19,12 +18,11 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
   onParagraphsUpdate,
   onChoicesUpdate,
   onSceneUpdate,
-  onKnotUpdate,
   onError
 }) => {
   const [story, setStory] = useState<Story | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
-  const [currentKnotState, setCurrentKnotState] = useState<string | null>(null);
+  const [currentKnot, setCurrentKnot] = useState<string | null>(null);
   const processedTextsRef = useRef(new Set<string>());
   const { selectedCharacter, storyState, setStoryState } = useGameStore();
 
@@ -38,8 +36,7 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
         onParagraphsUpdate([]);
         onChoicesUpdate([]);
         processedTextsRef.current.clear();
-        onKnotUpdate(null);
-        setCurrentKnotState(null);
+        setCurrentKnot(null);
         
         // Compile the story
         const newStory = new Compiler(storyContent).Compile();
@@ -70,11 +67,10 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
           // Get the current path in the story
           const path = newStory.state.currentPathString;
           // Extract the knot name (everything before the first dot or the whole string)
-          const knotName = path ? path.split('.')[0] : 'default';
+          const knotName = path ? path.split('.')[0] : null;
           
           // Set initial knot state
-          onKnotUpdate(knotName);
-          setCurrentKnotState(knotName);
+          setCurrentKnot(knotName);
           onSceneUpdate(prev => ({ ...prev, currentKnot: knotName }));
           
           if (initialText) {
@@ -130,8 +126,7 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
           speakingCharacter: undefined,
           currentKnot: undefined,
         });
-        onKnotUpdate(storyState.currentKnot || null);
-        setCurrentKnotState(storyState.currentKnot || null);
+        setCurrentKnot(storyState.currentKnot);
         
         // Restore processed texts
         if (storyState.processedTexts) {
@@ -156,7 +151,6 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
     onParagraphsUpdate,
     onChoicesUpdate,
     onSceneUpdate,
-    onKnotUpdate,
     onStoryReady,
     onError
   ]);
@@ -169,31 +163,26 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
           const storyJson = story.state.ToJson();
           const processedTextsArray = Array.from(processedTextsRef.current);
           
-          // Use direct function call to avoid React state updates during unmount
-          const gameStore = useGameStore.getState();
-          gameStore.setStoryState({
+          setStoryState({
             storyContent,
             storyJson,
-            paragraphs: gameStore.storyState?.paragraphs || [],
-            choices: gameStore.storyState?.choices || [],
-            sceneState: gameStore.storyState?.sceneState || {
+            paragraphs: [],
+            choices: [],
+            sceneState: {
               image: 'familyLife',
               presentCharacters: [],
               speakingCharacter: undefined,
               currentKnot: undefined,
             },
-            currentKnot: gameStore.storyState?.currentKnot || null,
+            currentKnot,
             processedTexts: processedTextsArray
           });
-          
-          // Call saveGameState directly to ensure the state is saved
-          gameStore.saveGameState();
         } catch (error) {
           console.error("Error saving story state on unmount:", error);
         }
       }
     };
-  }, [story, storyContent, setStoryState]);
+  }, [story, storyContent, currentKnot, setStoryState]);
 
   // Check if the next continuation will change the knot
   const willKnotChange = useCallback((currentStory: Story, currentKnot: string | null): boolean => {
@@ -227,7 +216,7 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
     if (!story || !story.canContinue) return;
     
     // Check if continuing will change the knot
-    const knotWillChange = willKnotChange(story, currentKnotState);
+    const knotWillChange = willKnotChange(story, currentKnot);
     
     if (knotWillChange) {
       // Get the text before we lose it
@@ -235,11 +224,10 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
       
       // Get the new knot name
       const path = story.state.currentPathString;
-      const newKnotName = path ? path.split('.')[0] : 'default';
+      const newKnotName = path ? path.split('.')[0] : null;
       
       // Update knot state
-      onKnotUpdate(newKnotName);
-      setCurrentKnotState(newKnotName);
+      setCurrentKnot(newKnotName);
       onSceneUpdate(prev => ({ ...prev, currentKnot: newKnotName }));
       
       // Clear previous paragraphs and start fresh with this text
@@ -265,45 +253,7 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
     } else {
       onChoicesUpdate([]);
     }
-    
-    // Request a save after state updates have settled
-    saveCurrentState();
-  }, [
-    story, 
-    currentKnotState, 
-    willKnotChange, 
-    onKnotUpdate, 
-    onSceneUpdate, 
-    onParagraphsUpdate, 
-    onChoicesUpdate
-  ]);
-
-  // Save current story state
-  const saveCurrentState = useCallback(() => {
-    if (!story) return;
-    
-    try {
-      const storyJson = story.state.ToJson();
-      const processedTextsArray = Array.from(processedTextsRef.current);
-      
-      setStoryState({
-        storyContent,
-        storyJson,
-        paragraphs: [],  // These will be filled by the parent component
-        choices: [],     // These will be filled by the parent component
-        sceneState: {    // This will be filled by the parent component
-          image: 'familyLife',
-          presentCharacters: [],
-          speakingCharacter: undefined,
-          currentKnot: undefined,
-        },
-        currentKnot: null, // This will be filled by the parent component
-        processedTexts: processedTextsArray
-      });
-    } catch (error) {
-      console.error("Error saving story state:", error);
-    }
-  }, [story, storyContent, setStoryState]);
+  }, [story, currentKnot, willKnotChange, onParagraphsUpdate, onChoicesUpdate, onSceneUpdate]);
 
   // Make choice
   const makeChoice = useCallback((index: number) => {

@@ -1,45 +1,51 @@
 import { create } from 'zustand';
-import { GameState, Resources, InventoryItem, ManufacturingItem } from '../types/game';
-import { Quest, QuestStatus } from '../types/quest';
-import { GAME_CONSTANTS } from '../constants/game';
-import { AVAILABLE_QUESTS } from '../data/quests';
-import { saveGame, loadGame, hasSavedGame } from '../utils/saveSystem';
+import { GameState } from '../types/game';
+import { NexusNode, NexusEdge, Character, GlossaryEntry } from '../types/nexus';
+import { saveGame, loadGame, hasSavedGame, clearAllGameData } from '../utils/saveSystem';
 
 export const useGameStore = create<GameState & {
   setScreen: (screen: GameState['currentScreen']) => void;
   setCharacter: (character: GameState['selectedCharacter']) => void;
   setStoryState: (state: any) => void;
   setCurrentStory: (story: string | null) => void;
-  updateResources: (resources: Partial<Resources>) => void;
-  addQuest: (quest: Quest) => void;
-  updateQuest: (questId: string, updates: Partial<Quest>) => void;
-  removeCompletedQuest: (questId: string) => void;
-  addInventoryItem: (item: InventoryItem) => void;
-  removeInventoryItem: (itemId: string, quantity: number) => void;
-  addManufacturingItem: (item: ManufacturingItem) => void;
-  advanceTurn: () => void;
   addCompletedConversation: (crewId: string) => void;
-  checkForSpecialEvents: () => void;
   saveGameState: () => void;
   loadGameState: () => Promise<boolean>;
   hasExistingSave: () => Promise<boolean>;
   resetGame: () => void;
+  
+  // Nexus actions
+  addNode: (node: NexusNode) => void;
+  updateNode: (nodeId: string, updates: Partial<NexusNode['data']>) => void;
+  removeNode: (nodeId: string) => void;
+  addEdge: (edge: NexusEdge) => void;
+  removeEdge: (edgeId: string) => void;
+  unlockNode: (nodeId: string) => void;
+  completeNode: (nodeId: string) => void;
+  
+  // Character actions
+  addCharacter: (character: Character) => void;
+  updateCharacter: (characterId: string, updates: Partial<Character>) => void;
+  addCharacterEvent: (characterId: string, event: string) => void;
+  
+  // Glossary actions
+  addGlossaryEntry: (entry: GlossaryEntry) => void;
+  updateGlossaryEntry: (entryId: string, updates: Partial<GlossaryEntry>) => void;
+  unlockGlossaryEntry: (entryId: string) => void;
 }>((set, get) => ({
   currentScreen: 'intro',
   selectedCharacter: null,
   storyState: null,
   currentStory: null,
-  resources: GAME_CONSTANTS.INITIAL_RESOURCES,
-  activeQuests: [],
-  inventory: [],
-  manufacturingQueue: [],
-  currentTurn: 1,
   completedConversations: [],
-  storyChoices: [], // Initialize the storyChoices array
+  storyChoices: [],
+  characters: [],
+  glossaryEntries: [],
+  nexusNodes: [],
+  nexusEdges: [],
   
   setScreen: (screen) => {
     set({ currentScreen: screen });
-    // Auto-save when changing screens
     if (screen !== 'intro') {
       get().saveGameState();
     }
@@ -59,200 +65,6 @@ export const useGameStore = create<GameState & {
     set({ currentStory: story });
     get().saveGameState();
   },
-  
-  updateResources: (resources) => {
-    set((state) => ({
-      resources: {
-        ...state.resources,
-        ...Object.entries(resources).reduce((acc, [key, value]) => ({
-          ...acc,
-          [key]: Math.max(0, (state.resources[key as keyof Resources] || 0) + (value || 0))
-        }), {})
-      }
-    }));
-    get().saveGameState();
-  },
-    
-  addQuest: (quest) => {
-    const state = get();
-    // Deduct required resources when starting a quest
-    if (quest.requirements) {
-      state.updateResources(
-        Object.entries(quest.requirements).reduce((acc, [key, value]) => ({
-          ...acc,
-          [key]: -(value || 0)
-        }), {})
-      );
-    }
-    set((state) => ({
-      activeQuests: [...state.activeQuests, quest]
-    }));
-    get().saveGameState();
-  },
-    
-  updateQuest: (questId, updates) => {
-    set((state) => {
-      const updatedQuests = state.activeQuests.map(quest => {
-        if (quest.id === questId) {
-          const updatedQuest = { ...quest, ...updates };
-          
-          // If the quest is newly completed, give rewards
-          if (updates.status === 'completed' && quest.status !== 'completed') {
-            const { updateResources } = get();
-            if (quest.rewards.resources) {
-              updateResources(quest.rewards.resources);
-            }
-          }
-          
-          return updatedQuest;
-        }
-        return quest;
-      });
-      
-      return { activeQuests: updatedQuests };
-    });
-    get().saveGameState();
-  },
-  
-  removeCompletedQuest: (questId) => {
-    set((state) => ({
-      activeQuests: state.activeQuests.filter(quest => 
-        quest.id !== questId || (quest.status !== 'completed' && quest.status !== 'failed')
-      )
-    }));
-    get().saveGameState();
-  },
-    
-  addInventoryItem: (item) => {
-    set((state) => {
-      const existingItem = state.inventory.find(i => i.id === item.id);
-      if (existingItem) {
-        return {
-          inventory: state.inventory.map(i =>
-            i.id === item.id
-              ? { ...i, quantity: i.quantity + item.quantity }
-              : i
-          )
-        };
-      }
-      return {
-        inventory: [...state.inventory, item]
-      };
-    });
-    get().saveGameState();
-  },
-    
-  removeInventoryItem: (itemId, quantity) => {
-    set((state) => ({
-      inventory: state.inventory
-        .map(item =>
-          item.id === itemId
-            ? { ...item, quantity: Math.max(0, item.quantity - quantity) }
-            : item
-        )
-        .filter(item => item.quantity > 0)
-    }));
-    get().saveGameState();
-  },
-
-  addManufacturingItem: (item) => {
-    set((state) => ({
-      manufacturingQueue: [...state.manufacturingQueue, item]
-    }));
-    get().saveGameState();
-  },
-
-  checkForSpecialEvents: () => {
-    const state = get();
-    const currentTurn = state.currentTurn;
-    
-    // Add Aharon's derelict ship mission after the first turn
-    if (currentTurn === 2) {
-      const aharonMission = AVAILABLE_QUESTS.find(q => q.id === 'AHARON_DERELICT');
-      const missionExists = state.activeQuests.some(q => q.id === 'AHARON_DERELICT');
-      
-      if (aharonMission && !missionExists) {
-        const newQuest: Quest = {
-          ...aharonMission,
-          currentTurn: 1,
-          status: 'active',
-          progress: 0,
-          cumulativeScore: 0
-        };
-        
-        set((state) => ({
-          activeQuests: [...state.activeQuests, newQuest]
-        }));
-        get().saveGameState();
-      }
-    }
-  },
-
-  advanceTurn: () => {
-    set((state) => {
-      const newTurn = state.currentTurn + 1;
-      
-      // Process manufacturing queue
-      const { completed, inProgress } = state.manufacturingQueue.reduce(
-        (acc, item) => {
-          const remainingTurns = item.turnsRemaining - 1;
-          if (remainingTurns <= 0) {
-            acc.completed.push(item);
-          } else {
-            acc.inProgress.push({ ...item, turnsRemaining: remainingTurns });
-          }
-          return acc;
-        },
-        { completed: [] as ManufacturingItem[], inProgress: [] as ManufacturingItem[] }
-      );
-
-      // Add completed items to inventory
-      completed.forEach(item => {
-        get().addInventoryItem({
-          id: item.id,
-          name: item.name,
-          description: item.description,
-          type: item.type,
-          quantity: 1
-        });
-      });
-
-      // Process quests
-      const updatedQuests = state.activeQuests.map(quest => {
-        if (quest.status === 'active') {
-          const newProgress = Math.min(100, (quest.progress || 0) + (100 / quest.duration));
-          const isComplete = newProgress >= 100;
-          
-          const updatedQuest = {
-            ...quest,
-            currentTurn: quest.currentTurn + 1,
-            progress: newProgress,
-            status: isComplete ? 'completed' as QuestStatus : 'active' as QuestStatus
-          };
-
-          // If quest is complete, give rewards
-          if (isComplete && quest.rewards.resources) {
-            get().updateResources(quest.rewards.resources);
-          }
-
-          return updatedQuest;
-        }
-        return quest;
-      });
-
-      // Check for special events after updating state
-      setTimeout(() => get().checkForSpecialEvents(), 0);
-
-      return {
-        currentTurn: newTurn,
-        manufacturingQueue: inProgress,
-        activeQuests: updatedQuests
-      };
-    });
-    
-    // Auto-save after advancing turn
-    get().saveGameState();
-  },
 
   addCompletedConversation: (crewId) => {
     set((state) => ({
@@ -261,20 +73,144 @@ export const useGameStore = create<GameState & {
     get().saveGameState();
   },
   
+  // Nexus actions
+  addNode: (node) => {
+    set((state) => ({
+      nexusNodes: [...state.nexusNodes, node]
+    }));
+    get().saveGameState();
+  },
+  
+  updateNode: (nodeId, updates) => {
+    set((state) => ({
+      nexusNodes: state.nexusNodes.map(node =>
+        node.id === nodeId
+          ? { ...node, data: { ...node.data, ...updates } }
+          : node
+      )
+    }));
+    get().saveGameState();
+  },
+  
+  removeNode: (nodeId) => {
+    set((state) => ({
+      nexusNodes: state.nexusNodes.filter(node => node.id !== nodeId),
+      nexusEdges: state.nexusEdges.filter(
+        edge => edge.source !== nodeId && edge.target !== nodeId
+      )
+    }));
+    get().saveGameState();
+  },
+  
+  addEdge: (edge) => {
+    set((state) => ({
+      nexusEdges: [...state.nexusEdges, edge]
+    }));
+    get().saveGameState();
+  },
+  
+  removeEdge: (edgeId) => {
+    set((state) => ({
+      nexusEdges: state.nexusEdges.filter(edge => edge.id !== edgeId)
+    }));
+    get().saveGameState();
+  },
+  
+  unlockNode: (nodeId) => {
+    set((state) => ({
+      nexusNodes: state.nexusNodes.map(node =>
+        node.id === nodeId
+          ? { ...node, data: { ...node.data, isLocked: false } }
+          : node
+      )
+    }));
+    get().saveGameState();
+  },
+  
+  completeNode: (nodeId) => {
+    set((state) => ({
+      nexusNodes: state.nexusNodes.map(node =>
+        node.id === nodeId
+          ? { ...node, data: { ...node.data, isCompleted: true } }
+          : node
+      )
+    }));
+    get().saveGameState();
+  },
+  
+  // Character actions
+  addCharacter: (character) => {
+    set((state) => ({
+      characters: [...state.characters, character]
+    }));
+    get().saveGameState();
+  },
+  
+  updateCharacter: (characterId, updates) => {
+    set((state) => ({
+      characters: state.characters.map(char =>
+        char.id === characterId ? { ...char, ...updates } : char
+      )
+    }));
+    get().saveGameState();
+  },
+  
+  addCharacterEvent: (characterId, event) => {
+    set((state) => ({
+      characters: state.characters.map(char =>
+        char.id === characterId
+          ? {
+              ...char,
+              history: [
+                ...char.history,
+                { timestamp: Date.now(), event }
+              ]
+            }
+          : char
+      )
+    }));
+    get().saveGameState();
+  },
+  
+  // Glossary actions
+  addGlossaryEntry: (entry) => {
+    set((state) => ({
+      glossaryEntries: [...state.glossaryEntries, entry]
+    }));
+    get().saveGameState();
+  },
+  
+  updateGlossaryEntry: (entryId, updates) => {
+    set((state) => ({
+      glossaryEntries: state.glossaryEntries.map(entry =>
+        entry.id === entryId ? { ...entry, ...updates } : entry
+      )
+    }));
+    get().saveGameState();
+  },
+  
+  unlockGlossaryEntry: (entryId) => {
+    set((state) => ({
+      glossaryEntries: state.glossaryEntries.map(entry =>
+        entry.id === entryId ? { ...entry, unlocked: true } : entry
+      )
+    }));
+    get().saveGameState();
+  },
+  
   saveGameState: () => {
     const state = get();
     const saveData = {
       selectedCharacter: state.selectedCharacter,
-      resources: state.resources,
-      activeQuests: state.activeQuests,
-      inventory: state.inventory,
-      manufacturingQueue: state.manufacturingQueue,
-      currentTurn: state.currentTurn,
       completedConversations: state.completedConversations,
       currentScreen: state.currentScreen,
       currentStory: state.currentStory,
       storyState: state.storyState,
-      storyChoices: state.storyChoices
+      storyChoices: state.storyChoices,
+      characters: state.characters,
+      glossaryEntries: state.glossaryEntries,
+      nexusNodes: state.nexusNodes,
+      nexusEdges: state.nexusEdges
     };
     
     saveGame(saveData);
@@ -287,17 +223,15 @@ export const useGameStore = create<GameState & {
       
       set({
         selectedCharacter: savedData.selectedCharacter,
-        resources: savedData.resources,
-        activeQuests: savedData.activeQuests,
-        inventory: savedData.inventory,
-        manufacturingQueue: savedData.manufacturingQueue,
-        currentTurn: savedData.currentTurn,
         completedConversations: savedData.completedConversations,
         currentStory: savedData.currentStory,
         storyState: savedData.storyState,
-        storyChoices: savedData.storyChoices || [], // Provide a default empty array if not present
-        // Restore the screen the player was on when they saved
-        currentScreen: savedData.currentScreen || 'ship-hub'
+        storyChoices: savedData.storyChoices || [],
+        currentScreen: savedData.currentScreen || 'intro',
+        characters: savedData.characters || [],
+        glossaryEntries: savedData.glossaryEntries || [],
+        nexusNodes: savedData.nexusNodes || [],
+        nexusEdges: savedData.nexusEdges || []
       });
       
       return true;
@@ -312,18 +246,18 @@ export const useGameStore = create<GameState & {
   },
   
   resetGame: () => {
+    clearAllGameData();
     set({
       currentScreen: 'intro',
       selectedCharacter: null,
       storyState: null,
       currentStory: null,
-      resources: GAME_CONSTANTS.INITIAL_RESOURCES,
-      activeQuests: [],
-      inventory: [],
-      manufacturingQueue: [],
-      currentTurn: 1,
       completedConversations: [],
-      storyChoices: []
+      storyChoices: [],
+      characters: [],
+      glossaryEntries: [],
+      nexusNodes: [],
+      nexusEdges: []
     });
   }
 }));

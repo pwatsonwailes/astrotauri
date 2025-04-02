@@ -33,7 +33,7 @@ const localStorageFallback = {
       localStorage.setItem(key, JSON.stringify(data));
     } catch (error) {
       console.error('Failed to save to localStorage:', error);
-      throw error; // Re-throw to allow caller to handle
+      throw error;
     }
   },
   
@@ -43,7 +43,7 @@ const localStorageFallback = {
       return data ? JSON.parse(data) : null;
     } catch (error) {
       console.error('Failed to load from localStorage:', error);
-      throw error; // Re-throw to allow caller to handle
+      throw error;
     }
   },
   
@@ -52,7 +52,7 @@ const localStorageFallback = {
       localStorage.removeItem(key);
     } catch (error) {
       console.error('Failed to delete from localStorage:', error);
-      throw error; // Re-throw to allow caller to handle
+      throw error;
     }
   },
   
@@ -80,7 +80,6 @@ export async function saveGame(gameState: any): Promise<void> {
     console.log('Game saved successfully to localStorage');
   } catch (error) {
     console.error('Failed to save game:', error);
-    // Don't throw the error to prevent app crashes
   }
 }
 
@@ -159,6 +158,30 @@ export async function deleteSavedGame(): Promise<boolean> {
     return true;
   } catch (error) {
     console.error('Failed to delete save data:', error);
+    return false;
+  }
+}
+
+/**
+ * Clears all game data
+ */
+export async function clearAllGameData(): Promise<boolean> {
+  try {
+    // Try to use Tauri store first
+    const tauriStore = await initStore();
+    if (tauriStore) {
+      await tauriStore.clear();
+      await tauriStore.save();
+      console.log('All game data cleared successfully from Tauri store');
+      return true;
+    }
+    
+    // Fallback to localStorage
+    localStorage.clear();
+    console.log('All game data cleared successfully from localStorage');
+    return true;
+  } catch (error) {
+    console.error('Failed to clear game data:', error);
     return false;
   }
 }

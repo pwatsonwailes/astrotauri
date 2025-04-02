@@ -3,9 +3,7 @@ import { useGameStore } from './store/gameStore';
 import { IntroScreen } from './components/IntroScreen';
 import { CharacterSelect } from './components/CharacterSelect';
 import { StoryScreen } from './components/StoryScreen';
-import { ShipHub } from './components/ShipHub';
-import { TutorialScreen } from './components/TutorialScreen';
-import { EscapeMenu } from './components/EscapeMenu';
+import { NexusBoard } from './components/nexus/NexusBoard';
 import { useEffect, useState } from 'react';
 import mainStory from './stories/main.ink?raw';
 
@@ -91,10 +89,10 @@ function App() {
             <StoryScreen storyContent={currentStory || mainStory} />
           </motion.div>
         )}
-        
-        {currentScreen === 'tutorial' && (
+
+        {currentScreen === 'nexus' && (
           <motion.div
-            key="tutorial"
+            key="nexus"
             initial="initial"
             animate="in"
             exit="out"
@@ -102,30 +100,10 @@ function App() {
             transition={pageTransition}
             className="fixed inset-0"
           >
-            <TutorialScreen />
-          </motion.div>
-        )}
-        
-        {currentScreen === 'ship-hub' && (
-          <motion.div
-            key="ship-hub"
-            initial="initial"
-            animate="in"
-            exit="out"
-            variants={pageVariants}
-            transition={pageTransition}
-            className="fixed inset-0"
-          >
-            <ShipHub />
+            <NexusBoard />
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Escape Menu */}
-      <EscapeMenu 
-        isOpen={isEscapeMenuOpen} 
-        onClose={() => setIsEscapeMenuOpen(false)} 
-      />
     </div>
   );
 }

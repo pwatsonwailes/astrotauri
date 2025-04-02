@@ -1,8 +1,6 @@
 export type StoryRequirement =
   | { type: 'initial' }
-  | { type: 'conversation'; storyId: string; turnsAfter: number }
-  | { type: 'manufacturing'; itemType: string; count: number }
-  | { type: 'quest'; questId: string; status: 'completed' | 'failed' };
+  | { type: 'conversation'; storyId: string; turnsAfter: number };
 
 export type Story = {
   id: string;
