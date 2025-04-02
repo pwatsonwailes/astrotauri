@@ -5,7 +5,6 @@ import { CharacterSelect } from './components/CharacterSelect';
 import { StoryScreen } from './components/StoryScreen';
 import { NexusBoard } from './components/nexus/NexusBoard';
 import { useEffect, useState } from 'react';
-import mainStory from './stories/main.ink?raw';
 
 const pageVariants = {
   initial: {
@@ -86,7 +85,7 @@ function App() {
             transition={pageTransition}
             className="fixed inset-0"
           >
-            <StoryScreen storyContent={currentStory || mainStory} />
+            <StoryScreen storyContent={currentStory} />
           </motion.div>
         )}
 
