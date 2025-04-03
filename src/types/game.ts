@@ -1,4 +1,5 @@
-import { Note, Conclusion, Character, Topic } from './nexus';
+import { Note, NoteStatus } from './notes';
+import { StoryDetails } from './story';
 
 export type Background = 'smuggler' | 'trader' | 'engineer' | 'pilot' | 'protection';
 
@@ -44,8 +45,8 @@ export type GameState = {
   storyState: StoryStateData | null;
   currentStory: string | null;
   completedConversations: string[];
+  playerChoices: string[];
   notes: Note[];
-  conclusions: Conclusion[];
-  characters: Character[];
-  topics: Topic[];
+  selectedStoryDetails: StoryDetails | null;
+  setSelectedStoryDetails: (details: StoryDetails | null) => void;
 };

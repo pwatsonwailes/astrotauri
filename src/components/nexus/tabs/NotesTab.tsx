@@ -1,15 +1,24 @@
 import React from 'react';
 import { useGameStore } from '../../../store/gameStore';
-import { ChevronRight } from 'lucide-react';
-import { stories } from '../../../data/stories';
+import { ChevronRight, CheckCircle2 } from 'lucide-react';
+import { significantChoices, storyNotes, storySets } from '../../../data/storyData';
+import { StoryDetails } from '../../../types/story';
 
 export const NotesTab: React.FC = () => {
-  const { notes, unlockNote, setCurrentStory, setScreen } = useGameStore();
+  const { 
+    notes, 
+    unlockNote, 
+    setCurrentStory, 
+    setScreen,
+    completedConversations,
+    selectedStoryDetails,
+    setSelectedStoryDetails
+  } = useGameStore();
 
   const handleNoteClick = (noteId: string, nextNoteId?: string) => {
     // Handle story launch for specific notes
     if (noteId === 'prologue-mission') {
-      setCurrentStory(stories.Prospector);
+      setCurrentStory(storySets.prologue.stories[1].content);
       setScreen('story');
       return;
     }
@@ -20,42 +29,50 @@ export const NotesTab: React.FC = () => {
     }
   };
 
-  return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-slate-900 mb-6">Story Notes</h2>
+  const handleStoryClick = (storyId: string) => {
+    // Find the story set containing this story
+    for (const setKey in storySets) {
+      const set = storySets[setKey];
+      const story = set.stories.find(s => s.id === storyId);
       
-      <div className="divide-y divide-gray-200">
-        {notes.map(note => (
-          <div
-            key={note.id}
-            className={`py-4 ${note.isLocked ? 'opacity-50' : ''}`}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-medium text-slate-900">
-                  {note.title}
-                </h3>
-                <p className="text-sm text-slate-500">
-                  {new Date(note.timestamp).toLocaleDateString()}
-                </p>
-              </div>
-              
-              {!note.isLocked && (note.nextNoteId || note.id === 'prologue-mission') && (
-                <button
-                  onClick={() => handleNoteClick(note.id, note.nextNoteId)}
-                  className="p-2 rounded-full hover:bg-slate-100"
-                >
-                  <ChevronRight className="w-5 h-5 text-slate-600" />
-                </button>
-              )}
-            </div>
-            
-            {!note.isLocked && (
-              <p className="mt-2 text-slate-600">{note.content}</p>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
+      if (story) {
+        const isCompleted = completedConversations.includes(storyId);
+        const details: StoryDetails = {
+          title: story.title,
+          description: story.description,
+          completedOn: isCompleted ? Date.now() : undefined
+        };
+
+        // If there's a next story and all requirements are met, include it
+        if (story.nextStoryId) {
+          const nextStory = set.stories.find(s => s.id === story.nextStoryId);
+          if (nextStory) {
+            const canAccessNext = nextStory.requiredChoices.every(choice => 
+              notes.some(note => note.id === choice && !note.isLocked)
+            );
+
+            if (canAccessNext) {
+              details.nextStory = {
+                id: nextStory.id,
+                title: nextStory.title,
+                description: nextStory.description
+              };
+            }
+          }
+        }
+
+        setSelectedStoryDetails(details);
+        
+        // If the story isn't completed, launch it
+        if (!isCompleted) {
+          setCurrentStory(story.content);
+          setScreen('story');
+        }
+        return;
+      }
+    }
+  };
+
+  // Filter notes to only show significant choices and story notes
+  const displayNotes = notes.filter(note => 
+    significan

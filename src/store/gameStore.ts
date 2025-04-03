@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { GameState } from '../types/game';
-import { NexusNode, NexusEdge, Character, GlossaryEntry } from '../types/nexus';
+import { Note, NoteStatus } from '../types/notes';
+import { StoryDetails } from '../types/story';
 import { saveGame, loadGame, hasSavedGame, clearAllGameData } from '../utils/saveSystem';
 
 export const useGameStore = create<GameState & {
@@ -14,35 +15,23 @@ export const useGameStore = create<GameState & {
   hasExistingSave: () => Promise<boolean>;
   resetGame: () => void;
   
-  // Nexus actions
-  addNode: (node: NexusNode) => void;
-  updateNode: (nodeId: string, updates: Partial<NexusNode['data']>) => void;
-  removeNode: (nodeId: string) => void;
-  addEdge: (edge: NexusEdge) => void;
-  removeEdge: (edgeId: string) => void;
-  unlockNode: (nodeId: string) => void;
-  completeNode: (nodeId: string) => void;
+  // Note actions
+  addNote: (note: Note) => void;
+  updateNote: (noteId: string, updates: Partial<Note>) => void;
+  updateNoteStatus: (noteId: string, status: NoteStatus) => void;
   
-  // Character actions
-  addCharacter: (character: Character) => void;
-  updateCharacter: (characterId: string, updates: Partial<Character>) => void;
-  addCharacterEvent: (characterId: string, event: string) => void;
-  
-  // Glossary actions
-  addGlossaryEntry: (entry: GlossaryEntry) => void;
-  updateGlossaryEntry: (entryId: string, updates: Partial<GlossaryEntry>) => void;
-  unlockGlossaryEntry: (entryId: string) => void;
+  // Player choice actions
+  addPlayerChoice: (choiceId: string) => void;
+  hasPlayerChoice: (choiceId: string) => boolean;
 }>((set, get) => ({
   currentScreen: 'intro',
   selectedCharacter: null,
   storyState: null,
   currentStory: null,
   completedConversations: [],
-  storyChoices: [],
-  characters: [],
-  glossaryEntries: [],
-  nexusNodes: [],
-  nexusEdges: [],
+  playerChoices: [],
+  notes: [],
+  selectedStoryDetails: null,
   
   setScreen: (screen) => {
     set({ currentScreen: screen });
@@ -66,6 +55,10 @@ export const useGameStore = create<GameState & {
     get().saveGameState();
   },
 
+  setSelectedStoryDetails: (details) => {
+    set({ selectedStoryDetails: details });
+  },
+
   addCompletedConversation: (crewId) => {
     set((state) => ({
       completedConversations: [...state.completedConversations, crewId]
@@ -73,129 +66,42 @@ export const useGameStore = create<GameState & {
     get().saveGameState();
   },
   
-  // Nexus actions
-  addNode: (node) => {
+  // Note actions
+  addNote: (note) => {
     set((state) => ({
-      nexusNodes: [...state.nexusNodes, node]
+      notes: [...state.notes, note]
     }));
     get().saveGameState();
   },
   
-  updateNode: (nodeId, updates) => {
+  updateNote: (noteId, updates) => {
     set((state) => ({
-      nexusNodes: state.nexusNodes.map(node =>
-        node.id === nodeId
-          ? { ...node, data: { ...node.data, ...updates } }
-          : node
+      notes: state.notes.map(note =>
+        note.id === noteId ? { ...note, ...updates } : note
       )
     }));
     get().saveGameState();
   },
   
-  removeNode: (nodeId) => {
+  updateNoteStatus: (noteId, status) => {
     set((state) => ({
-      nexusNodes: state.nexusNodes.filter(node => node.id !== nodeId),
-      nexusEdges: state.nexusEdges.filter(
-        edge => edge.source !== nodeId && edge.target !== nodeId
+      notes: state.notes.map(note =>
+        note.id === noteId ? { ...note, status } : note
       )
     }));
     get().saveGameState();
   },
   
-  addEdge: (edge) => {
+  // Player choice actions
+  addPlayerChoice: (choiceId) => {
     set((state) => ({
-      nexusEdges: [...state.nexusEdges, edge]
+      playerChoices: [...state.playerChoices, choiceId]
     }));
     get().saveGameState();
   },
   
-  removeEdge: (edgeId) => {
-    set((state) => ({
-      nexusEdges: state.nexusEdges.filter(edge => edge.id !== edgeId)
-    }));
-    get().saveGameState();
-  },
-  
-  unlockNode: (nodeId) => {
-    set((state) => ({
-      nexusNodes: state.nexusNodes.map(node =>
-        node.id === nodeId
-          ? { ...node, data: { ...node.data, isLocked: false } }
-          : node
-      )
-    }));
-    get().saveGameState();
-  },
-  
-  completeNode: (nodeId) => {
-    set((state) => ({
-      nexusNodes: state.nexusNodes.map(node =>
-        node.id === nodeId
-          ? { ...node, data: { ...node.data, isCompleted: true } }
-          : node
-      )
-    }));
-    get().saveGameState();
-  },
-  
-  // Character actions
-  addCharacter: (character) => {
-    set((state) => ({
-      characters: [...state.characters, character]
-    }));
-    get().saveGameState();
-  },
-  
-  updateCharacter: (characterId, updates) => {
-    set((state) => ({
-      characters: state.characters.map(char =>
-        char.id === characterId ? { ...char, ...updates } : char
-      )
-    }));
-    get().saveGameState();
-  },
-  
-  addCharacterEvent: (characterId, event) => {
-    set((state) => ({
-      characters: state.characters.map(char =>
-        char.id === characterId
-          ? {
-              ...char,
-              history: [
-                ...char.history,
-                { timestamp: Date.now(), event }
-              ]
-            }
-          : char
-      )
-    }));
-    get().saveGameState();
-  },
-  
-  // Glossary actions
-  addGlossaryEntry: (entry) => {
-    set((state) => ({
-      glossaryEntries: [...state.glossaryEntries, entry]
-    }));
-    get().saveGameState();
-  },
-  
-  updateGlossaryEntry: (entryId, updates) => {
-    set((state) => ({
-      glossaryEntries: state.glossaryEntries.map(entry =>
-        entry.id === entryId ? { ...entry, ...updates } : entry
-      )
-    }));
-    get().saveGameState();
-  },
-  
-  unlockGlossaryEntry: (entryId) => {
-    set((state) => ({
-      glossaryEntries: state.glossaryEntries.map(entry =>
-        entry.id === entryId ? { ...entry, unlocked: true } : entry
-      )
-    }));
-    get().saveGameState();
+  hasPlayerChoice: (choiceId) => {
+    return get().playerChoices.includes(choiceId);
   },
   
   saveGameState: () => {
@@ -206,11 +112,8 @@ export const useGameStore = create<GameState & {
       currentScreen: state.currentScreen,
       currentStory: state.currentStory,
       storyState: state.storyState,
-      storyChoices: state.storyChoices,
-      characters: state.characters,
-      glossaryEntries: state.glossaryEntries,
-      nexusNodes: state.nexusNodes,
-      nexusEdges: state.nexusEdges
+      notes: state.notes,
+      playerChoices: state.playerChoices
     };
     
     saveGame(saveData);
@@ -226,12 +129,9 @@ export const useGameStore = create<GameState & {
         completedConversations: savedData.completedConversations,
         currentStory: savedData.currentStory,
         storyState: savedData.storyState,
-        storyChoices: savedData.storyChoices || [],
         currentScreen: savedData.currentScreen || 'intro',
-        characters: savedData.characters || [],
-        glossaryEntries: savedData.glossaryEntries || [],
-        nexusNodes: savedData.nexusNodes || [],
-        nexusEdges: savedData.nexusEdges || []
+        notes: savedData.notes || [],
+        playerChoices: savedData.playerChoices || []
       });
       
       return true;
@@ -253,11 +153,9 @@ export const useGameStore = create<GameState & {
       storyState: null,
       currentStory: null,
       completedConversations: [],
-      storyChoices: [],
-      characters: [],
-      glossaryEntries: [],
-      nexusNodes: [],
-      nexusEdges: []
+      playerChoices: [],
+      notes: [],
+      selectedStoryDetails: null
     });
   }
 }));
