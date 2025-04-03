@@ -1,5 +1,4 @@
-import { SceneState } from './story';
-import { Character, GlossaryEntry, NexusNode, NexusEdge } from './nexus';
+import { Note, Conclusion, Character, Topic } from './nexus';
 
 export type Background = 'smuggler' | 'trader' | 'engineer' | 'pilot' | 'protection';
 
@@ -35,7 +34,6 @@ export type StoryStateData = {
   storyJson: string;
   paragraphs: string[];
   choices: { text: string; index: number }[];
-  sceneState: SceneState;
   currentKnot: string | null;
   processedTexts: string[];
 };
@@ -46,10 +44,8 @@ export type GameState = {
   storyState: StoryStateData | null;
   currentStory: string | null;
   completedConversations: string[];
-  storyChoices: StoryChoice[];
-  // Nexus-related state
+  notes: Note[];
+  conclusions: Conclusion[];
   characters: Character[];
-  glossaryEntries: GlossaryEntry[];
-  nexusNodes: NexusNode[];
-  nexusEdges: NexusEdge[];
+  topics: Topic[];
 };

@@ -3,7 +3,6 @@ import { Story } from 'inkjs/types';
 import { useGameStore } from '../store/gameStore';
 import { useStorySystem } from '../hooks/useStorySystem';
 import { useSoundSystem } from '../hooks/useSoundSystem';
-import { useNexusSystem } from '../hooks/useNexusSystem';
 import { SceneImage } from './SceneImage';
 import { SceneState } from '../types/story';
 import { StoryContent } from './story/StoryContent';
@@ -32,9 +31,11 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent }) => {
     setScreen, 
     setCurrentStory,
     addCompletedConversation,
+    addNote,
+    unlockNote,
+    notes,
     saveGameState
   } = useGameStore();
-  const { handleNodeCompletion } = useNexusSystem();
   const { playSound } = useSoundSystem();
 
   // Handle story ready
@@ -62,30 +63,49 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent }) => {
     const enhancedStory = story as Story & { makeChoice?: (index: number) => void };
     if (enhancedStory.makeChoice) {
       enhancedStory.makeChoice(index);
+      
+      // Add choice to notes
+      addNote({
+        id: `choice-${Date.now()}`,
+        title: 'Your Decision',
+        content: choices[index].text,
+        timestamp: Date.now(),
+        isLocked: false,
+        type: 'choice'
+      });
     }
     
     saveGameState();
-  }, [story, playSound, saveGameState]);
+  }, [story, choices, playSound, addNote, saveGameState]);
 
   // Handle story completion
   const handleStoryCompletion = useCallback(() => {
     playSound('complete');
     
     if (storyContent) {
-      // Mark the story as completed in conversations
+      // Mark the story as completed
       addCompletedConversation(storyContent);
       
-      // Get the node ID from the story content
-      let nodeId = '';
+      // Handle specific story completions
       if (storyContent.includes('Prologue')) {
-        nodeId = 'prologue';
-      } else if (storyContent.includes('salvage-mission')) {
-        nodeId = 'salvage-mission';
-      }
-      
-      // Handle node completion if we have a valid node ID
-      if (nodeId) {
-        handleNodeCompletion(nodeId);
+        // Check if the mission note already exists
+        const missionNoteExists = notes.some(note => note.id === 'prologue-mission');
+        
+        if (!missionNoteExists) {
+          // Add the mission note after prologue
+          addNote({
+            id: 'prologue-mission',
+            title: 'Mission from Aharon',
+            content: 'Aharon has a special mission for the crew of the Prospector...',
+            timestamp: Date.now(),
+            isLocked: false,
+            type: 'narrative',
+            nextNoteId: 'mission-start'
+          });
+          
+          // Unlock the mission note
+          unlockNote('prologue-mission');
+        }
       }
       
       // Return to the nexus board
@@ -93,7 +113,7 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent }) => {
     }
     
     saveGameState();
-  }, [storyContent, playSound, addCompletedConversation, handleNodeCompletion, setScreen, saveGameState]);
+  }, [storyContent, playSound, addCompletedConversation, addNote, unlockNote, notes, setScreen, saveGameState]);
 
   return (
     <>

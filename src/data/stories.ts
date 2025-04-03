@@ -38,4 +38,4 @@ export const stories = {
   jaxStory2,
   kadeStory,
   kadeStory2
-;
+}

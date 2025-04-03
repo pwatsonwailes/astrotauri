@@ -4,6 +4,7 @@ import { useGameStore } from '../store/gameStore';
 import { useSoundSystem } from '../hooks/useSoundSystem';
 import { backgrounds, alignments, getBaseStats } from '../data/characters';
 import { Background, Alignment, PlayerCharacter } from '../types/game';
+import { stories } from '../data/stories';
 
 import radial from '../assets/imgs/radial.jpg';
 
@@ -23,7 +24,7 @@ const StatBar: React.FC<{ value: number; label: string }> = ({ value, label }) =
 );
 
 export const CharacterSelect: React.FC = () => {
-  const { setScreen, setCharacter } = useGameStore();
+  const { setScreen, setCharacter, setCurrentStory, addNote } = useGameStore();
   const { playSound } = useSoundSystem();
   const [selectedBackground, setSelectedBackground] = useState<Background>('smuggler');
   const [selectedAlignment, setSelectedAlignment] = useState<Alignment>('ruthless');
@@ -48,7 +49,21 @@ export const CharacterSelect: React.FC = () => {
 
     playSound('select');
     setCharacter(character);
-    setScreen('nexus');
+    
+    // Add initial story note
+    addNote({
+      id: 'prologue-start',
+      title: 'The Beginning',
+      content: 'Your journey begins with memories of a fateful night on Ceres...',
+      timestamp: Date.now(),
+      isLocked: false,
+      type: 'narrative',
+      nextNoteId: 'prologue-mission'
+    });
+    
+    // Set the prologue as current story
+    setCurrentStory(stories.Prologue);
+    setScreen('story');
   };
 
   return (
