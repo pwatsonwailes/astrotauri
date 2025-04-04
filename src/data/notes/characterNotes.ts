@@ -58,6 +58,32 @@ export const characterNotes: NoteCollection = {
         importance: 'medium',
         sequence: 2
       }
+    },
+    {
+      id: 'meet_kade',
+      category: 'character',
+      title: 'Meeting Kade',
+      content: 'Your first discussion with the pilot.',
+      status: 'locked',
+      timestamp: Date.now(),
+      requirements: [
+        {
+          type: 'story',
+          id: 'prospector',
+          condition: 'active'
+        }
+      ],
+      actions: [
+        {
+          type: 'unlock_note',
+          target: 'kade_background'
+        }
+      ],
+      relatedCharacters: ['kade'],
+      metadata: {
+        importance: 'medium',
+        sequence: 3
+      }
     }
   ]
 };

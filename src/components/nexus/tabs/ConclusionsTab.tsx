@@ -46,6 +46,22 @@ export const ConclusionsTab: React.FC = () => {
                     <span>Belief</span>
                   </div>
                 </div>
+
+                {conclusion.relatedCharacters && conclusion.relatedCharacters.length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="text-sm font-medium text-slate-700 mb-2">Related Characters</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {conclusion.relatedCharacters.map(charId => (
+                        <span 
+                          key={charId}
+                          className="px-2 py-1 text-sm bg-slate-100 text-slate-700 rounded"
+                        >
+                          {charId}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </>
             )}
           </div>
