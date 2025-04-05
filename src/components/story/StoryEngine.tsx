@@ -22,59 +22,82 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
 }) => {
   const [story, setStory] = useState<Story | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
-  const [currentKnot, setCurrentKnot] = useState<string | null>(null);
+  const [currentKnot, setCurrentKnot] = useState<string | undefined>(undefined);
   const processedTextsRef = useRef(new Set<string>());
+  const paragraphsRef = useRef<string[]>([]);
   const { selectedCharacter, storyState, setStoryState } = useGameStore();
+  const sceneStateRef = useRef<SceneState>({
+    image: 'familyLife',
+    presentCharacters: [],
+    speakingCharacter: undefined,
+    currentKnot: undefined,
+  });
 
   // Initialize the story
   useEffect(() => {
     if (!storyContent || isInitialized) return;
     
     try {
+      // Check if story content is valid
+      if (typeof storyContent !== 'string' || storyContent.trim() === '') {
+        console.error('Invalid story content:', storyContent);
+        onError('Invalid story content. Please try again.');
+        return;
+      }
+      
       // Reset state if we don't have saved state
       if (!storyState || storyState.storyContent !== storyContent) {
         onParagraphsUpdate([]);
         onChoicesUpdate([]);
         processedTextsRef.current.clear();
-        setCurrentKnot(null);
+        paragraphsRef.current = [];
+        setCurrentKnot(undefined);
         
         // Compile the story
         const newStory = new Compiler(storyContent).Compile();
-        
-        // Set character class if available
-        if (selectedCharacter?.id) {
-          newStory.variablesState["character_class"] = selectedCharacter.id;
+        if (!newStory) {
+          onError('Failed to compile story.');
+          return;
         }
         
         // Set up variable observers
         newStory.ObserveVariable('scene_image', (_: string, newValue: string) => {
-          onSceneUpdate(prev => ({ ...prev, image: newValue }));
+          const newState = { ...sceneStateRef.current, image: newValue };
+          sceneStateRef.current = newState;
+          onSceneUpdate(newState);
         });
         
         newStory.ObserveVariable('present_characters', (_: string, newValue: any) => {
           const characters = newValue.toString().split(", ");
-          onSceneUpdate(prev => ({ ...prev, presentCharacters: characters }));
+          const newState = { ...sceneStateRef.current, presentCharacters: characters };
+          sceneStateRef.current = newState;
+          onSceneUpdate(newState);
         });
         
         newStory.ObserveVariable('speaking_character', (_: string, newValue: string) => {
-          onSceneUpdate(prev => ({ ...prev, speakingCharacter: newValue }));
+          const newState = { ...sceneStateRef.current, speakingCharacter: newValue };
+          sceneStateRef.current = newState;
+          onSceneUpdate(newState);
         });
         
         // Get the initial content
-        if (newStory.canContinue) {
+        if (newStory?.canContinue && newStory?.state) {
           const initialText = newStory.Continue().trim();
           
           // Get the current path in the story
           const path = newStory.state.currentPathString;
           // Extract the knot name (everything before the first dot or the whole string)
-          const knotName = path ? path.split('.')[0] : null;
+          const knotName = path ? path.split('.')[0] : undefined;
           
           // Set initial knot state
           setCurrentKnot(knotName);
-          onSceneUpdate(prev => ({ ...prev, currentKnot: knotName }));
+          const newState = { ...sceneStateRef.current, currentKnot: knotName };
+          sceneStateRef.current = newState;
+          onSceneUpdate(newState);
           
           if (initialText) {
-            onParagraphsUpdate([initialText]);
+            paragraphsRef.current = [initialText];
+            onParagraphsUpdate(paragraphsRef.current);
             processedTextsRef.current.add(initialText);
           }
         }
@@ -92,24 +115,29 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
       } else {
         // Restore from saved state
         const newStory = new Compiler(storyContent).Compile();
-        
-        // Set character class if available
-        if (selectedCharacter?.id) {
-          newStory.variablesState["character_class"] = selectedCharacter.id;
+        if (!newStory) {
+          onError('Failed to compile story.');
+          return;
         }
         
         // Set up variable observers
         newStory.ObserveVariable('scene_image', (_: string, newValue: string) => {
-          onSceneUpdate(prev => ({ ...prev, image: newValue }));
+          const newState = { ...sceneStateRef.current, image: newValue };
+          sceneStateRef.current = newState;
+          onSceneUpdate(newState);
         });
         
         newStory.ObserveVariable('present_characters', (_: string, newValue: any) => {
           const characters = newValue.toString().split(", ");
-          onSceneUpdate(prev => ({ ...prev, presentCharacters: characters }));
+          const newState = { ...sceneStateRef.current, presentCharacters: characters };
+          sceneStateRef.current = newState;
+          onSceneUpdate(newState);
         });
         
         newStory.ObserveVariable('speaking_character', (_: string, newValue: string) => {
-          onSceneUpdate(prev => ({ ...prev, speakingCharacter: newValue }));
+          const newState = { ...sceneStateRef.current, speakingCharacter: newValue };
+          sceneStateRef.current = newState;
+          onSceneUpdate(newState);
         });
         
         // Restore story state
@@ -118,15 +146,18 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
         }
         
         // Restore other state
-        onParagraphsUpdate(storyState.paragraphs || []);
+        paragraphsRef.current = storyState.paragraphs || [];
+        onParagraphsUpdate(paragraphsRef.current);
         onChoicesUpdate(storyState.choices || []);
-        onSceneUpdate(storyState.sceneState || {
+        const initialSceneState = {
           image: 'familyLife',
           presentCharacters: [],
           speakingCharacter: undefined,
           currentKnot: undefined,
-        });
-        setCurrentKnot(storyState.currentKnot);
+        };
+        sceneStateRef.current = initialSceneState;
+        onSceneUpdate(initialSceneState);
+        setCurrentKnot(storyState.currentKnot || undefined);
         
         // Restore processed texts
         if (storyState.processedTexts) {
@@ -166,15 +197,9 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
           setStoryState({
             storyContent,
             storyJson,
-            paragraphs: [],
+            paragraphs: paragraphsRef.current,
             choices: [],
-            sceneState: {
-              image: 'familyLife',
-              presentCharacters: [],
-              speakingCharacter: undefined,
-              currentKnot: undefined,
-            },
-            currentKnot,
+            currentKnot: currentKnot || null,
             processedTexts: processedTextsArray
           });
         } catch (error) {
@@ -185,30 +210,33 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
   }, [story, storyContent, currentKnot, setStoryState]);
 
   // Check if the next continuation will change the knot
-  const willKnotChange = useCallback((currentStory: Story, currentKnot: string | null): boolean => {
+  const willKnotChange = useCallback((currentStory: Story, currentKnot: string | undefined): boolean => {
     if (!currentStory || !currentStory.canContinue) return false;
     
     // Save current state
     const savedState = currentStory.state.ToJson();
     
     // Peek ahead by continuing and checking the path
-    currentStory.Continue();
-    const path = currentStory.state.currentPathString;
-    
-    // Handle null path
-    if (!path) {
+    if (currentStory?.state) {
+      currentStory.Continue();
+      const path = currentStory.state.currentPathString;
+      
+      // Handle null path
+      if (!path) {
+        // Restore state
+        currentStory.state.LoadJson(savedState);
+        return false;
+      }
+      
+      const newKnotName = path.split('.')[0];
+      
       // Restore state
       currentStory.state.LoadJson(savedState);
-      return false;
+      
+      // Return whether the knot will change
+      return newKnotName !== currentKnot;
     }
-    
-    const newKnotName = path.split('.')[0];
-    
-    // Restore state
-    currentStory.state.LoadJson(savedState);
-    
-    // Return whether the knot will change
-    return newKnotName !== currentKnot;
+    return false;
   }, []);
 
   // Continue the story
@@ -223,15 +251,18 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
       const text = story.Continue().trim();
       
       // Get the new knot name
-      const path = story.state.currentPathString;
-      const newKnotName = path ? path.split('.')[0] : null;
+      const path = story.state?.currentPathString;
+      const newKnotName = path ? path.split('.')[0] : undefined;
       
       // Update knot state
       setCurrentKnot(newKnotName);
-      onSceneUpdate(prev => ({ ...prev, currentKnot: newKnotName }));
+      const newState = { ...sceneStateRef.current, currentKnot: newKnotName };
+      sceneStateRef.current = newState;
+      onSceneUpdate(newState);
       
       // Clear previous paragraphs and start fresh with this text
-      onParagraphsUpdate([text]);
+      paragraphsRef.current = [text];
+      onParagraphsUpdate(paragraphsRef.current);
       processedTextsRef.current.clear();
       processedTextsRef.current.add(text);
     } else {
@@ -240,7 +271,8 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
       
       if (text && !processedTextsRef.current.has(text)) {
         processedTextsRef.current.add(text);
-        onParagraphsUpdate(prev => [...prev, text]);
+        paragraphsRef.current = [...paragraphsRef.current, text];
+        onParagraphsUpdate(paragraphsRef.current);
       }
     }
     
@@ -269,18 +301,13 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
     continueStory();
   }, [story, continueStory, onChoicesUpdate]);
 
-  // Expose methods to parent component
+  // Add methods to the story object
   useEffect(() => {
     if (story) {
-      // Add the continue method to the story object
-      const enhancedStory = story as Story & { continueStory?: () => void, makeChoice?: (index: number) => void };
-      enhancedStory.continueStory = continueStory;
-      enhancedStory.makeChoice = makeChoice;
-      
-      // The parent component can now access these methods
-      onStoryReady(enhancedStory);
+      (story as any).continueStory = continueStory;
+      (story as any).makeChoice = makeChoice;
     }
-  }, [story, continueStory, makeChoice, onStoryReady]);
+  }, [story, continueStory, makeChoice]);
 
-  return null; // This is a logic-only component, no UI
+  return null;
 };

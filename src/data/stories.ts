@@ -30,12 +30,12 @@ import jaxStory2 from '../stories/jax2.ink?raw';
 import kadeStory2 from '../stories/kade2.ink?raw';
 
 export const stories = {
-  Prologue,
-  Prospector,
-  rheaStory,
-  rheaStory2,
-  jaxStory,
-  jaxStory2,
-  kadeStory,
-  kadeStory2
+  'prologue': Prologue,
+  'prospector': Prospector,
+  'rhea': rheaStory,
+  'rhea2': rheaStory2,
+  'jax': jaxStory,
+  'jax2': jaxStory2,
+  'kade': kadeStory,
+  'kade2': kadeStory2
 }

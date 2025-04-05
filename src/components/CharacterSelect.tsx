@@ -5,6 +5,7 @@ import { useSoundSystem } from '../hooks/useSoundSystem';
 import { backgrounds, alignments, getBaseStats } from '../data/characters';
 import { Background, Alignment, PlayerCharacter } from '../types/game';
 import { stories } from '../data/stories';
+import { Note } from '../types/notes';
 
 import radial from '../assets/imgs/radial.jpg';
 
@@ -51,21 +52,33 @@ export const CharacterSelect: React.FC = () => {
     setCharacter(character);
     
     // Add initial story note
-    addNote({
+    const initialNote: Note = {
       id: 'prologue-start',
+      category: 'main_story',
       title: 'The Beginning',
       content: 'Your journey begins with memories of a fateful night on Ceres...',
+      status: 'available',
       timestamp: Date.now(),
-      isLocked: false,
-      type: 'narrative',
-      nextNoteId: 'prologue-mission'
-    });
+      requirements: [],
+      actions: [
+        {
+          type: 'unlock_note',
+          target: 'prologue-mission'
+        }
+      ],
+      metadata: {
+        importance: 'critical',
+        sequence: 1
+      }
+    };
+    
+    addNote(initialNote);
     
     // Set the prologue as current story
-    setCurrentStory(stories.Prologue);
+    setCurrentStory('prologue');
     setScreen('story');
   };
-
+  
   return (
     <div
       className="min-h-screen creamyBg text-black p-4 md:p-8 overflow-auto flex flex-col align-center justify-center"

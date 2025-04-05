@@ -5,6 +5,10 @@ import { CharacterSelect } from './components/CharacterSelect';
 import { StoryScreen } from './components/StoryScreen';
 import { NexusBoard } from './components/nexus/NexusBoard';
 import { useEffect, useState } from 'react';
+import { stories } from './data/stories';
+
+// Define the valid story IDs
+type StoryId = 'prologue' | 'prospector' | 'rhea' | 'rhea2' | 'jax' | 'jax2' | 'kade' | 'kade2';
 
 const pageVariants = {
   initial: {
@@ -29,8 +33,11 @@ const pageTransition = {
 
 function App() {
   const currentScreen = useGameStore((state) => state.currentScreen);
-  const currentStory = useGameStore((state) => state.currentStory);
+  const currentStory = useGameStore((state) => state.currentStory) as StoryId | null;
   const [isEscapeMenuOpen, setIsEscapeMenuOpen] = useState(false);
+
+  // Get the actual story content based on the current story ID
+  const storyContent = currentStory ? stories[currentStory] : null;
 
   // Handle ESC key to open the menu
   useEffect(() => {
@@ -75,7 +82,7 @@ function App() {
           </motion.div>
         )}
         
-        {currentScreen === 'story' && (
+        {currentScreen === 'story' && storyContent && (
           <motion.div
             key="story"
             initial="initial"
@@ -85,7 +92,7 @@ function App() {
             transition={pageTransition}
             className="fixed inset-0"
           >
-            <StoryScreen storyContent={currentStory} />
+            <StoryScreen storyContent={storyContent} />
           </motion.div>
         )}
 
