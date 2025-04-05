@@ -3,12 +3,14 @@ import { Story } from 'inkjs/types';
 import { useGameStore } from '../store/gameStore';
 import { useStorySystem } from '../hooks/useStorySystem';
 import { useSoundSystem } from '../hooks/useSoundSystem';
+import { useNoteSystem } from '../hooks/useNoteSystem';
 import { SceneImage } from './SceneImage';
 import { SceneState } from '../types/story';
 import { StoryContent } from './story/StoryContent';
 import { StoryControls } from './story/StoryControls';
 import { StoryEngine } from './story/StoryEngine';
 import { StoryLoader } from './story/StoryLoader';
+import { findNoteById } from '../data/notes';
 
 interface StoryScreenProps {
   storyContent: string;
@@ -37,6 +39,7 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent }) => {
     saveGameState
   } = useGameStore();
   const { playSound } = useSoundSystem();
+  const { updateNoteStatus } = useNoteSystem();
 
   // Handle story ready
   const handleStoryReady = useCallback((newStory: Story) => {
@@ -69,9 +72,13 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent }) => {
         id: `choice-${Date.now()}`,
         title: 'Your Decision',
         content: choices[index].text,
+        type: 'choice',
+        category: 'decision',
+        requirements: [],
+        actions: [],
         timestamp: Date.now(),
         isLocked: false,
-        type: 'choice'
+        status: 'available'
       });
     }
     
@@ -88,32 +95,39 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent }) => {
       
       // Handle specific story completions
       if (storyContent.includes('Prologue')) {
-        // Check if the mission note already exists
-        const missionNoteExists = notes.some(note => note.id === 'prologue-mission');
+        // Update the prologue note status to completed
+        updateNoteStatus('prologue_start', 'completed');
         
-        if (!missionNoteExists) {
-          // Add the mission note after prologue
-          addNote({
-            id: 'prologue-mission',
-            title: 'Mission from Aharon',
-            content: 'Aharon has a special mission for the crew of the Prospector...',
-            timestamp: Date.now(),
-            isLocked: false,
-            type: 'narrative',
-            nextNoteId: 'mission-start'
+        // Process note actions after completion
+        const prologueNote = findNoteById('prologue_start');
+        if (prologueNote) {
+          prologueNote.actions.forEach(action => {
+            if (action.type === 'unlock_note') {
+              unlockNote(action.target);
+              updateNoteStatus(action.target, 'available');
+            }
           });
-          
-          // Unlock the mission note
-          unlockNote('prologue-mission');
         }
       }
+      
+      // Clear current story before changing screen
+      setCurrentStory(null);
       
       // Return to the nexus board
       setScreen('nexus');
     }
     
     saveGameState();
-  }, [storyContent, playSound, addCompletedConversation, addNote, unlockNote, notes, setScreen, saveGameState]);
+  }, [
+    storyContent, 
+    playSound, 
+    addCompletedConversation, 
+    unlockNote, 
+    setScreen, 
+    setCurrentStory, 
+    saveGameState, 
+    updateNoteStatus
+  ]);
 
   return (
     <>

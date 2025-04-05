@@ -2,6 +2,8 @@ import { NoteCollection } from '../../types/notes';
 import { mainStoryNotes } from './mainStory';
 import { characterNotes } from './characterNotes';
 
+export { mainStoryNotes }; // Add explicit export
+
 export const noteCollections: NoteCollection[] = [
   mainStoryNotes,
   characterNotes

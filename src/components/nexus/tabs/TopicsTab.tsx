@@ -11,7 +11,7 @@ export const TopicsTab: React.FC = () => {
       <h2 className="text-xl font-semibold text-slate-900 mb-6">Topics</h2>
       
       <div className="divide-y divide-gray-200">
-        {topics.map((topic) => (
+        {(Array.isArray(topics) ? topics : []).map((topic) => (
           <div
             key={topic.id}
             className={`${topic.isLocked ? 'opacity-50' : ''}`}

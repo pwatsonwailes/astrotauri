@@ -43,7 +43,7 @@ export const mainStoryNotes: NoteCollection = {
       actions: [
         {
           type: 'trigger_story',
-          target: 'prospector'
+          target: 'Prospector'
         }
       ],
       metadata: {

@@ -11,7 +11,7 @@ export const CharactersTab: React.FC = () => {
       <h2 className="text-xl font-semibold text-slate-900 mb-6">Characters</h2>
       
       <div className="divide-y divide-gray-200">
-        {characters.map((character) => (
+        {(Array.isArray(characters) ? characters : []).map((character) => (
           <div
             key={character.id}
             className={`${character.isLocked ? 'opacity-50' : ''}`}

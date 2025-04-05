@@ -2,25 +2,25 @@ import { useCallback } from 'react';
 import { useGameStore } from '../store/gameStore';
 import { Note, NoteStatus } from '../types/notes';
 import { findNoteById, checkNoteRequirements, processNoteActions } from '../data/notes';
+import { noteCollections } from '../data/notes';
 
 export const useNoteSystem = () => {
   const gameState = useGameStore();
 
   const updateNoteStatus = useCallback((noteId: string, status: NoteStatus) => {
+    gameState.updateNoteStatus(noteId, status);
+    
     const note = findNoteById(noteId);
-    if (note) {
-      note.status = status;
-      if (status === 'completed') {
-        processNoteActions(note, gameState);
-      }
+    if (note && status === 'completed') {
+      processNoteActions(note, gameState);
     }
   }, [gameState]);
 
   const checkAndUnlockNotes = useCallback(() => {
     noteCollections.forEach(collection => {
       collection.notes.forEach(note => {
-        if (note.status === 'locked' && checkNoteRequirements(note, gameState)) {
-          note.status = 'available';
+        if (gameState.noteStatuses[note.id] === 'locked' && checkNoteRequirements(note, gameState)) {
+          gameState.updateNoteStatus(note.id, 'available');
         }
       });
     });
@@ -29,7 +29,10 @@ export const useNoteSystem = () => {
   const getAvailableNotes = useCallback(() => {
     return noteCollections
       .flatMap(collection => collection.notes)
-      .filter(note => note.status !== 'locked' && note.status !== 'archived')
+      .filter(note => {
+        const status = gameState.noteStatuses[note.id];
+        return status !== 'locked' && status !== 'archived';
+      })
       .sort((a, b) => {
         // Sort by importance first
         const importanceOrder = { critical: 0, high: 1, medium: 2, low: 3 };
@@ -47,7 +50,7 @@ export const useNoteSystem = () => {
         // Finally by timestamp
         return b.timestamp - a.timestamp;
       });
-  }, []);
+  }, [gameState.noteStatuses]);
 
   return {
     updateNoteStatus,

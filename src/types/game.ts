@@ -46,7 +46,9 @@ export type GameState = {
   currentStory: string | null;
   completedConversations: string[];
   playerChoices: string[];
-  notes: Note[];
+  noteStatuses: Record<string, NoteStatus>;
   selectedStoryDetails: StoryDetails | null;
-  setSelectedStoryDetails: (details: StoryDetails | null) => void;
+  characters: any[];
+  topics: any[];
+  conclusions: any[];
 };

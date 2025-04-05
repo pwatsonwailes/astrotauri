@@ -3,6 +3,7 @@ import { GameState } from '../types/game';
 import { Note, NoteStatus } from '../types/notes';
 import { StoryDetails } from '../types/story';
 import { saveGame, loadGame, hasSavedGame, clearAllGameData } from '../utils/saveSystem';
+import { noteCollections } from '../data/notes';
 
 export const useGameStore = create<GameState & {
   setScreen: (screen: GameState['currentScreen']) => void;
@@ -16,9 +17,9 @@ export const useGameStore = create<GameState & {
   resetGame: () => void;
   
   // Note actions
-  addNote: (note: Note) => void;
-  updateNote: (noteId: string, updates: Partial<Note>) => void;
   updateNoteStatus: (noteId: string, status: NoteStatus) => void;
+  unlockNote: (noteId: string) => void;
+  addNote: (note: Note) => void;
   
   // Player choice actions
   addPlayerChoice: (choiceId: string) => void;
@@ -30,8 +31,12 @@ export const useGameStore = create<GameState & {
   currentStory: null,
   completedConversations: [],
   playerChoices: [],
-  notes: [],
+  noteStatuses: {},
   selectedStoryDetails: null,
+  characters: [],
+  topics: [],
+  conclusions: [],
+  notes: [], // Add notes array to store state
   
   setScreen: (screen) => {
     set({ currentScreen: screen });
@@ -66,28 +71,29 @@ export const useGameStore = create<GameState & {
     get().saveGameState();
   },
   
-  // Note actions
-  addNote: (note) => {
+  updateNoteStatus: (noteId: string, status: NoteStatus) => {
     set((state) => ({
-      notes: [...state.notes, note]
+      noteStatuses: {
+        ...state.noteStatuses,
+        [noteId]: status
+      }
     }));
     get().saveGameState();
   },
-  
-  updateNote: (noteId, updates) => {
+
+  unlockNote: (noteId: string) => {
     set((state) => ({
-      notes: state.notes.map(note =>
-        note.id === noteId ? { ...note, ...updates } : note
-      )
+      noteStatuses: {
+        ...state.noteStatuses,
+        [noteId]: 'available'
+      }
     }));
     get().saveGameState();
   },
-  
-  updateNoteStatus: (noteId, status) => {
+
+  addNote: (note: Note) => {
     set((state) => ({
-      notes: state.notes.map(note =>
-        note.id === noteId ? { ...note, status } : note
-      )
+      notes: [...(state.notes || []), note]
     }));
     get().saveGameState();
   },
@@ -112,8 +118,12 @@ export const useGameStore = create<GameState & {
       currentScreen: state.currentScreen,
       currentStory: state.currentStory,
       storyState: state.storyState,
-      notes: state.notes,
-      playerChoices: state.playerChoices
+      noteStatuses: state.noteStatuses,
+      playerChoices: state.playerChoices,
+      characters: state.characters,
+      topics: state.topics,
+      conclusions: state.conclusions,
+      notes: state.notes
     };
     
     saveGame(saveData);
@@ -130,8 +140,12 @@ export const useGameStore = create<GameState & {
         currentStory: savedData.currentStory,
         storyState: savedData.storyState,
         currentScreen: savedData.currentScreen || 'intro',
-        notes: savedData.notes || [],
-        playerChoices: savedData.playerChoices || []
+        noteStatuses: savedData.noteStatuses || {},
+        playerChoices: savedData.playerChoices || [],
+        characters: savedData.characters || [],
+        topics: savedData.topics || [],
+        conclusions: savedData.conclusions || [],
+        notes: savedData.notes || []
       });
       
       return true;
@@ -154,8 +168,12 @@ export const useGameStore = create<GameState & {
       currentStory: null,
       completedConversations: [],
       playerChoices: [],
-      notes: [],
-      selectedStoryDetails: null
+      noteStatuses: {},
+      selectedStoryDetails: null,
+      characters: [],
+      topics: [],
+      conclusions: [],
+      notes: []
     });
   }
 }));

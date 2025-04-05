@@ -13,7 +13,7 @@ export const ConclusionsTab: React.FC = () => {
       <h2 className="text-xl font-semibold text-slate-900 mb-6">Conclusions</h2>
       
       <div className="divide-y divide-gray-200">
-        {conclusions.map(conclusion => (
+        {(conclusions || []).map(conclusion => (
           <div
             key={conclusion.id}
             className={`py-4 ${conclusion.isLocked ? 'opacity-50' : ''}`}
