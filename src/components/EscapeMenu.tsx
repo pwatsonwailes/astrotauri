@@ -38,7 +38,6 @@ export const EscapeMenu: React.FC<EscapeMenuProps> = ({ isOpen, onClose }) => {
 
   const handleMainMenu = () => {
     playSound('navigation');
-    saveGameState();
     setScreen('intro');
     onClose();
   };
