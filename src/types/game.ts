@@ -1,14 +1,6 @@
-import { Quest } from './quest';
-import { SceneState } from './story';
-
-export type Resources = {
-  credits: number;
-  materials: number;
-  tech: number;
-  influence: number;
-};
-
-export type Location = 'bridge' | 'quarters' | 'comms' | 'engineering';
+import { Note, NoteStatus } from './notes';
+import { StoryDetails } from './story';
+import { StoryWrapper } from './ink';
 
 export type Background = 'smuggler' | 'trader' | 'engineer' | 'pilot' | 'protection';
 
@@ -22,7 +14,7 @@ export type CharacterStats = {
   strategicIntelligence: number;
 };
 
-export type Character = {
+export type PlayerCharacter = {
   id: string;
   name: string;
   description: string;
@@ -30,22 +22,6 @@ export type Character = {
   background: Background;
   alignment: Alignment;
   stats: CharacterStats;
-};
-
-export type InventoryItem = {
-  id: string;
-  name: string;
-  description: string;
-  type: string;
-  quantity: number;
-};
-
-export type ManufacturingItem = {
-  id: string;
-  name: string;
-  description: string;
-  type: string;
-  turnsRemaining: number;
 };
 
 export type StoryChoice = {
@@ -60,21 +36,20 @@ export type StoryStateData = {
   storyJson: string;
   paragraphs: string[];
   choices: { text: string; index: number }[];
-  sceneState: SceneState;
   currentKnot: string | null;
   processedTexts: string[];
 };
 
 export type GameState = {
-  currentScreen: 'intro' | 'character-select' | 'story' | 'tutorial' | 'ship-hub';
-  selectedCharacter: Character | null;
-  storyState: StoryStateData | null;
+  currentScreen: 'intro' | 'character-select' | 'story' | 'dossier';
+  selectedCharacter: PlayerCharacter | null;
+  storyState: StoryWrapper | null;
   currentStory: string | null;
-  resources: Resources;
-  activeQuests: Quest[];
-  inventory: InventoryItem[];
-  manufacturingQueue: ManufacturingItem[];
-  currentTurn: number;
   completedConversations: string[];
-  storyChoices: StoryChoice[];
+  playerChoices: string[];
+  noteStatuses: Record<string, NoteStatus>;
+  selectedStoryDetails: StoryDetails | null;
+  characters: any[];
+  topics: any[];
+  conclusions: any[];
 };

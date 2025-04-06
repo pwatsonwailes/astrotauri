@@ -1,5 +1,3 @@
-import { Story } from '../types/story';
-
 import Prologue from '../stories/main/c1/Prologue.ink?raw'
 import Prospector from '../stories/main/c1/Prospector.ink?raw'
 //import CatalystEvent from '../stories/main/c1/CatalystEvent.ink?raw'
@@ -24,7 +22,6 @@ import Prospector from '../stories/main/c1/Prospector.ink?raw'
 //import SinclairsLab from '../stories/main/c1/SinclairsLab.ink?raw'
 //import TheJump from '../stories/main/c1/TheJump.ink?raw'
 
-
 import rheaStory from '../stories/rhea.ink?raw';
 import jaxStory from '../stories/jax.ink?raw';
 import kadeStory from '../stories/kade.ink?raw';
@@ -32,87 +29,13 @@ import rheaStory2 from '../stories/rhea2.ink?raw';
 import jaxStory2 from '../stories/jax2.ink?raw';
 import kadeStory2 from '../stories/kade2.ink?raw';
 
-export const stories: Story[] = [
-  // Main story progression
-  {
-    id: 'prologue',
-    crewId: 'captain',
-    title: 'Prologue',
-    content: Prologue,
-    requirements: {
-      type: 'initial'
-    }
-  },
-  {
-    id: 'prospector',
-    crewId: 'captain',
-    title: 'The Derelict Discovery',
-    content: Prospector,
-    requirements: {
-      type: 'quest',
-      questId: 'AHARON_DERELICT',
-      status: 'completed'
-    }
-  },
-  // Crew stories
-  {
-    id: 'rhea_1',
-    crewId: 'rhea',
-    title: 'Engineering Concerns',
-    content: rheaStory,
-    requirements: {
-      type: 'initial'
-    }
-  },
-  {
-    id: 'rhea_2',
-    crewId: 'rhea',
-    title: 'New Possibilities',
-    content: rheaStory2,
-    requirements: {
-      type: 'manufacturing',
-      itemType: 'upgrade',
-      count: 1
-    }
-  },
-  {
-    id: 'jax_1',
-    crewId: 'jax',
-    title: 'Security Briefing',
-    content: jaxStory,
-    requirements: {
-      type: 'initial'
-    }
-  },
-  {
-    id: 'jax_2',
-    crewId: 'jax',
-    title: 'Tactical Update',
-    content: jaxStory2,
-    requirements: {
-      type: 'conversation',
-      storyId: 'jax_1',
-      turnsAfter: 3
-    }
-  },
-  {
-    id: 'kade_1',
-    crewId: 'kade',
-    title: 'Navigation Plans',
-    content: kadeStory,
-    requirements: {
-      type: 'initial'
-    }
-  },
-  {
-    id: 'kade_2',
-    crewId: 'kade',
-    title: 'Strange Readings',
-    content: kadeStory2,
-    requirements: {
-      type: 'quest',
-      questId: 'M001',
-      status: 'completed'
-    }
-  }
-];
+export const stories = {
+  'prologue': Prologue,
+  'prospector': Prospector,
+  'rhea': rheaStory,
+  'rhea2': rheaStory2,
+  'jax': jaxStory,
+  'jax2': jaxStory2,
+  'kade': kadeStory,
+  'kade2': kadeStory2
+}

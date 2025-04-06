@@ -1,8 +1,6 @@
 export type StoryRequirement =
   | { type: 'initial' }
-  | { type: 'conversation'; storyId: string; turnsAfter: number }
-  | { type: 'manufacturing'; itemType: string; count: number }
-  | { type: 'quest'; questId: string; status: 'completed' | 'failed' };
+  | { type: 'conversation'; storyId: string; turnsAfter: number };
 
 export type Story = {
   id: string;
@@ -12,9 +10,18 @@ export type Story = {
   requirements: StoryRequirement;
 };
 
-export type SceneState = {
+export type StoryDetails = {
+  id: string;
+  title: string;
+  description: string;
   image: string;
+  requirements: StoryRequirement;
+};
+
+export interface SceneState {
+  image?: string;
   presentCharacters: string[];
   speakingCharacter?: string;
   currentKnot?: string;
-};
+  music?: string;
+}
