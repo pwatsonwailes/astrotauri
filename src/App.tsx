@@ -3,7 +3,6 @@ import { useGameStore } from './store/gameStore';
 import { IntroScreen } from './components/IntroScreen';
 import { CharacterSelect } from './components/CharacterSelect';
 import { StoryScreen } from './components/StoryScreen';
-import { ShipHub } from './components/ShipHub';
 import { TutorialScreen } from './components/TutorialScreen';
 import { EscapeMenu } from './components/EscapeMenu';
 import { useEffect, useState } from 'react';
@@ -103,20 +102,6 @@ function App() {
             className="fixed inset-0"
           >
             <TutorialScreen />
-          </motion.div>
-        )}
-        
-        {currentScreen === 'ship-hub' && (
-          <motion.div
-            key="ship-hub"
-            initial="initial"
-            animate="in"
-            exit="out"
-            variants={pageVariants}
-            transition={pageTransition}
-            className="fixed inset-0"
-          >
-            <ShipHub />
           </motion.div>
         )}
       </AnimatePresence>
