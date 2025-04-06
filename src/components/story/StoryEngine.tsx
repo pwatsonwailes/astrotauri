@@ -9,7 +9,6 @@ interface StoryEngineProps {
   onParagraphsUpdate: (paragraphs: string[]) => void;
   onChoicesUpdate: (choices: { text: string; index: number }[]) => void;
   onSceneUpdate: (scene: SceneState) => void;
-  onKnotUpdate: (knot: string | null) => void;
   onError: (error: string) => void;
 }
 
@@ -19,7 +18,6 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
   onParagraphsUpdate,
   onChoicesUpdate,
   onSceneUpdate,
-  onKnotUpdate,
   onError
 }) => {
   const [story, setStory] = useState<Story | null>(null);
@@ -38,7 +36,7 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
         onParagraphsUpdate([]);
         onChoicesUpdate([]);
         processedTextsRef.current.clear();
-        onKnotUpdate(null);
+        onSceneUpdate(prev => ({ ...prev, currentKnot: undefined }));
         setCurrentKnotState(null);
         
         // Compile the story
@@ -73,9 +71,8 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
           const knotName = path ? path.split('.')[0] : 'default';
           
           // Set initial knot state
-          onKnotUpdate(knotName);
-          setCurrentKnotState(knotName);
           onSceneUpdate(prev => ({ ...prev, currentKnot: knotName }));
+          setCurrentKnotState(knotName);
           
           if (initialText) {
             onParagraphsUpdate([initialText]);
@@ -128,9 +125,8 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
           image: 'familyLife',
           presentCharacters: [],
           speakingCharacter: undefined,
-          currentKnot: undefined,
+          currentKnot: storyState.currentKnot || null,
         });
-        onKnotUpdate(storyState.currentKnot || null);
         setCurrentKnotState(storyState.currentKnot || null);
         
         // Restore processed texts
@@ -156,7 +152,6 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
     onParagraphsUpdate,
     onChoicesUpdate,
     onSceneUpdate,
-    onKnotUpdate,
     onStoryReady,
     onError
   ]);
@@ -238,7 +233,6 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
       const newKnotName = path ? path.split('.')[0] : 'default';
       
       // Update knot state
-      onKnotUpdate(newKnotName);
       setCurrentKnotState(newKnotName);
       onSceneUpdate(prev => ({ ...prev, currentKnot: newKnotName }));
       
@@ -272,7 +266,6 @@ export const StoryEngine: React.FC<StoryEngineProps> = ({
     story, 
     currentKnotState, 
     willKnotChange, 
-    onKnotUpdate, 
     onSceneUpdate, 
     onParagraphsUpdate, 
     onChoicesUpdate

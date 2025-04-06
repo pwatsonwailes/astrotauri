@@ -19,15 +19,15 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
   const [story, setStory] = useState<Story | null>(null);
   const [paragraphs, setParagraphs] = useState<string[]>([]);
   const [choices, setChoices] = useState<{ text: string; index: number }[]>([]);
-  const [error, setError] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [sceneCharacters, setSceneCharacters] = useState<string[]>([]);
   const [sceneState, setSceneState] = useState<SceneState>({
     image: 'familyLife',
     presentCharacters: [],
     speakingCharacter: undefined,
     currentKnot: undefined,
   });
-  const [currentKnot, setCurrentKnot] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string>('');
 
   const { 
     setScreen, 
@@ -35,6 +35,7 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     addCompletedConversation,
     saveGameState
   } = useGameStore();
+
   const { getNextStory } = useStorySystem();
   const { playSound } = useSoundSystem();
 
@@ -76,7 +77,10 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
     playSound('complete');
     
     if (storyContent) {
-      addCompletedConversation(storyContent);
+      const currentStoryId = story.state.currentPathString?.split('.')[0];
+      if (currentStoryId) {
+        addCompletedConversation(currentStoryId);
+      }
       
       // Get the next story in sequence if one exists
       const nextStory = getNextStory(storyContent);
@@ -84,19 +88,16 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
       if (nextStory) {
         // If there's a next story, load it immediately
         setCurrentStory(nextStory.content);
-        addCompletedConversation(nextStory.id);
-      } else {
-        // If no next story, go to tutorial first if it's the prologue
-        if (storyContent.includes('Prologue')) {
-          setScreen('tutorial');
-        } else {
-          // Otherwise return to ship hub
-          setScreen('ship-hub');
-        }
       }
     } else {
-      setScreen('ship-hub');
+      setScreen('dossier');
     }
+
+    const handleSceneCharactersUpdate = (characters: string[]) => {
+      setSceneCharacters(characters);
+      setSceneState(prevState => ({ ...prevState, presentCharacters: characters }));
+      console.log("StoryScreen: Scene characters updated:", characters);
+    };
     
     if (onComplete) {
       onComplete();
@@ -154,7 +155,6 @@ export const StoryScreen: React.FC<StoryScreenProps> = ({ storyContent, onComple
         onParagraphsUpdate={setParagraphs}
         onChoicesUpdate={setChoices}
         onSceneUpdate={setSceneState}
-        onKnotUpdate={setCurrentKnot}
         onError={setError}
       />
     </>

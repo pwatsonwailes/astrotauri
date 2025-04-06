@@ -77,7 +77,7 @@ export async function saveGame(gameState: any): Promise<void> {
     
     // Fallback to localStorage
     await localStorageFallback.save('astromine_gameState', gameState);
-    console.log('Game saved successfully to localStorage');
+    console.log('Game saved successfully to localStorage', gameState);
   } catch (error) {
     console.error('Failed to save game:', error);
     // Don't throw the error to prevent app crashes
@@ -105,6 +105,7 @@ export async function loadGame(): Promise<any | null> {
     
     // Fallback to localStorage
     const gameState = await localStorageFallback.load('astromine_gameState');
+    console.log(gameState)
     console.log('Game loaded successfully from localStorage');
     
     if (!gameState) {

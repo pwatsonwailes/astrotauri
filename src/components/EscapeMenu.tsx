@@ -76,14 +76,6 @@ export const EscapeMenu: React.FC<EscapeMenuProps> = ({ isOpen, onClose }) => {
           </button>
           
           <button 
-            onClick={handleSaveGame}
-            className="w-full flex items-center p-4 bg-slate-50 hover:bg-orange-50 rounded-lg transition-colors border border-slate-200 hover:border-orange-200"
-          >
-            <Save className="w-5 h-5 text-slate-600 mr-3" />
-            <span className="font-medium text-slate-800">Save Game</span>
-          </button>
-          
-          <button 
             className="w-full flex items-center p-4 bg-slate-50 hover:bg-orange-50 rounded-lg transition-colors border border-slate-200 hover:border-orange-200"
           >
             <Settings className="w-5 h-5 text-slate-600 mr-3" />

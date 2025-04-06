@@ -6,10 +6,7 @@ import { Story } from '../types/story';
 export const useStorySystem = () => {
   const {
     currentTurn,
-    completedConversations,
-    manufacturingQueue,
-    inventory,
-    activeQuests
+    completedConversations
   } = useGameStore();
 
   const availableStories = useMemo(() => {
@@ -38,33 +35,13 @@ export const useStorySystem = () => {
           return turnsSinceCompletion >= req.turnsAfter;
         }
 
-        case 'manufacturing': {
-          // Count completed items of the required type
-          const completedCount = inventory.filter(
-            item => item.type === req.itemType
-          ).length;
-          const queueCount = manufacturingQueue.filter(
-            item => item.type === req.itemType
-          ).length;
-          return (completedCount + queueCount) >= req.count;
-        }
-
-        case 'quest': {
-          // Check if the specified quest has the required status
-          const quest = activeQuests.find(q => q.id === req.questId);
-          return quest?.status === req.status;
-        }
-
         default:
           return false;
       }
     });
   }, [
     currentTurn,
-    completedConversations,
-    manufacturingQueue,
-    inventory,
-    activeQuests
+    completedConversations
   ]);
 
   const getCrewStories = (crewId: string): Story[] => {
